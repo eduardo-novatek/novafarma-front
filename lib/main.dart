@@ -5,16 +5,16 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'NovaFarma',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.deepPurple,
+        primarySwatch: Colors.grey,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.lightBlueAccent,
         ),
       ),
       home: const MyHomePage(title: 'NovaFarma'),
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
   final String title;
 
   @override
@@ -33,14 +33,14 @@ class MyHomePage extends StatelessWidget {
         title: Text(title),
         leading: IconButton(
           onPressed: () => _openMenu(context),
-          icon: Icon(Icons.menu),
+          icon: const Icon(Icons.menu),
           tooltip: 'Menu',
         ),
       ),
-      body: Center(
+      body: const Center(
         child: Text(
           'Bienvenido a NovaFarma',
-          style: TextStyle(fontSize: 24),
+          style: TextStyle(fontSize: 24, color: Colors.black12),
         ),
       ),
     );
@@ -48,11 +48,11 @@ class MyHomePage extends StatelessWidget {
 
   void _openMenu(BuildContext context) {
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero), ancestor: overlay),
+        button.localToGlobal(const Offset(0, kToolbarHeight), ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(const Offset(0, kToolbarHeight)), ancestor: overlay),
       ),
       Offset.zero & overlay.size,
     );
@@ -60,29 +60,25 @@ class MyHomePage extends StatelessWidget {
       context: context,
       position: position,
       items: [
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'Comprobantes de venta',
-          child: const Text('Comprobantes de venta'),
+          child: Text('Comprobantes de venta'),
         ),
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'Clientes',
-          child: const Text('Clientes'),
+          child: Text('Clientes'),
         ),
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'Proveedores',
-          child: const Text('Proveedores'),
+          child: Text('Proveedores'),
         ),
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'Medicamentos',
-          child: const Text('Medicamentos'),
+          child: Text('Medicamentos'),
         ),
-        PopupMenuItem<String>(
-          value: 'Usuarios',
-          child: const Text('Usuarios'),
-        ),
-        PopupMenuItem<String>(
-          value: 'Roles',
-          child: const Text('Roles'),
+        const PopupMenuItem<String>(
+          value: 'Usuarios y Roles',
+          child: Text('Usuarios y Roles'),
         ),
       ],
       elevation: 8.0,
@@ -97,10 +93,8 @@ class MyHomePage extends StatelessWidget {
           // Acción para "Proveedores"
         } else if (result == 'Medicamentos') {
           // Acción para "Medicamentos"
-        } else if (result == 'Usuarios') {
+        } else if (result == 'Usuarios y Roles') {
           // Acción para "Usuarios"
-        } else if (result == 'Roles') {
-          // Acción para "Roles"
         }
       }
     });
