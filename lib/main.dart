@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+//import 'package:novafarma_front/view/screens.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,33 +23,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
   final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  Widget _currentWidget = Container(); // Widget inicial
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
         leading: IconButton(
           onPressed: () => _openMenu(context),
           icon: const Icon(Icons.menu),
           tooltip: 'Menu',
         ),
       ),
-      body: const Center(
-        child: Text(
-          'Bienvenido a NovaFarma',
-          style: TextStyle(fontSize: 24, color: Colors.black12),
-        ),
+      body: Center(
+        child: _currentWidget, // Mostrar el widget actual
       ),
     );
   }
 
   void _openMenu(BuildContext context) {
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(const Offset(0, kToolbarHeight), ancestor: overlay),
@@ -84,19 +89,38 @@ class MyHomePage extends StatelessWidget {
       elevation: 8.0,
     ).then((String? result) {
       if (result != null) {
-        // Implementa lo que deseas que haga cada opción del menú aquí
-        if (result == 'Comprobantes de venta') {
-          // Acción para "Comprobantes de venta"
-        } else if (result == 'Clientes') {
-          // Acción para "Clientes"
-        } else if (result == 'Proveedores') {
-          // Acción para "Proveedores"
-        } else if (result == 'Medicamentos') {
-          // Acción para "Medicamentos"
-        } else if (result == 'Usuarios y Roles') {
-          // Acción para "Usuarios"
+        if (result == 'Usuarios y Roles') {
+          setState(() {
+            _currentWidget = _buildUsersAndRolesWidget(); // Actualizar el widget actual
+          });
+        } else {
+          // manejar las otras opciones del menú
         }
       }
     });
+  }
+
+  Widget _buildUsersAndRolesWidget() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: const UsersAndRoles(),
+    );
+  }
+}
+
+class UsersAndRoles extends StatelessWidget {
+  const UsersAndRoles({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'Contenido de Usuarios y Roles',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
   }
 }
