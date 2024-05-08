@@ -39,33 +39,57 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ),
       Offset.zero & overlay.size,
     );
+
     showMenu<String>(
       context: context,
       position: position,
       items: [
         const PopupMenuItem<String>(
           value: 'vouchers',
-          child: Text('Comprobantes'),
+          child: ListTile(
+            leading: Icon(Icons.receipt),
+            title: Text('Comprobantes', style: TextStyle(fontSize: 17.0)),
+          ),
         ),
+
         const PopupMenuItem<String>(
           value: 'customers',
-          child: Text('Clientes'),
+          child: ListTile(
+            leading: Icon(Icons.person),
+            title: Text('Clientes', style: TextStyle(fontSize: 17.0)),
+          ),
         ),
+
         const PopupMenuItem<String>(
           value: 'suppliers',
-          child: Text('Proveedores'),
+          child: ListTile(
+            leading: Icon(Icons.store),
+            title: Text('Proveedores', style: TextStyle(fontSize: 17.0)),
+          ),
         ),
+
         const PopupMenuItem<String>(
           value: 'medicines',
-          child: Text('Medicamentos'),
+          child: ListTile(
+            leading: Icon(Icons.local_pharmacy),
+            title: Text('Medicamentos', style: TextStyle(fontSize: 17.0)),
+          ),
         ),
+
         const PopupMenuItem<String>(
           value: 'balances',
-          child: Text('Balances'),
+          child: ListTile(
+            leading: Icon(Icons.note_alt_sharp),
+            title: Text('Balances', style: TextStyle(fontSize: 17.0)),
+          ),
         ),
+
         const PopupMenuItem<String>(
           value: 'users and roles',
-          child: Text('Usuarios y Roles'),
+          child: ListTile(
+            leading: Icon(Icons.people),
+            title: Text('Usuarios y roles', style: TextStyle(fontSize: 17.0)),
+          ),
         ),
       ],
       elevation: 8.0,
