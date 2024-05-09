@@ -23,16 +23,16 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(18.0),
                     topRight: Radius.circular(18.0),
                   ),
                   child: Container(
                     color: Colors.blue, // Color de fondo del título
                     padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Container 1', // Título del contenedor 1
-                      style: TextStyle(color: Colors.white),
+                    child: const Text(
+                      'Roles', // Título del contenedor 1
+                      style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ),
                 ),
@@ -54,16 +54,16 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(18.0),
                     topRight: Radius.circular(18.0),
                   ),
                   child: Container(
                     color: Colors.green, // Color de fondo del título
                     padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Container 2', // Título del contenedor 2
-                      style: TextStyle(color: Colors.white),
+                    child: const Text(
+                      'Usuarios', // Título del contenedor 2
+                      style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ),
                 ),
