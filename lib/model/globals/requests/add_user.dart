@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
-import 'package:pf_care_front/model/enums/role_enum.dart';
-import 'package:pf_care_front/model/globals/constants.dart'
+import 'package:novafarma_front/model/enums/role_enum.dart';
+import 'package:novafarma_front/model/globals/constants.dart'
     show socket, uriUsersAdd, timeOutSecondsResponse;
 
 Future<(bool, String?)> addUser({

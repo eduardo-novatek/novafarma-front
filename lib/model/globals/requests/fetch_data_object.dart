@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:pf_care_front/model/globals/constants.dart'
-    show socket, timeOutSecondsResponse, uriDonationsPlatformHost,
-          uriDonationsPlatformPath;
-import 'package:pf_care_front/model/globals/deserializable.dart';
+import 'package:novafarma_front/model/globals/constants.dart'
+    show socket, timeOutSecondsResponse;
+import 'package:novafarma_front/model/globals/deserializable.dart';
 
 import '../../enums/request_type_enum.dart';
 
@@ -16,18 +15,13 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
   required T classObject,
   RequestTypeEnum? requestType = RequestTypeEnum.get,
   Object? body,
-  bool isDonationPlatform = false, //Si es una consulta para Plataforma de Donaciones
-  String? neighborhoodName,
-  String? cityName,
-  String? departmentName,
-  String? countryName,
 }) async {
 
-  String _host = socket;
-  String _path = uri;
-  Uri url;
+  //String _host = socket;
+  //String _path = uri;
+  Uri url = Uri.parse('$socket$uri');
 
-  if (! isDonationPlatform) {
+  /*if (! isDonationPlatform) {
     if (neighborhoodName != null) _path = "$_path/$neighborhoodName";
     if (cityName != null) _path = "$_path/$cityName";
     if (departmentName != null) _path = "$_path/$departmentName";
@@ -38,23 +32,11 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
     _host = uriDonationsPlatformHost;
     _path = uriDonationsPlatformPath;
     url = Uri.parse('$_host$_path');
-  }
+  }*/
 
   Response response;
   try {
     if (requestType == RequestTypeEnum.post) {
-      if (isDonationPlatform) {
-        response = await http.post(
-            url,
-            body: json.encode(body),
-            headers:
-            {
-              "Authorization": "Token ac18731744ff6393c02accdf1fecb3c29901faf0",
-              "Content-Type": "application/json; charset=UTF-8",
-            }
-        ).timeout(const Duration(seconds: timeOutSecondsResponse));
-
-      } else {
         response = await http.post(
             url,
             body: json.encode(body),
@@ -63,7 +45,6 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
               "Content-Type": "application/json; charset=UTF-8",
             }
         ).timeout(const Duration(seconds: timeOutSecondsResponse));
-      }
 
     } else if (requestType == RequestTypeEnum.put) {
       response = await http.put(
@@ -86,8 +67,8 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
         //La línea que usa utf8.decode podría ser ligeramente más segura si
         // existe la posibilidad de que la respuesta no esté codificada en UTF-8,
         // pero en la mayoría de los casos, ambos enfoques son intercambiables.
-        //Se implementó para compatibilidad con "Plataforma de Donaciones".
-        dynamic decodedData = json.decode(utf8.decode(response.bodyBytes));
+        //dynamic decodedData = json.decode(utf8.decode(response.bodyBytes));
+        dynamic decodedData = json.decode(response.body);
 
         if (decodedData is List) {
           return decodedData.map((item) => classObject.fromJson(item)).toList();

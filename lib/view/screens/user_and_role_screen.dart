@@ -1,13 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/RoleDTO.dart';
+import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
+import 'package:novafarma_front/model/globals/constants.dart' show
+  uriRoleFindAll;
 
 class UserAndRoleScreen extends StatefulWidget {
   const UserAndRoleScreen({super.key});
 
   @override
-  State<UserAndRoleScreen> createState() => _UserAndRoleScreenState();
+  _UserAndRoleScreenState createState() => _UserAndRoleScreenState();
 }
 
 class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
+  late List<RoleDTO> _roles = List.empty();
+  bool _loadingRoles = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRoles();
+  }
+
+  Future<void> _fetchRoles() async {
+    setState(() {
+      _loadingRoles = true;
+    });
+
+    try {
+      List<RoleDTO> roles = (await fetchDataObject<RoleDTO>(
+        uri: uriRoleFindAll,
+        classObject: RoleDTO.empty(),
+      )) as List<RoleDTO>;
+
+      setState(() {
+        _roles = roles;
+        _loadingRoles = false;
+      });
+    } catch (e) {
+      setState(() {
+        _loadingRoles = false;
+      });
+      // Manejar el error
+    }
+  }
+
   Widget buildContainer(String title, IconData icon) {
     return Expanded(
       child: Container(
@@ -41,9 +77,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                       ],
                     ),
                     IconButton(
-                      onPressed: () {
-                        // Acción para refrescar
-                      },
+                      onPressed: _fetchRoles,
                       icon: const Icon(Icons.refresh),
                       color: Colors.white,
                     ),
@@ -52,8 +86,19 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
               ),
             ),
             const SizedBox(height: 10), // Espacio entre el título y la lista de elementos
-            // Aquí puedes agregar la lista de elementos para el contenedor
-            Expanded(child: Container()), // Espacio entre la lista de elementos y los botones
+            _loadingRoles
+                ? Center(child: CircularProgressIndicator())
+                : Expanded(
+              child: ListView.builder(
+                itemCount: _roles.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(_roles[index].name),
+                    // Otros detalles del rol, si los hay
+                  );
+                },
+              ),
+            ),
             Container(
               height: 40, // Altura de la barra de botones
               decoration: BoxDecoration(
