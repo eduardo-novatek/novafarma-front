@@ -1,6 +1,6 @@
 //const String socket = "192.168.1.8:8080";       //casa
 //const String socket = "192.168.43.203:8080";    //celu
-const String socket = "127.0.0.1:8080";           // server jorge
+const String socket = 'localhost:8080';           //server jorge
 
 const int timeOutSecondsResponse = 30;
 

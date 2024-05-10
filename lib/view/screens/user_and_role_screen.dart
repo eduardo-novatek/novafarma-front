@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/RoleDTO.dart';
+import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll;
+import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 class UserAndRoleScreen extends StatefulWidget {
   const UserAndRoleScreen({super.key});
@@ -12,7 +14,7 @@ class UserAndRoleScreen extends StatefulWidget {
 }
 
 class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
-  late List<RoleDTO> _roles = List.empty();
+  final List<RoleDTO> _roles = [];
   bool _loadingRoles = false;
 
   @override
@@ -27,20 +29,29 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
     });
 
     try {
-      List<RoleDTO> roles = (await fetchDataObject<RoleDTO>(
+      fetchDataObject<RoleDTO>(
         uri: uriRoleFindAll,
         classObject: RoleDTO.empty(),
-      )) as List<RoleDTO>;
+        requestType: RequestTypeEnum.get
+      ).then((data) => {
+        setState(() {
+          _roles.addAll(data.cast<RoleDTO>().map((e) =>
+              RoleDTO(roleId: e.roleId, name: e.name)
+          ));
+          _loadingRoles = false;
+        })
+      });
 
-      setState(() {
+      /*setState(() {
         _roles = roles;
         _loadingRoles = false;
-      });
+      });*/
+
     } catch (e) {
       setState(() {
         _loadingRoles = false;
       });
-      // Manejar el error
+      floatingMessage(context, "Error de conexión");
     }
   }
 

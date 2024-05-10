@@ -17,25 +17,12 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
   Object? body,
 }) async {
 
-  //String _host = socket;
-  //String _path = uri;
-  Uri url = Uri.parse('$socket$uri');
-
-  /*if (! isDonationPlatform) {
-    if (neighborhoodName != null) _path = "$_path/$neighborhoodName";
-    if (cityName != null) _path = "$_path/$cityName";
-    if (departmentName != null) _path = "$_path/$departmentName";
-    if (countryName != null) _path = "$_path/$countryName";
-    url = Uri.http(_host, _path);
-
-  } else {
-    _host = uriDonationsPlatformHost;
-    _path = uriDonationsPlatformPath;
-    url = Uri.parse('$_host$_path');
-  }*/
-
+  Uri url;
   Response response;
+
   try {
+    url = Uri.http(socket, uri);
+
     if (requestType == RequestTypeEnum.post) {
         response = await http.post(
             url,
@@ -88,7 +75,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
       if (kDebugMode) print("Error cargando datos: error ${response.statusCode}. ${response.body}");
       throw Exception('Error cargando datos: ');
     }
-  }catch (e) {
+  } catch (e) {
     if (kDebugMode) print("Error de conexión: $e");
     throw Exception("Error de conexión");
   }
