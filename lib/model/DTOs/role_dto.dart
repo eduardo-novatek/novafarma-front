@@ -1,8 +1,8 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
 class RoleDTO extends Deserializable<RoleDTO> {
-  int roleId;
-  String name;
+  final int roleId;
+  final String name;
 
   RoleDTO.empty(): roleId = 0, name = "";
 

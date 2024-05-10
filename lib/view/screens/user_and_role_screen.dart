@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/RoleDTO.dart';
+import 'package:novafarma_front/model/DTOs/role_dto.dart';
+import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-  uriRoleFindAll;
+  uriRoleFindAll, uriUserFindAll;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 class UserAndRoleScreen extends StatefulWidget {
@@ -14,45 +15,18 @@ class UserAndRoleScreen extends StatefulWidget {
 }
 
 class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
-  final List<RoleDTO> _roles = [];
+
+  final List<RoleDTO> _roleList = [];
+  final List<UserDTO> _userList = [];
+
   bool _loadingRoles = false;
+  bool _loadingUsers = false;
 
   @override
   void initState() {
     super.initState();
     _fetchRoles();
-  }
-
-  Future<void> _fetchRoles() async {
-    setState(() {
-      _loadingRoles = true;
-    });
-
-    try {
-      fetchDataObject<RoleDTO>(
-        uri: uriRoleFindAll,
-        classObject: RoleDTO.empty(),
-        requestType: RequestTypeEnum.get
-      ).then((data) => {
-        setState(() {
-          _roles.addAll(data.cast<RoleDTO>().map((e) =>
-              RoleDTO(roleId: e.roleId, name: e.name)
-          ));
-          _loadingRoles = false;
-        })
-      });
-
-      /*setState(() {
-        _roles = roles;
-        _loadingRoles = false;
-      });*/
-
-    } catch (e) {
-      setState(() {
-        _loadingRoles = false;
-      });
-      floatingMessage(context, "Error de conexión");
-    }
+    _fetchUsers();
   }
 
   Widget buildContainer(String title, IconData icon) {
@@ -101,10 +75,10 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                 ? Center(child: CircularProgressIndicator())
                 : Expanded(
               child: ListView.builder(
-                itemCount: _roles.length,
+                itemCount: _roleList.length,
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(_roles[index].name),
+                    title: Text(_roleList[index].name),
                     // Otros detalles del rol, si los hay
                   );
                 },
@@ -150,6 +124,66 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _fetchRoles() async {
+    setState(() {
+      _loadingRoles = true;
+    });
+
+    try {
+      fetchDataObject<RoleDTO>(
+          uri: uriRoleFindAll,
+          classObject: RoleDTO.empty(),
+          requestType: RequestTypeEnum.get
+      ).then((data) => {
+        setState(() {
+          _roleList.addAll(data.cast<RoleDTO>().map((e) =>
+              RoleDTO(roleId: e.roleId, name: e.name)
+          ));
+          _loadingRoles = false;
+        })
+      });
+
+    } catch (e) {
+      setState(() {
+        _loadingRoles = false;
+      });
+      floatingMessage(context, "Error de conexión");
+    }
+  }
+
+  Future<void> _fetchUsers() async {
+    setState(() {
+      _loadingUsers = true;
+    });
+
+    try {
+      fetchDataObject<UserDTO>(
+          uri: uriUserFindAll,
+          classObject: UserDTO.empty(),
+          requestType: RequestTypeEnum.get
+      ).then((data) => {
+        setState(() {
+          _userList.addAll(data.cast<UserDTO>().map((e) =>
+              UserDTO(
+                  userId: e.userId,
+                  name: e.name,
+                  lastname: e.lastname,
+                  isActive: e.isActive,
+                  role: e.role,
+              )
+          ));
+          _loadingUsers = false;
+        })
+      });
+
+    } catch (e) {
+      setState(() {
+        _loadingUsers = false;
+      });
+      floatingMessage(context, "Error de conexión");
+    }
   }
 
   @override
