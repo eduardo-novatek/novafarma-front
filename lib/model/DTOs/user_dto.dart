@@ -5,21 +5,21 @@ class UserDTO extends Deserializable<UserDTO> {
   final int userId;
   final String name;
   final String lastname;
-  final bool isActive;
+  final bool active;
   final RoleDTO role;
 
   UserDTO.empty():
         userId = 0,
         name = "",
         lastname = "",
-        isActive = false,
+        active = false,
         role = RoleDTO.empty();
 
   UserDTO({
     required this.userId,
     required this.name,
     required this.lastname,
-    required this.isActive,
+    required this.active,
     required this.role
   });
 
@@ -36,7 +36,7 @@ class UserDTO extends Deserializable<UserDTO> {
       userId: json['userId'],
       name: json['name'],
       lastname: json['lastname'],
-      isActive: json['isActive'],
+      active: json['active'],
       role: role.fromJson(json['role']),
     );
   }
