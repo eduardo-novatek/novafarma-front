@@ -29,6 +29,16 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
     _fetchUsers();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        buildContainer('Roles', Icons.group),
+        buildContainer('Usuarios', Icons.person),
+      ],
+    );
+  }
+
   Widget buildContainer(String title, IconData icon) {
     return Expanded(
       child: Container(
@@ -72,18 +82,17 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
             ),
             const SizedBox(height: 10), // Espacio entre el título y la lista de elementos
             _loadingRoles
-                ? Center(child: CircularProgressIndicator())
-                : Expanded(
-              child: ListView.builder(
-                itemCount: _roleList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(_roleList[index].name),
-                    // Otros detalles del rol, si los hay
-                  );
-                },
-              ),
-            ),
+                ? const Center(child: CircularProgressIndicator())
+                : Expanded (
+                  child: ListView.builder (
+                    itemCount: _roleList.length,
+                    itemBuilder: (context, index) {
+                      return title == 'Roles'
+                            ? buildRoleData(index)
+                            : buildUserData(index);
+                    },
+                  ),
+                ),
             Container(
               height: 40, // Altura de la barra de botones
               decoration: BoxDecoration(
@@ -126,73 +135,80 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
     );
   }
 
-  Future<void> _fetchRoles() async {
-    setState(() {
-      _loadingRoles = true;
-    });
 
-    try {
-      fetchDataObject<RoleDTO>(
-          uri: uriRoleFindAll,
-          classObject: RoleDTO.empty(),
-          requestType: RequestTypeEnum.get
-      ).then((data) => {
-        setState(() {
-          _roleList.addAll(data.cast<RoleDTO>().map((e) =>
-              RoleDTO(roleId: e.roleId, name: e.name)
-          ));
-          _loadingRoles = false;
-        })
-      });
-
-    } catch (e) {
-      setState(() {
-        _loadingRoles = false;
-      });
-      floatingMessage(context, "Error de conexión");
-    }
+  Widget buildRoleData(int index) {
+    return const Text('_roleList[index].name');
   }
 
-  Future<void> _fetchUsers() async {
-    setState(() {
-      _loadingUsers = true;
-    });
+  Widget buildUserData(int index) {
+    return ListTile(
+      title: Text('${_userList[index].name} ${_userList[index].lastname}'),
+      subtitle:
+        Text ('Activo: ${_userList[index].isActive ? "Si" : "No"}'
+              'Rol: ${_userList[index].role.name}'
+        ),
+    );
+  }
 
-    try {
-      fetchDataObject<UserDTO>(
-          uri: uriUserFindAll,
-          classObject: UserDTO.empty(),
-          requestType: RequestTypeEnum.get
-      ).then((data) => {
+    Future<void> _fetchRoles() async {
+      setState(() {
+        _loadingRoles = true;
+      });
+
+      try {
+        fetchDataObject<RoleDTO>(
+            uri: uriRoleFindAll,
+            classObject: RoleDTO.empty(),
+            requestType: RequestTypeEnum.get
+        ).then((data) => {
+          setState(() {
+            _roleList.addAll(data.cast<RoleDTO>().map((e) =>
+                RoleDTO(roleId: e.roleId, name: e.name)
+            ));
+            _loadingRoles = false;
+          })
+        });
+
+      } catch (e) {
         setState(() {
-          _userList.addAll(data.cast<UserDTO>().map((e) =>
-              UserDTO(
+          _loadingRoles = false;
+        });
+        floatingMessage(context, "Error de conexión");
+      }
+    }
+
+    Future<void> _fetchUsers() async {
+      setState(() {
+        _loadingUsers = true;
+      });
+
+      try {
+        fetchDataObject<UserDTO>(
+            uri: uriUserFindAll,
+            classObject: UserDTO.empty(),
+            requestType: RequestTypeEnum.get
+        ).then((data) => {
+          setState(() {
+            _userList.addAll(data.cast<UserDTO>().map((e) =>
+                UserDTO(
                   userId: e.userId,
                   name: e.name,
                   lastname: e.lastname,
                   isActive: e.isActive,
                   role: e.role,
-              )
-          ));
-          _loadingUsers = false;
-        })
-      });
+                )
+            ));
+            _loadingUsers = false;
+          })
+        });
 
-    } catch (e) {
-      setState(() {
-        _loadingUsers = false;
-      });
-      floatingMessage(context, "Error de conexión");
+      } catch (e) {
+        setState(() {
+          _loadingUsers = false;
+        });
+        floatingMessage(context, "Error de conexión");
+      }
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        buildContainer('Roles', Icons.group),
-        buildContainer('Usuarios', Icons.person),
-      ],
-    );
-  }
 }
