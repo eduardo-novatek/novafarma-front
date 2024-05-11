@@ -4,7 +4,7 @@ import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-  uriRoleFindAll, uriUserFindAll;
+  uriRoleFindAll, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 class UserAndRoleScreen extends StatefulWidget {
@@ -31,8 +31,8 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        buildContainer('Roles', Icons.group, _roleList, _loadingRoles),
         buildContainer('Usuarios', Icons.person, _userList, _loadingUsers),
+        buildContainer('Roles', Icons.group, _roleList, _loadingRoles),
       ],
     );
   }
@@ -72,11 +72,12 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                       ],
                     ),
                     IconButton(
+                      icon: const Icon(Icons.refresh),
                       onPressed: title == 'Roles'
                           ? _fetchRoles
                           : _fetchUsers,
-                      icon: const Icon(Icons.refresh),
                       color: Colors.white,
+                      tooltip: "Actualizar",
                     ),
                   ],
                 ),
@@ -108,24 +109,27 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      // Acción para agregar
-                    },
                     icon: const Icon(Icons.add),
+                    onPressed: () {
+                      if (title == 'users')
+                        _addUsers();
+                      else if (title == 'roles')
+                        _addRoles();
+                    },
                     color: Colors.white,
                   ),
                   IconButton(
+                    icon: const Icon(Icons.edit),
                     onPressed: () {
                       // Acción para modificar
                     },
-                    icon: const Icon(Icons.edit),
                     color: Colors.white,
                   ),
                   IconButton(
+                    icon: const Icon(Icons.delete),
                     onPressed: () {
                       // Acción para eliminar
                     },
-                    icon: const Icon(Icons.delete),
                     color: Colors.white,
                   ),
                 ],
@@ -138,14 +142,17 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
   }
 
   Widget buildRoleData(RoleDTO role) {
-    return Text(role.name);
+    return ListTile(
+      title: Text(role.name),
+    );
   }
 
   Widget buildUserData(UserDTO user) {
     return ListTile(
-      title: Text('${user.name} ${user.lastname}'),
-      subtitle: Text('Activo: ${user.active ? "Si" : "No"}'
-          'Rol: ${user.role.name}'),
+      title: Text('${user.name} ${user.lastname} (${user.role.name})'),
+      subtitle: user.active
+          ? const Text("Activo", style: TextStyle(color: Colors.green))
+          : const Text("Inactivo", style: TextStyle(color: Colors.red))
     );
   }
 
@@ -205,4 +212,22 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       floatingMessage(context, "Error de conexión");
     }
   }
+
+  Future<void> _addUsers() async {
+    try {
+      fetchDataObject(
+          uri: uriUserAdd,
+          classObject: UserDTO.empty(),
+          requestType: RequestTypeEnum.post,
+      )
+     //@1
+
+    } catch(e) {
+      floatingMessage(context, 'Error: $e');
+    }
+
+  }
+
+
+
 }

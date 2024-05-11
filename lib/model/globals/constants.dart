@@ -34,5 +34,6 @@ const String uriRoleFindAll = "/role/findAll";
 const String uriRoleFindId = "/role/findId/";
 
 //Users
+const String uriUserAdd = "/user/add";
 const String uriUserFindAll = "/user/findAll";
 const String uriUserFindId = "/user/findId/";
