@@ -7,6 +7,8 @@ import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
+import '../dialogs/add_user_dialog.dart';
+
 class UserAndRoleScreen extends StatefulWidget {
   const UserAndRoleScreen({super.key});
 
@@ -111,10 +113,11 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () {
-                      if (title == 'users')
-                        _addUsers();
-                      else if (title == 'roles')
+                      if (title == 'Usuarios') {
+                        _addUsers(_roleList);
+                      } else if (title == 'roles') {
                         _addRoles();
+                      }
                     },
                     color: Colors.white,
                   ),
@@ -150,7 +153,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
   Widget buildUserData(UserDTO user) {
     return ListTile(
       title: Text('${user.name} ${user.lastname} (${user.role.name})'),
-      subtitle: user.active
+      subtitle: user.active!
           ? const Text("Activo", style: TextStyle(color: Colors.green))
           : const Text("Inactivo", style: TextStyle(color: Colors.red))
     );
@@ -213,20 +216,33 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
     }
   }
 
-  Future<void> _addUsers() async {
+  Future<void> _addUsers(List<RoleDTO> roleList) async {
     try {
-      fetchDataObject(
-          uri: uriUserAdd,
-          classObject: UserDTO.empty(),
-          requestType: RequestTypeEnum.post,
+      // Muestra un diálogo para ingresar los datos del nuevo usuario
+      UserDTO? newUser = await showDialog<UserDTO>(
+        context: context,
+        builder: (BuildContext context) {
+          return AddUserDialog(roleList);
+        },
       );
-     //@1
 
-    } catch(e) {
+      if (newUser != null) {
+        // Realiza la llamada a la API para agregar el nuevo usuario
+        fetchDataObject(
+          uri: uriUserAdd,
+          classObject: newUser,
+          requestType: RequestTypeEnum.post,
+          body: newUser
+        );
+
+        // Actualiza la lista de usuarios después de agregar uno nuevo
+        _fetchUsers();
+      }
+    } catch (e) {
       floatingMessage(context, 'Error: $e');
     }
-
   }
+
 
   Future<void> _addRoles() async {
     try {

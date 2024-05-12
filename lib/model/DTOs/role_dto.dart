@@ -23,5 +23,11 @@ class RoleDTO extends Deserializable<RoleDTO> {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'roleId': roleId,
+      'name': name,
+    };
+  }
 
 }
