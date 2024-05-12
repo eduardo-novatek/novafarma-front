@@ -4,7 +4,7 @@ import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-  uriRoleFindAll, uriUserFindAll, uriUserAdd;
+  uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 class UserAndRoleScreen extends StatefulWidget {
@@ -219,8 +219,23 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
           uri: uriUserAdd,
           classObject: UserDTO.empty(),
           requestType: RequestTypeEnum.post,
-      )
+      );
      //@1
+
+    } catch(e) {
+      floatingMessage(context, 'Error: $e');
+    }
+
+  }
+
+  Future<void> _addRoles() async {
+    try {
+      fetchDataObject(
+        uri: uriRoleAdd,
+        classObject: RoleDTO.empty(),
+        requestType: RequestTypeEnum.post,
+      );
+      //@2
 
     } catch(e) {
       floatingMessage(context, 'Error: $e');
