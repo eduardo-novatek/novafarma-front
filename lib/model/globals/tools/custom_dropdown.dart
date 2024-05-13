@@ -39,6 +39,13 @@ import '../constants.dart' show menuMaxHeight;
 ///         print(gender);
 ///       });
 ///   }
+
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
+
 class CustomDropdown<T extends Object> extends StatefulWidget {
 
   final ThemeData themeData;
@@ -47,17 +54,17 @@ class CustomDropdown<T extends Object> extends StatefulWidget {
   final Function(T?) callback;
 
   const CustomDropdown({
-        Key? key,
+        super.key,
         required this.themeData,
         required this.modelList,
         required this.model,
         required this.callback,
-  }): super(key: key);
+  });
 
   @override
   State<CustomDropdown<T>> createState() => _CustomDropdownState<T>();
 }
-//class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
+
 class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
 
   T? object;

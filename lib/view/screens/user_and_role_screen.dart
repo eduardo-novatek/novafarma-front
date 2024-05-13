@@ -6,8 +6,7 @@ import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-
-import '../overlays/add_user_overlay.dart';
+import '../dialogs/add_user_dialog.dart';
 
 class UserAndRoleScreen extends StatefulWidget {
   const UserAndRoleScreen({super.key});
@@ -222,7 +221,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       UserDTO? newUser = await showDialog<UserDTO>(
         context: context,
         builder: (BuildContext context) {
-          return AddUserOverlay(roleList);
+          return AddUserDialog(roleList);
         },
       );
 
@@ -239,7 +238,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
         _fetchUsers();
       }
     } catch (e) {
-      floatingMessage(context, 'Error: $e');
+       floatingMessage(context, 'Error: $e');
     }
   }
 
