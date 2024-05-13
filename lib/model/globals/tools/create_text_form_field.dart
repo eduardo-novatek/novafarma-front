@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:novafarma_front/model/enums/data_types_enum.dart';
-import 'package:novafarma_front/model/enums/data_types_enum.dart';
 import 'package:intl/intl.dart';
 
 class CreateTextFormField extends StatefulWidget {
