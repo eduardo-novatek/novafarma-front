@@ -64,10 +64,13 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
               controller: widget.controller,
               keyboardType: _determinateInputType(),
               maxLines: widget.dataType == DataTypesEnum.text ? widget.maxLines : 1,
-              maxLength: widget.dataType == DataTypesEnum.text &&
-                             widget.maxValueForValidation != null
-                         ? widget.maxValueForValidation
-                         : null,
+              maxLength:
+                  (widget.dataType == DataTypesEnum.text
+                      || widget.dataType == DataTypesEnum.password)
+                  && widget.maxValueForValidation != null
+                      ? widget.maxValueForValidation
+                      : null,
+
               inputFormatters: _determinateMask(),
               decoration: InputDecoration(
                   labelText: widget.label,

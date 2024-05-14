@@ -29,11 +29,12 @@ const String superAdminPass = "n0vaF4rm4";
 //Roles
 const String uriRoleAdd = "/role/add";
 const String uriRoleUpdate = "/role/update";
-const String uriRoleDelete = "/role/delete/";
+const String uriRoleDelete = "/role/delete";
 const String uriRoleFindAll = "/role/findAll";
-const String uriRoleFindId = "/role/findId/";
+const String uriRoleFindId = "/role/findId";
 
 //Users
 const String uriUserAdd = "/user/add";
 const String uriUserFindAll = "/user/findAll";
-const String uriUserFindId = "/user/findId/";
+const String uriUserFindId = "/user/findId";
+const String uriUserNameExist = "user/userNameExist";
