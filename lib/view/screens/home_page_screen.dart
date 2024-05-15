@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
 class HomePageScreen extends StatefulWidget {
-  const HomePageScreen({super.key, required this.title});
+
+  //final GlobalKey<ScaffoldState> scaffoldKey;
   final String title;
+
+  const HomePageScreen({super.key, required this.title});
 
   @override
   State<HomePageScreen> createState() => _HomePageScreenState();
@@ -145,15 +148,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildUsersAndRolesWidget() {
-    /*return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(18.0),
-      ),
-      child: const UsersAndRoles(),
-    );
-     */
-    return const UserAndRoleScreen();
+    return UserAndRoleScreen();
   }
+
 }
 

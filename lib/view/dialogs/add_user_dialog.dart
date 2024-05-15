@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_types_enum.dart';
+import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
@@ -11,9 +12,10 @@ import '../../model/globals/tools/floating_message.dart';
 
 class AddUserDialog extends StatefulWidget {
 
+  //final GlobalKey<ScaffoldState> scaffoldKey;
   final List<RoleDTO> roleList;
 
-  const AddUserDialog(this.roleList, {super.key});
+  const AddUserDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
 
   @override
   _AddUserDialogState createState() => _AddUserDialogState();
@@ -175,8 +177,9 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 role: widget.roleList.firstWhere((role) =>
                 role.name == selectedRole),
               );
-              Navigator.of(context).pop(
-                  newUser); // Cierra el diálogo y devuelve el nuevo usuario
+
+              // Cierra el diálogo y devuelve el nuevo usuario
+              Navigator.of(context).pop(newUser);
             }
           }
         ),
@@ -200,7 +203,12 @@ class _AddUserDialogState extends State<AddUserDialog> {
     try {
       if (await existUserName(userName: userName)) {
         if (context.mounted) {
-          floatingMessage(context, "Usuario ya registrado");
+          floatingMessage(
+              context: context,
+              text: "Usuario ya registrado",
+              messageTypeEnum: MessageTypeEnum.error
+          );
+          //floatingMessage(widget.scaffoldKey.currentContext!, "Usuario ya registrado");
           _userNameFocusNode.requestFocus();
         }
         return false;
@@ -209,12 +217,16 @@ class _AddUserDialogState extends State<AddUserDialog> {
       return true;
 
     } catch (e) {
-      floatingMessage(context, "Error de conexión");
+      floatingMessage(
+          context: context,
+          text: "Error de conexión",
+        messageTypeEnum: MessageTypeEnum.error
+      );
       return false;
     }
 
-
   }
+
 
 }
 

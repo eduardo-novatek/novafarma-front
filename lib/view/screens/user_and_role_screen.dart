@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
+import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
@@ -9,7 +10,9 @@ import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import '../dialogs/add_user_dialog.dart';
 
 class UserAndRoleScreen extends StatefulWidget {
-  const UserAndRoleScreen({super.key});
+
+  //final GlobalKey<ScaffoldState> scaffoldKey;
+  const UserAndRoleScreen({super.key}); // required this.scaffoldKey});
 
   @override
   _UserAndRoleScreenState createState() => _UserAndRoleScreenState();
@@ -180,7 +183,11 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       setState(() {
         _loadingRoles = false;
       });
-      floatingMessage(context, "Error de conexión");
+      floatingMessage(
+          context: context,
+          text: "Error de conexión",
+          messageTypeEnum: MessageTypeEnum.error
+      );
     }
   }
 
@@ -211,7 +218,10 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       setState(() {
         _loadingUsers = false;
       });
-      floatingMessage(context, "Error de conexión");
+      floatingMessage(
+          context: context,
+          text: "Error de conexión",
+          messageTypeEnum: MessageTypeEnum.error);
     }
   }
 
@@ -221,7 +231,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       UserDTO? newUser = await showDialog<UserDTO>(
         context: context,
         builder: (BuildContext context) {
-          return AddUserDialog(roleList);
+          return AddUserDialog(roleList); //, scaffoldKey: widget.scaffoldKey,);
         },
       );
 
@@ -238,7 +248,11 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
         _fetchUsers();
       }
     } catch (e) {
-       floatingMessage(context, 'Error: $e');
+       floatingMessage(
+           context: context,
+           text: 'Error: $e',
+           messageTypeEnum: MessageTypeEnum.error
+       );
     }
   }
 
@@ -253,7 +267,11 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       //@2
 
     } catch(e) {
-      floatingMessage(context, 'Error: $e');
+      floatingMessage(
+          context: context,
+          text: 'Error: $e',
+          messageTypeEnum: MessageTypeEnum.error
+      );
     }
 
   }

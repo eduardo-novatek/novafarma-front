@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({super.key});
+
+  //final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.lightBlueAccent,
         ),
       ),
-      home: const HomePageScreen(title: 'NovaFarma'),
+      home: HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
     );
   }
 }
