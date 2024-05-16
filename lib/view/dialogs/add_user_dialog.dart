@@ -35,7 +35,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
 
-  String? selectedRole;
+  String selectedRole = defaultTextFromDropdownMenu;
   ThemeData themeData = ThemeData();
 
   @override
@@ -127,7 +127,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                         modelList: widget.roleList,
                         model: widget.roleList[0],
                         callback: (role) {
-                          selectedRole = role?.name;
+                          selectedRole = role!.name;
                         },
                       ),
                     ],

@@ -27,13 +27,13 @@ Icon getIconMessage(MessageTypeEnum messageTypeEnum) {
   } else if (messageTypeEnum == MessageTypeEnum.warning) {
     return const Icon(
       Icons.warning_outlined,
-      color: Colors.yellow,
+      color: Colors.orange,
       size: 40.0,
     );
 
   } else { // error
     return const Icon(
-        Icons.error_outline,
+        Icons.error,
         color: Colors.red,
         size: 40.0,
     );
