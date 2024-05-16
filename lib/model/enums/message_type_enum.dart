@@ -8,13 +8,35 @@ enum MessageTypeEnum {
 
 Color getColorMessage(MessageTypeEnum messageTypeEnum) {
   if (messageTypeEnum == MessageTypeEnum.info) {
-    return Colors.green;
+    return Colors.green.shade100;
   } else if (messageTypeEnum == MessageTypeEnum.warning) {
-    return Colors.yellowAccent.shade100;
+    return Colors.yellow.shade100;
   } else { // error
-    return Colors.redAccent;
+    return Colors.red.shade100;
   }
+}
 
+Icon getIconMessage(MessageTypeEnum messageTypeEnum) {
+  if (messageTypeEnum == MessageTypeEnum.info) {
+    return const Icon(
+      Icons.info_outline,
+      color: Colors.green,
+      size: 40.0,
+    );
 
+  } else if (messageTypeEnum == MessageTypeEnum.warning) {
+    return const Icon(
+      Icons.warning_outlined,
+      color: Colors.yellow,
+      size: 40.0,
+    );
+
+  } else { // error
+    return const Icon(
+        Icons.error_outline,
+        color: Colors.red,
+        size: 40.0,
+    );
+  }
 
 }

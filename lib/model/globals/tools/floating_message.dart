@@ -8,7 +8,17 @@ void floatingMessage({
   required MessageTypeEnum messageTypeEnum,
 }) {
   final overlay = Overlay.of(context);
-  final overlayEntry = OverlayEntry(
+  late OverlayEntry overlayEntry;
+  bool isRemoved = false;
+
+  void removeOverlay() {
+    if (!isRemoved) {
+      isRemoved = true;
+      overlayEntry.remove();
+    }
+  }
+
+  overlayEntry = OverlayEntry(
     builder: (context) => Positioned(
       bottom: MediaQuery.of(context).size.height * 0.02,
       left: MediaQuery.of(context).size.width * 0.3,
@@ -16,26 +26,38 @@ void floatingMessage({
       child: Material(
         color: Colors.transparent,
         child: Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
-            //color: Theme.of(context).colorScheme.secondary,
             color: getColorMessage(messageTypeEnum),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.w300, color: Colors.black),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              getIconMessage(messageTypeEnum),
+              const SizedBox(width: 8.0), // Espaciado entre el icono y el texto
+              Expanded(
+                child: Text(
+                  text,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 17.0, color: Colors.black),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.black),
+                onPressed: removeOverlay,
+              ),
+            ],
           ),
         ),
       ),
     ),
   );
 
-  overlay.insert(overlayEntry);
-  Future.delayed(const Duration(seconds: 3), () {
-    overlayEntry.remove();
-  });
+  overlay?.insert(overlayEntry);
+  Future.delayed(const Duration(seconds: 3), removeOverlay);
+}
+
 
 
   /*ScaffoldMessenger.of(context).clearSnackBars();
@@ -61,4 +83,4 @@ void floatingMessage({
   ));
 
    */
-}
+

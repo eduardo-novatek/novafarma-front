@@ -126,8 +126,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
                         themeData: themeData,
                         modelList: widget.roleList,
                         model: widget.roleList[0],
-                        callback: (selectedRolName) {
-
+                        callback: (role) {
+                          selectedRole = role?.name;
                         },
                       ),
                     ],
@@ -174,8 +174,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 lastname: _lastNameController.text,
                 userName: _userNameController.text,
                 pass: _passController.text,
-                role: widget.roleList.firstWhere((role) =>
-                role.name == selectedRole),
+                role: widget.roleList.firstWhere(
+                        (role) => role.name == selectedRole),
               );
 
               // Cierra el diálogo y devuelve el nuevo usuario
@@ -205,8 +205,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
         if (context.mounted) {
           floatingMessage(
               context: context,
-              text: "Usuario ya registrado",
-              messageTypeEnum: MessageTypeEnum.error
+              text: 'Usuario ya registrado: $userName',
+              messageTypeEnum: MessageTypeEnum.warning
           );
           //floatingMessage(widget.scaffoldKey.currentContext!, "Usuario ya registrado");
           _userNameFocusNode.requestFocus();

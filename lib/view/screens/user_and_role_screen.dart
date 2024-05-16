@@ -231,12 +231,11 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       UserDTO? newUser = await showDialog<UserDTO>(
         context: context,
         builder: (BuildContext context) {
-          return AddUserDialog(roleList); //, scaffoldKey: widget.scaffoldKey,);
+          return AddUserDialog(roleList);
         },
       );
 
       if (newUser != null) {
-        // Realiza la llamada a la API para agregar el nuevo usuario
         fetchDataObject(
           uri: uriUserAdd,
           classObject: newUser,
@@ -244,8 +243,14 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
           body: newUser
         );
 
+        floatingMessage(
+            context: context,
+            text: "Usuario agregado con éxito",
+            messageTypeEnum: MessageTypeEnum.info);
+
         // Actualiza la lista de usuarios después de agregar uno nuevo
         _fetchUsers();
+
       }
     } catch (e) {
        floatingMessage(
