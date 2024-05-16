@@ -163,12 +163,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
         ElevatedButton(
           child: const Text('Aceptar'),
           onPressed: () async {
-            if (await _validatedForm(
-              userName: _userNameController.text,
-              userNameFocusNode: _userNameFocusNode,)) {
-
+            if (await _validatedForm(userName: _userNameController.text)) {
               if (!context.mounted) return;
-
               UserDTO newUser = UserDTO(
                 name: _nameController.text,
                 lastname: _lastNameController.text,
@@ -177,7 +173,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 role: widget.roleList.firstWhere(
                         (role) => role.name == selectedRole),
               );
-
               // Cierra el diálogo y devuelve el nuevo usuario
               Navigator.of(context).pop(newUser);
             }
@@ -195,9 +190,9 @@ class _AddUserDialogState extends State<AddUserDialog> {
 
   }
 
-  Future<bool> _validatedForm({
-  required String userName, required FocusNode userNameFocusNode,}) async {
+  Future<bool> _validatedForm({required String userName}) async {
 
+    //Valida el formulario
     if (!_formKey.currentState!.validate()) return false;
 
     try {
@@ -208,8 +203,18 @@ class _AddUserDialogState extends State<AddUserDialog> {
               text: 'Usuario ya registrado: $userName',
               messageTypeEnum: MessageTypeEnum.warning
           );
-          //floatingMessage(widget.scaffoldKey.currentContext!, "Usuario ya registrado");
           _userNameFocusNode.requestFocus();
+        }
+        return false;
+      }
+
+      if (selectedRole == defaultTextFromDropdownMenu) {
+        if (context.mounted) {
+          floatingMessage(
+              context: context,
+              text: 'Por favor, seleccione el rol',
+              messageTypeEnum: MessageTypeEnum.warning
+          );
         }
         return false;
       }

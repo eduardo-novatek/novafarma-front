@@ -72,12 +72,12 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
         throw Exception('Error al decodificando datos');
       }
     } else {
-      if (kDebugMode) print("Error cargando datos: error ${response.statusCode}. ${response.body}");
-      throw Exception('Error cargando datos: ');
+      if (kDebugMode) print("ERROR: ${response.statusCode}. ${response.body}");
+      throw Exception('${response.statusCode}. ${response.body}');
     }
   } catch (e) {
-    if (kDebugMode) print("Error de conexión: $e");
-    throw Exception("Error de conexión");
+    if (kDebugMode) print(e);
+    throw Exception(e);
   }
 
 }

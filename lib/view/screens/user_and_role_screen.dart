@@ -226,8 +226,8 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
   }
 
   Future<void> _addUsers(List<RoleDTO> roleList) async {
-    try {
-      // Muestra un diálogo para ingresar los datos del nuevo usuario
+
+    // Muestra un diálogo para ingresar los datos del nuevo usuario
       UserDTO? newUser = await showDialog<UserDTO>(
         context: context,
         builder: (BuildContext context) {
@@ -236,29 +236,30 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       );
 
       if (newUser != null) {
-        fetchDataObject(
-          uri: uriUserAdd,
-          classObject: newUser,
-          requestType: RequestTypeEnum.post,
-          body: newUser
-        );
+        try {
+          fetchDataObject(
+              uri: uriUserAdd,
+              classObject: newUser,
+              requestType: RequestTypeEnum.post,
+              body: newUser
+          );
 
-        floatingMessage(
-            context: context,
-            text: "Usuario agregado con éxito",
-            messageTypeEnum: MessageTypeEnum.info);
+          floatingMessage(
+              context: context,
+              text: "Usuario agregado con éxito",
+              messageTypeEnum: MessageTypeEnum.info);
 
-        // Actualiza la lista de usuarios después de agregar uno nuevo
-        _fetchUsers();
+          // Actualiza la lista de usuarios después de agregar uno nuevo
+          _fetchUsers();
 
+        } catch (e) {
+          floatingMessage(
+              context: context,
+              text: 'Error: $e',
+              messageTypeEnum: MessageTypeEnum.error
+          );
+        }
       }
-    } catch (e) {
-       floatingMessage(
-           context: context,
-           text: 'Error: $e',
-           messageTypeEnum: MessageTypeEnum.error
-       );
-    }
   }
 
 
