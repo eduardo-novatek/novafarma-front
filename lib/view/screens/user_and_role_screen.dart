@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
@@ -116,7 +118,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                     icon: const Icon(Icons.add),
                     onPressed: () {
                       if (title == 'Usuarios') {
-                        _addUsers(_roleList);
+                        _addUsers();
                       } else if (title == 'roles') {
                         _addRoles();
                       }
@@ -200,68 +202,74 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       fetchDataObject<UserDTO>(
           uri: uriUserFindAll,
           classObject: UserDTO.empty(),
-          requestType: RequestTypeEnum.get)
-          .then((data) => {
+          requestType: RequestTypeEnum.get
+      ).then((data) => {
         setState(() {
           _userList.clear();
-          _userList.addAll(data.cast<UserDTO>().map((e) => UserDTO(
-            userId: e.userId,
-            name: e.name,
-            lastname: e.lastname,
-            active: e.active,
-            role: e.role,
-          )));
+          _userList.addAll(data.cast<UserDTO>().map((e) =>
+              UserDTO(
+                userId: e.userId,
+                name: e.name,
+                lastname: e.lastname,
+                active: e.active,
+                role: e.role,
+              )
+          ));
           _loadingUsers = false;
         })
       });
+
     } catch (e) {
       setState(() {
         _loadingUsers = false;
       });
       floatingMessage(
           context: context,
-          text: "Error de conexión",
+          text: "Error: $e",
           messageTypeEnum: MessageTypeEnum.error);
     }
   }
 
-  Future<void> _addUsers(List<RoleDTO> roleList) async {
+  Future<void> _addUsers() async {
 
-    // Muestra un diálogo para ingresar los datos del nuevo usuario
-      UserDTO? newUser = await showDialog<UserDTO>(
-        context: context,
-        builder: (BuildContext context) {
-          return AddUserDialog(roleList);
-        },
-      );
+    UserDTO? newUser;
+    do {
+        // Muestra un diálogo para ingresar los datos del nuevo usuario
+        newUser = await showDialog<UserDTO>(
+          context: context,
+          builder: (BuildContext context) {
+            return AddUserDialog(_roleList);
+          },
+        );
 
-      if (newUser != null) {
-        try {
-          fetchDataObject(
-              uri: uriUserAdd,
-              classObject: newUser,
-              requestType: RequestTypeEnum.post,
-              body: newUser
-          );
-
-          floatingMessage(
-              context: context,
-              text: "Usuario agregado con éxito",
-              messageTypeEnum: MessageTypeEnum.info);
-
-          // Actualiza la lista de usuarios después de agregar uno nuevo
-          _fetchUsers();
-
-        } catch (e) {
-          floatingMessage(
-              context: context,
-              text: 'Error: $e',
-              messageTypeEnum: MessageTypeEnum.error
-          );
+        if (newUser != null) {
+          try {
+            fetchDataObject(
+                uri: uriUserAdd,
+                classObject: newUser,
+                requestType: RequestTypeEnum.post,
+                body: newUser
+            ).then((newUserId) {
+              floatingMessage(
+                  context: context,
+                  text: "Usuario agregado con éxito",
+                  messageTypeEnum: MessageTypeEnum.info
+              );
+              // Si está la opcion "Seleccione...", la elimina de la lista
+              if (_roleList[0].isFirst! == true) _roleList.removeAt(0);
+              // Actualiza la lista de usuarios
+              _fetchUsers();
+            });
+          } catch (e) {
+            floatingMessage(
+                context: context,
+                text: 'Error: $e',
+                messageTypeEnum: MessageTypeEnum.error
+            );
+          }
         }
-      }
+    } while (newUser != null);
   }
-
 
   Future<void> _addRoles() async {
     try {

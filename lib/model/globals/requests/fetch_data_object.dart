@@ -63,6 +63,8 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           return [classObject.fromJson(decodedData)].toList();
         } else if (decodedData is bool) {
           return [decodedData].toList();
+        } else if (decodedData is int) {
+          return [decodedData].toList();
         } else {
           if (kDebugMode) print("Tipo de datos desconocido");
           throw Exception('Tipo de datos desconocido');

@@ -41,10 +41,13 @@ class _AddUserDialogState extends State<AddUserDialog> {
   @override
   void initState() {
     super.initState();
-    widget.roleList.insert(
-        0,
-        RoleDTO(isFirst: true, roleId: null, name: defaultTextFromDropdownMenu)
-    );
+    if (!widget.roleList[0].isFirst!) {
+      widget.roleList.insert(
+          0,
+          RoleDTO(
+              isFirst: true, roleId: null, name: defaultTextFromDropdownMenu)
+      );
+    }
   }
 
   @override
@@ -132,26 +135,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
                       ),
                     ],
                   )
-
-
-                  /*
-                  DropdownButtonFormField(
-                    value: selectedRole,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedRole = value!;
-                      });
-                    },
-                    items: widget.roleList.map((role) {
-                      return DropdownMenuItem(
-                        value: role.name,
-                        child: Text(role.name),
-                      );
-                    }).toList(),
-                    decoration: const InputDecoration(
-                      labelText: 'Rol',
-                    ),
-                  ),*/
                 ],
               ),
             ),
@@ -219,7 +202,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
         return false;
       }
 
-      return true;
 
     } catch (e) {
       floatingMessage(
@@ -229,6 +211,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
       );
       return false;
     }
+
+    return true;  // Validacion correcta
 
   }
 
