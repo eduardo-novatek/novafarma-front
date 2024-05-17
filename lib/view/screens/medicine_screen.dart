@@ -10,7 +10,7 @@ class MedicineScreen extends StatefulWidget {
 class _MedicineScreenState extends State<MedicineScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text(
         'Contenido de Medicamentos',
         style: TextStyle(fontSize: 24),

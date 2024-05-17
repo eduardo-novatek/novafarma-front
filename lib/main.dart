@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({super.key});
+  const MyApp({super.key});
 
   //final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.lightBlueAccent,
         ),
       ),
-      home: HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
+      home: const HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
     );
   }
 }

@@ -2,7 +2,7 @@
 //const String socket = "192.168.43.203:8080";    //celu
 const String socket = 'localhost:8080';           //server jorge
 
-const int timeOutSecondsResponse = 30;
+const int timeOutSecondsResponse = 10;
 
 const String defaultTextFromDropdownMenu = "Seleccione...";
 const double menuMaxHeight = 300.0;

@@ -18,7 +18,7 @@ class CreateTextFormField extends StatefulWidget {
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
 
   const CreateTextFormField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.label,
     required this.dataType,
@@ -31,7 +31,7 @@ class CreateTextFormField extends StatefulWidget {
     this.minValueForValidation,
     this.maxValueForValidation,
     this.onChange,
-  }) : super(key: key);
+  });
 
   @override
   State<CreateTextFormField> createState() => _CreateTextFormFieldState();
@@ -208,7 +208,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
   bool _validateDocument(String? document) {
     if (document == "00000000") return true; //valida este documento para fines especificos
     if (document!.length < 7 || document.length > 8) return false;
-    if (double.tryParse(document!) == null) return false;
+    if (double.tryParse(document) == null) return false;
     if (_equalDigits(document)) return false;
 
     List<int> controlList;

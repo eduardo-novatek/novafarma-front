@@ -18,10 +18,10 @@ class AddUserDialog extends StatefulWidget {
   const AddUserDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
 
   @override
-  _AddUserDialogState createState() => _AddUserDialogState();
+  AddUserDialogState createState() => AddUserDialogState();
 }
 
-class _AddUserDialogState extends State<AddUserDialog> {
+class AddUserDialogState extends State<AddUserDialog> {
 
   final _formKey = GlobalKey<FormState>();
 

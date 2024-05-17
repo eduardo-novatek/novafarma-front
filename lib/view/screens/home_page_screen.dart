@@ -34,7 +34,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   void _openMenu(BuildContext context) {
     final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
         button.localToGlobal(const Offset(0, kToolbarHeight), ancestor: overlay),
@@ -148,7 +148,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildUsersAndRolesWidget() {
-    return UserAndRoleScreen();
+    return const UserAndRoleScreen();
   }
 
 }

@@ -9,14 +9,14 @@ class SelectableCardItem extends StatefulWidget {
   final Function()? onTapCallback; // Función de devolución de llamada
 
   const SelectableCardItem({
-    Key? key,
+    super.key,
     required this.themeData,
     required this.title,
     required this.subtitle,
     this.image,
     this.icon,
     this.onTapCallback,
-  }) : super(key: key);
+  });
 
   @override
   State<SelectableCardItem> createState() => _SelectableCardItemState();

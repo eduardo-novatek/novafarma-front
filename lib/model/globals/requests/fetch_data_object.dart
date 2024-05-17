@@ -47,6 +47,9 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
 
     if (response.statusCode == 200) {
       try {
+
+        if (response.body.isEmpty) return [];
+
         //Asume que el cuerpo de la respuesta está codificado en UTF-8 por defecto
         //dynamic decodedData = json.decode(response.body);
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
@@ -17,10 +18,10 @@ class UserAndRoleScreen extends StatefulWidget {
   const UserAndRoleScreen({super.key}); // required this.scaffoldKey});
 
   @override
-  _UserAndRoleScreenState createState() => _UserAndRoleScreenState();
+  UserAndRoleScreenState createState() => UserAndRoleScreenState();
 }
 
-class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
+class UserAndRoleScreenState extends State<UserAndRoleScreen> {
   final List<RoleDTO> _roleList = [];
   final List<UserDTO> _userList = [];
   bool _loadingRoles = false;
@@ -29,21 +30,21 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchRoles();
     _fetchUsers();
+    _fetchRoles();
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        buildContainer('Usuarios', Icons.person, _userList, _loadingUsers),
-        buildContainer('Roles', Icons.group, _roleList, _loadingRoles),
+        _buildContainer('Usuarios', Icons.person, _userList, _loadingUsers),
+        _buildContainer('Roles', Icons.group, _roleList, _loadingRoles),
       ],
     );
   }
 
-  Widget buildContainer(
+  Widget _buildContainer(
       String title, IconData icon, List<dynamic> dataList, bool loading) {
     return Expanded(
       child: Container(
@@ -79,9 +80,7 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.refresh),
-                      onPressed: title == 'Roles'
-                          ? _fetchRoles
-                          : _fetchUsers,
+                      onPressed: title == 'Roles' ? _fetchRoles : _fetchUsers,
                       color: Colors.white,
                       tooltip: "Actualizar",
                     ),
@@ -97,8 +96,8 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
                     itemCount: dataList.length,
                     itemBuilder: (context, index) {
                       return title == 'Roles'
-                          ? buildRoleData(dataList[index])
-                          : buildUserData(dataList[index]);
+                          ? _buildRoleData(dataList[index])
+                          : _buildUserData(dataList[index]);
                     },
                   ),
                 ),
@@ -148,13 +147,13 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
     );
   }
 
-  Widget buildRoleData(RoleDTO role) {
+  Widget _buildRoleData(RoleDTO role) {
     return ListTile(
       title: Text(role.name),
     );
   }
 
-  Widget buildUserData(UserDTO user) {
+  Widget _buildUserData(UserDTO user) {
     return ListTile(
       title: Text('${user.name} ${user.lastname} (${user.role.name})'),
       subtitle: user.active!
@@ -206,17 +205,29 @@ class _UserAndRoleScreenState extends State<UserAndRoleScreen> {
       ).then((data) => {
         setState(() {
           _userList.clear();
-          _userList.addAll(data.cast<UserDTO>().map((e) =>
-              UserDTO(
-                userId: e.userId,
-                name: e.name,
-                lastname: e.lastname,
-                active: e.active,
-                role: e.role,
-              )
-          ));
+          if (data.isNotEmpty) {
+            _userList.addAll(data.cast<UserDTO>().map((e) =>
+                UserDTO(
+                  userId: e.userId,
+                  name: e.name,
+                  lastname: e.lastname,
+                  active: e.active,
+                  role: e.role,
+                )
+            ));
+          }
           _loadingUsers = false;
         })
+      }).onError((error, stackTrace) {
+        floatingMessage(
+            context: context,
+            text: "Error de conexión",
+            messageTypeEnum: MessageTypeEnum.error
+        );
+        setState(() {
+          _loadingUsers = false;
+        });
+        return <void>{};
       });
 
     } catch (e) {

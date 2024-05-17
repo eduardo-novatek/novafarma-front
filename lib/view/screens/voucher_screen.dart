@@ -10,7 +10,7 @@ class VoucherScreen extends StatefulWidget {
 class _VoucherScreenState extends State<VoucherScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text(
         'Contenido de Voucher',
         style: TextStyle(fontSize: 24),

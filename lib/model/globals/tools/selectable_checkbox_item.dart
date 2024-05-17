@@ -13,9 +13,9 @@ class SelectableCheckBoxItem extends StatefulWidget {
   });
 
   @override
-  _SelectableCheckBoxItemState createState() => _SelectableCheckBoxItemState();
+  SelectableCheckBoxItemState createState() => SelectableCheckBoxItemState();
 }
-class _SelectableCheckBoxItemState extends State<SelectableCheckBoxItem> {
+class SelectableCheckBoxItemState extends State<SelectableCheckBoxItem> {
   late bool isSelected;
 
   @override

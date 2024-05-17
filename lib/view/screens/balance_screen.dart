@@ -10,7 +10,7 @@ class BalanceScreen extends StatefulWidget {
 class _BalanceScreenState extends State<BalanceScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text(
         'Contenido de Balances',
         style: TextStyle(fontSize: 24),

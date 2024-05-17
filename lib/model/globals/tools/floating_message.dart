@@ -54,11 +54,9 @@ void floatingMessage({
     ),
   );
 
-  overlay?.insert(overlayEntry);
+  overlay.insert(overlayEntry);
   Future.delayed(const Duration(seconds: 3), removeOverlay);
 }
-
-
 
   /*ScaffoldMessenger.of(context).clearSnackBars();
 

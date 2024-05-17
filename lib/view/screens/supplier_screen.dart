@@ -10,7 +10,7 @@ class SupplierScreen extends StatefulWidget {
 class _SupplierScreenState extends State<SupplierScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text(
         'Contenido de Proveedores',
         style: TextStyle(fontSize: 24),
