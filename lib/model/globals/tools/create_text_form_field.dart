@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:novafarma_front/model/enums/data_types_enum.dart';
+import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:intl/intl.dart';
 
 class CreateTextFormField extends StatefulWidget {
@@ -10,11 +10,13 @@ class CreateTextFormField extends StatefulWidget {
   final int? minValueForValidation;  //si es texto, es el largo minimo. Si es numero, es el valor minimo,...
   final int? maxValueForValidation;
   final String textForValidation; //texto de validacion si esta ocurre
-  final DataTypesEnum dataType;
+  final DataTypeEnum dataType;
   final int maxLines; //cantidad de lineas 'visibles'
+  final bool? isUnderline; // Underline=true: coloca una linea debajo del texto (false: la linea rodea el texto)
   final TextEditingController controller;
   final FocusNode? focusNode;
   final Function(String)? onChange;
+
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
 
   const CreateTextFormField({
@@ -24,13 +26,14 @@ class CreateTextFormField extends StatefulWidget {
     required this.dataType,
     this.validationStates,
     this.maxLines = 1, //solo para campos de texto
-    this.focusNode,
+    this.isUnderline = true,
     this.validate = true,  //si desea validar el campo
     this.acceptEmpty = false, //si acepta el campo vacío (si validar=true, lo valida solo si no es vacio)
     this.textForValidation = "Por favor, ingrese el dato correcto",
     this.minValueForValidation,
     this.maxValueForValidation,
     this.onChange,
+    this.focusNode,
   });
 
   @override
@@ -50,7 +53,12 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
       _index = widget.validationStates!.length; // Asignar un índice único
       widget.validationStates!.add(true); // Inicializar el estado de validación
     }
-    _isObscureText = (widget.dataType == DataTypesEnum.password);
+    _isObscureText = (widget.dataType == DataTypeEnum.password);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
     @override
@@ -63,10 +71,10 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
               focusNode: widget.focusNode,
               controller: widget.controller,
               keyboardType: _determinateInputType(),
-              maxLines: widget.dataType == DataTypesEnum.text ? widget.maxLines : 1,
+              maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
               maxLength:
-                  (widget.dataType == DataTypesEnum.text
-                      || widget.dataType == DataTypesEnum.password)
+                  (widget.dataType == DataTypeEnum.text
+                      || widget.dataType == DataTypeEnum.password)
                   && widget.maxValueForValidation != null
                       ? widget.maxValueForValidation
                       : null,
@@ -75,9 +83,11 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
               decoration: InputDecoration(
                   labelText: widget.label,
                   labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
+                  border: widget.isUnderline!
+                    ? const UnderlineInputBorder()
+                    : OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      )
               ),
               style: TextStyle(
                   fontSize: themeData.textTheme.bodyMedium?.fontSize,
@@ -100,8 +110,8 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                 if (value!.trim().isEmpty) {
                   hasError = true;
 
-                } else if (widget.dataType == DataTypesEnum.text ||
-                    widget.dataType == DataTypesEnum.password){
+                } else if (widget.dataType == DataTypeEnum.text ||
+                    widget.dataType == DataTypeEnum.password){
 
                   bool errorMin = false;
                   bool errorMax = false;
@@ -114,13 +124,13 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                   }
                   hasError = (errorMin || errorMax);
 
-                } else if (widget.dataType == DataTypesEnum.number ||
-                           widget.dataType == DataTypesEnum.telephone) {
+                } else if (widget.dataType == DataTypeEnum.number ||
+                           widget.dataType == DataTypeEnum.telephone) {
                     var number = double.tryParse(value);
                     hasError = (number == null);
                     if (!hasError) {
                       if (widget.minValueForValidation != null) {
-                        if (widget.dataType == DataTypesEnum.telephone) {
+                        if (widget.dataType == DataTypeEnum.telephone) {
                           hasError = (
                               value.trim().length < widget.minValueForValidation!);
                         } else { //Es numero
@@ -128,7 +138,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                         }
                       }
                       if (!hasError && (widget.maxValueForValidation != null)) {
-                        if (widget.dataType == DataTypesEnum.telephone) {
+                        if (widget.dataType == DataTypeEnum.telephone) {
                           hasError = (
                               value.trim().length > widget.maxValueForValidation!);
                         } else { //Es numero
@@ -137,7 +147,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                       }
                     }
 
-                } else if (widget.dataType == DataTypesEnum.date) {
+                } else if (widget.dataType == DataTypeEnum.date) {
                   try {
                     final inputDate = DateFormat('dd/MM/yyyy')
                         .parseStrict(value.trim());
@@ -149,7 +159,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                     hasError = true;
                   }
 
-                }else if (widget.dataType == DataTypesEnum.time) {
+                }else if (widget.dataType == DataTypeEnum.time) {
                   try {
                     final RegExp regExp =
                       RegExp(r'^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
@@ -159,12 +169,12 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                     hasError = true;
                   }
 
-                } else if (widget.dataType == DataTypesEnum.email) {
+                } else if (widget.dataType == DataTypeEnum.email) {
                     final emailRegExp =
                       RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
                     hasError = !emailRegExp.hasMatch(value.trim());
 
-                } else if (widget.dataType == DataTypesEnum.identificationDocument) {
+                } else if (widget.dataType == DataTypeEnum.identificationDocument) {
                     hasError = ! _validateDocument(value.trim());
                 }
 
@@ -177,6 +187,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                   widget.focusNode?.requestFocus();
                   return widget.textForValidation;
                 }
+
                 return null;
               },
             ),
@@ -184,7 +195,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
             Positioned(
               right: 0,
               top: 10,
-              child: widget.dataType == DataTypesEnum.password
+              child: widget.dataType == DataTypeEnum.password
                   ? IconButton(
                         onPressed: () {
                             setState(() {
@@ -245,16 +256,16 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
   }
 
   TextInputType _determinateInputType(){
-    if (widget.dataType == DataTypesEnum.identificationDocument ||
-        widget.dataType == DataTypesEnum.number ||
-        widget.dataType == DataTypesEnum.telephone) return TextInputType.number;
+    if (widget.dataType == DataTypeEnum.identificationDocument ||
+        widget.dataType == DataTypeEnum.number ||
+        widget.dataType == DataTypeEnum.telephone) return TextInputType.number;
 
-    if (widget.dataType == DataTypesEnum.date ||
-        widget.dataType == DataTypesEnum.time) return TextInputType.datetime;
+    if (widget.dataType == DataTypeEnum.date ||
+        widget.dataType == DataTypeEnum.time) return TextInputType.datetime;
 
-    if (widget.dataType == DataTypesEnum.email) return TextInputType.emailAddress;
+    if (widget.dataType == DataTypeEnum.email) return TextInputType.emailAddress;
 
-    if (widget.dataType == DataTypesEnum.text && widget.maxLines > 1) {
+    if (widget.dataType == DataTypeEnum.text && widget.maxLines > 1) {
       return TextInputType.multiline;
     }
 
@@ -262,7 +273,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
   }
 
   List<MaskTextInputFormatter> _determinateMask() {
-    if (widget.dataType == DataTypesEnum.date) {
+    if (widget.dataType == DataTypeEnum.date) {
       return [MaskTextInputFormatter(mask: '##/##/####')];
     }
     return [];

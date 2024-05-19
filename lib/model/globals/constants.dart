@@ -1,5 +1,7 @@
 //const String socket = "192.168.1.8:8080";       //casa
 //const String socket = "192.168.43.203:8080";    //celu
+import 'package:novafarma_front/model/enums/movement_type_enum.dart';
+
 const String socket = 'localhost:8080';           //server jorge
 
 const int timeOutSecondsResponse = 10;
@@ -10,17 +12,12 @@ const double menuMaxWeight = 300.0;
 
 const String imagesPath = "assets/images/";
 
-//titulos
-const double smallTitleSize = 14.0;
-const double mediumTitleSize = 18.0;
-const double largeTitleSize = 22.0;
-
-//Botones
-const double buttonsTextSize = 18.0;
-
 //Credenciales SuperAdmin
 const String superAdminUser = "N0v4Tek.2o24";
 const String superAdminPass = "n0vaF4rm4";
+
+//Tokens
+const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1nH1A19CwLuSCHnT3X3DYU2DvfaKnJbp1lZEVXNV0TpjWIzZrAqOTjxcPDxaDInIsdPkLi8QGHfgrQaU3ZIa8sLapH7qgyWU8eIn5AXiXcn5cRVbfh44mljLZr5jvgmtGmvW2CMUHzdrWfxCzNoUQgP6XECm2f3ShGJjXDyjkJOLYaS9fNAamqqqVBm";
 
 //
 // EndPoints

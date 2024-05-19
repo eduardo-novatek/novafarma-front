@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/enums/data_types_enum.dart';
+import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
@@ -18,10 +18,10 @@ class AddUserDialog extends StatefulWidget {
   const AddUserDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
 
   @override
-  AddUserDialogState createState() => AddUserDialogState();
+  State<AddUserDialog> createState() => _AddUserDialogState();
 }
 
-class AddUserDialogState extends State<AddUserDialog> {
+class _AddUserDialogState extends State<AddUserDialog> {
 
   final _formKey = GlobalKey<FormState>();
 
@@ -83,7 +83,7 @@ class AddUserDialogState extends State<AddUserDialog> {
                     controller: _nameController,
                     focusNode: _nameFocusNode,
                     label: 'Nombre',
-                    dataType: DataTypesEnum.text,
+                    dataType: DataTypeEnum.text,
                     maxValueForValidation: 25,
                     textForValidation: 'El nombre es requerido',
                   ),
@@ -93,7 +93,7 @@ class AddUserDialogState extends State<AddUserDialog> {
                     controller: _lastNameController,
                     focusNode: _lastNameFocusNode,
                     label: 'Apellido',
-                    dataType: DataTypesEnum.text,
+                    dataType: DataTypeEnum.text,
                     maxValueForValidation: 25,
                     textForValidation: 'El apellido es requerido',
                   ),
@@ -103,7 +103,7 @@ class AddUserDialogState extends State<AddUserDialog> {
                     controller: _userNameController,
                     focusNode: _userNameFocusNode,
                     label: 'Nombre de usuario',
-                    dataType: DataTypesEnum.text,
+                    dataType: DataTypeEnum.text,
                     maxValueForValidation: 10,
                     textForValidation: 'El nombre de usuario es requerido',
                   ),
@@ -113,7 +113,7 @@ class AddUserDialogState extends State<AddUserDialog> {
                     controller: _passController,
                     focusNode: _passFocusNode,
                     label: 'Contraseña',
-                    dataType: DataTypesEnum.password,
+                    dataType: DataTypeEnum.password,
                     maxValueForValidation: 10,
                     textForValidation: 'La contraseña es requerida',
                   ),

@@ -12,16 +12,16 @@ import 'package:novafarma_front/model/globals/constants.dart' show
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import '../dialogs/add_user_dialog.dart';
 
-class UserAndRoleScreen extends StatefulWidget {
+class UserRoleTaskScreen extends StatefulWidget {
 
   //final GlobalKey<ScaffoldState> scaffoldKey;
-  const UserAndRoleScreen({super.key}); // required this.scaffoldKey});
+  const UserRoleTaskScreen({super.key}); // required this.scaffoldKey});
 
   @override
-  UserAndRoleScreenState createState() => UserAndRoleScreenState();
+  UserRoleTaskScreenState createState() => UserRoleTaskScreenState();
 }
 
-class UserAndRoleScreenState extends State<UserAndRoleScreen> {
+class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   final List<RoleDTO> _roleList = [];
   final List<UserDTO> _userList = [];
   bool _loadingRoles = false;
