@@ -96,9 +96,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
               obscureText: _isObscureText,
 
               onChanged: (value) {
-                if (widget.onChange != null) {
-                  widget.onChange!(value);
-                }
+               if (widget.onChange != null) widget.onChange!(value);
               },
 
               validator: (String? value) {
@@ -278,5 +276,13 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     }
     return [];
   }
+
+  // Esta funcion se deshabilito porque es para validar fechas enteras,
+  // (no se ajusta al onChange)
+  /*bool _validateDate(String date) {
+    final RegExp dateRegex = RegExp(r'^\d{2}/\d{2}/\d{4}$');
+    if (!dateRegex.hasMatch(date)) return false;
+    return true;
+  }*/
 
 }
