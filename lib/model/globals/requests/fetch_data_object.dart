@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
@@ -74,14 +75,18 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
         }
       } catch (e) {
         if (kDebugMode) print("Error al decodificar la respuesta JSON $e");
-        throw Exception('Error al decodificando datos');
+        throw Exception('Error al decodificar la respuesta JSON $e');
       }
+
     } else {
-      if (kDebugMode) print("ERROR: ${response.statusCode}. ${response.body}");
-      throw Exception('${response.statusCode}. ${response.body}');
+      if (response.statusCode == HttpStatus.notFound) return [];
+      String msg = "\nRespuesta del servidor ["
+          "StatusCode: ${response.statusCode}. Body: ${response.body}]\n";
+      if (kDebugMode) print(msg);
+      throw Exception(msg);
     }
   } catch (e) {
-    if (kDebugMode) print(e);
+    if (kDebugMode) print("$e");
     throw Exception(e);
   }
 

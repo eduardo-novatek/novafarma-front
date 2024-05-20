@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
+import 'package:novafarma_front/model/globals/requests/fetch_supplierList.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
+import 'package:novafarma_front/view/boxes/supplier_box.dart';
 
 import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/data_type_enum.dart';
@@ -27,7 +30,7 @@ class VoucherScreen extends StatefulWidget {
 class _VoucherScreenState extends State<VoucherScreen> {
 
   final ThemeData _themeData = ThemeData();
-  bool _loading = false;
+  //bool _loading = false;
   String _selectedMovementType = defaultTextFromDropdownMenu;
 
   Map<String, dynamic> _selectedSupplier = {
@@ -121,7 +124,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildMovementTypeBox() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Tipo: ",
           style: TextStyle(fontSize: 16.0),
@@ -165,31 +169,51 @@ class _VoucherScreenState extends State<VoucherScreen> {
     if (_supplierList.isEmpty) {
       try {
         //Actualiza lista de proveedores
-        await _fetchSupplierList();
+        await fetchSupplierList(_supplierList);//_fetchSupplierList();
       } catch (e) {
         if (kDebugMode) print('Error cargando proveedores: $e');
         throw Exception('Error cargando proveedores: $e');
       }
     }
     return Expanded(
-      child: Row(
-        children: [
-          const SizedBox(width: 16.0),
-          CustomDropdown<SupplierDTO>(
-            themeData: _themeData,
-            modelList: _supplierList,
-            model: _supplierList[0],
-            callback: (supplier) {
-              setState(() {
-                _selectedSupplier = {
-                  'id': supplier?.supplierId,
-                  'name': supplier?.name,
-                };
-              });
-            },
-          ),
-          const SizedBox(width: 8.0,),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () async => await fetchSupplierList(_supplierList), //_fetchSupplierList,
+                  icon: const Icon(
+                    Icons.refresh_rounded,
+                    color: Colors.blue,
+                    size: 16.0,
+                  ),
+
+                ),
+                const Text('Proveedor:', style: TextStyle(fontSize: 16.0),),
+              ],
+            ),
+            Row(
+              children: [
+                CustomDropdown<SupplierDTO>(
+                  themeData: _themeData,
+                  modelList: _supplierList,
+                  model: _supplierList[0],
+                  callback: (supplier) {
+                    setState(() {
+                      _selectedSupplier = {
+                        'id': supplier?.supplierId,
+                        'name': supplier?.name,
+                      };
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -225,7 +249,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   FutureBuilder<Widget> supplierListFutureBuilder() {
     return FutureBuilder<Widget>(
-      future: _buildSupplierBox(),
+      future: drawSupplierBox(),//_buildSupplierBox(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
@@ -233,6 +257,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           if (snapshot.hasData) {
             return snapshot.data!;
           } else {
+            // Retrasar la llamada a floatingMessage para evitar errores durante la construcción del widget
             Future.delayed(Duration.zero, ()  {
               if (snapshot.hasData) {
                 showMessageConnectionError(context);
@@ -248,6 +273,9 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
+  Future<Widget> drawSupplierBox() async {
+    return SupplierBox(supplierList: _supplierList, selectedSupplier: _selectedSupplier);
+  }
 
   void showMessageConnectionError(BuildContext context) {
     return floatingMessage(
@@ -369,6 +397,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
         );
         // _loading = false;
       });
+    }).onError((error, stackTrace) {
+      throw Exception(error);
     });
   }
 
