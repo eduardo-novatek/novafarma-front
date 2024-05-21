@@ -46,7 +46,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   final FocusNode _dateFocusNode = FocusNode();
   final FocusNode _timeFocusNode = FocusNode();
 
-  final List<SupplierDTO> _supplierList = [];
+  late final List<SupplierDTO> _supplierList = [];
 
   @override
   void initState() {
@@ -71,10 +71,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        width: MediaQuery
-            .of(context)
-            .size
-            .width * 0.6,
+        width: MediaQuery.of(context).size.width * 0.6,
         decoration: BoxDecoration(
           border: Border.all(
             color: Colors.black,
@@ -165,15 +162,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
 //@1
-  Future<Widget> _buildSupplierBox() async {
+  Widget _buildSupplierBox() {
     if (_supplierList.isEmpty) {
-      try {
-        //Actualiza lista de proveedores
-        await fetchSupplierList(_supplierList);//_fetchSupplierList();
-      } catch (e) {
-        if (kDebugMode) print('Error cargando proveedores: $e');
-        throw Exception('Error cargando proveedores: $e');
-      }
+      //Actualiza lista de proveedores
+      fetchSupplierList(_supplierList);//_fetchSupplierList();
     }
     return Expanded(
       child: Padding(
@@ -184,7 +176,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
             Row(
               children: [
                 IconButton(
-                  onPressed: () async => await fetchSupplierList(_supplierList), //_fetchSupplierList,
+                  onPressed: () => fetchSupplierList(_supplierList), //_fetchSupplierList,
                   icon: const Icon(
                     Icons.refresh_rounded,
                     color: Colors.blue,
@@ -237,99 +229,23 @@ class _VoucherScreenState extends State<VoucherScreen> {
     if (_selectedMovementType != defaultTextFromDropdownMenu) {
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
           _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)) {
-        return supplierListFutureBuilder();
+        return SupplierBox(
+            supplierList: _supplierList, selectedSupplier: _selectedSupplier);
       } else
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
-        return customerListFutureBuilder();
+        //return CustomerBox(customerList: _customerList, selectedCustomer: _selectedCustomer);
       }
     }
     return const SizedBox();
   }
 
-
-  FutureBuilder<Widget> supplierListFutureBuilder() {
-    return FutureBuilder<Widget>(
-      future: drawSupplierBox(),//_buildSupplierBox(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            return snapshot.data!;
-          } else {
-            // Retrasar la llamada a floatingMessage para evitar errores durante la construcción del widget
-            Future.delayed(Duration.zero, ()  {
-              if (snapshot.hasData) {
-                showMessageConnectionError(context);
-              }
-            });
-            return const SizedBox();
-          }
-        } else {
-          if (snapshot.hasError) showMessageConnectionError(context);
-          return const SizedBox();
-        }
-      },
-    );
-  }
-
-  Future<Widget> drawSupplierBox() async {
-    return SupplierBox(supplierList: _supplierList, selectedSupplier: _selectedSupplier);
-  }
-
   void showMessageConnectionError(BuildContext context) {
-    return floatingMessage(
+    floatingMessage(
                   context: context,
                   text: "Error de conexión",
                   messageTypeEnum: MessageTypeEnum.error
     );
   }
-
-  /*FutureBuilder<Widget> supplierListFutureBuilder() {
-    return FutureBuilder<Widget>(
-      future: _buildSupplierBox(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          // Retrasar la llamada a floatingMessage para evitar errores durante la construcción del widget
-          Future.delayed(Duration.zero, () {
-            floatingMessage(
-                context: context,
-                text: "Error de conexión",
-                messageTypeEnum: MessageTypeEnum.error
-            );
-          });
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          // Retorna el resultado de _buildSupplierBox() o SizedBox si es nulo
-          return snapshot.data ?? const SizedBox();
-        }
-        return const SizedBox();
-      },
-    );
-  }*/
-
-  //@2
-  FutureBuilder<Widget> customerListFutureBuilder() {
-    return FutureBuilder<Widget>(
-      future: _buildSupplierBox(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          // Retrasar la llamada a floatingMessage para evitar errores durante la construcción del widget
-          Future.delayed(Duration.zero, () {
-            showMessageConnectionError(context);
-          });
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          // Retorna el resultado de _buildSupplierBox() o SizedBox si es nulo
-          return snapshot.data ?? const SizedBox();
-        }
-        return const SizedBox();
-      },
-    );
-  }
-
 
   Widget _buildDateTimeBox() {
     return Expanded(
@@ -358,49 +274,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
-  //String timeNow() => '${DateTime.now().hour}:${DateTime.now().minute}}';
   String timeNow() {
     final formatter = DateFormat('HH:mm');
     return formatter.format(DateTime.now());
   }
 
-  //String dateNow() => '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}';
   String dateNow() {
     final formatter = DateFormat('dd/MM/yyyy');
     return formatter.format(DateTime.now());
   }
 
-  Future<void> _fetchSupplierList() async {
-    fetchDataObject<SupplierDTO>(
-      uri: uriSupplierFindAll,
-      classObject: SupplierDTO.empty(),
-
-    ).then((data) {
-      setState(() {
-        _supplierList.clear();
-        _supplierList.addAll(data.cast<SupplierDTO>().map((e) =>
-            SupplierDTO(
-              supplierId: e.supplierId,
-              name: e.name,
-              telephone1: e.telephone1,
-              telephone2: e.telephone2,
-              address: e.address,
-              email: e.email,
-              notes: e.notes,
-            )
-        ));
-        _supplierList.insert(
-            0,
-            SupplierDTO(
-                name: defaultTextFromDropdownMenu, supplierId: 0, isFirst: true
-            )
-        );
-        // _loading = false;
-      });
-    }).onError((error, stackTrace) {
-      throw Exception(error);
-    });
-  }
 
 }
 

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../model/DTOs/supplier_dto.dart';
+import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_supplierList.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
+import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
+import '../../model/globals/tools/floating_message.dart';
 
 class SupplierBox extends StatefulWidget {
-  final List<SupplierDTO> supplierList;
+  late final List<SupplierDTO> supplierList;
   late final Map<String, dynamic> selectedSupplier;
 
   SupplierBox({
@@ -19,12 +22,12 @@ class SupplierBox extends StatefulWidget {
 }
 
 class SupplierBoxState extends State<SupplierBox> {
-  late Future<void> _fetchSupplierListFuture;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchSupplierListFuture = fetchSupplierList(widget.supplierList);
+    _updateSupplierList();
   }
 
   @override
@@ -39,9 +42,9 @@ class SupplierBoxState extends State<SupplierBox> {
               children: [
                 IconButton(
                   onPressed: () {
-                    setState(() {
-                      _fetchSupplierListFuture = fetchSupplierList(widget.supplierList);
-                    });
+                    if (!_isLoading) {
+                      _updateSupplierList();
+                    }
                   },
                   icon: const Icon(
                     Icons.refresh_rounded,
@@ -52,15 +55,9 @@ class SupplierBoxState extends State<SupplierBox> {
                 const Text('Proveedor:', style: TextStyle(fontSize: 16.0)),
               ],
             ),
-            FutureBuilder<void>(
-              future: _fetchSupplierListFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return CustomDropdown<SupplierDTO>(
+            _isLoading
+                ? const CircularProgressIndicator()
+                : CustomDropdown<SupplierDTO>(
                     themeData: ThemeData(),
                     modelList: widget.supplierList,
                     model: widget.supplierList.isNotEmpty ? widget.supplierList[0] : null,
@@ -72,16 +69,58 @@ class SupplierBoxState extends State<SupplierBox> {
                         };
                       });
                     },
-                  );
-                }
-              },
-            ),
+                  ),
           ],
         ),
       ),
     );
   }
+
+  Future<void> _updateSupplierList() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+       await fetchSupplierList(widget.supplierList).then((value) {
+         widget.supplierList.insert(
+             0,
+             SupplierDTO(
+               isFirst: true,
+               name: defaultTextFromDropdownMenu,
+               supplierId: 0,
+             ));
+       });
+
+    } catch (error) {
+        _showMessageConnectionError(context);
+
+    } finally {
+      if (widget.supplierList.isEmpty) {
+        widget.supplierList.add(
+            SupplierDTO(
+              isFirst: true,
+              name: defaultTextFromDropdownMenu,
+              supplierId: 0,
+            ));
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showMessageConnectionError(BuildContext context) {
+    floatingMessage(
+      context: context,
+      text: "Error de conexión",
+      messageTypeEnum: MessageTypeEnum.error,
+    );
+  }
 }
+
+
+
 
 
 /*class SupplierBox extends StatefulWidget {
