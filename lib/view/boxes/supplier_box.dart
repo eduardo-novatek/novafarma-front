@@ -8,20 +8,21 @@ import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
 
 class SupplierBox extends StatefulWidget {
-  late final List<SupplierDTO> supplierList;
-  late final Map<String, dynamic> selectedSupplier;
+  final int selectedSupplierId;
+  final ValueChanged<int> onSelectedSupplierIdChanged;
 
-  SupplierBox({
-    Key? key,
-    required this.supplierList,
-    required this.selectedSupplier,
-  }) : super(key: key);
+  const SupplierBox({
+    super.key,
+    required this.selectedSupplierId,
+    required this.onSelectedSupplierIdChanged,
+  });
 
   @override
   SupplierBoxState createState() => SupplierBoxState();
 }
 
 class SupplierBoxState extends State<SupplierBox> {
+  final List<SupplierDTO> _supplierList = [];
   bool _isLoading = false;
 
   @override
@@ -59,17 +60,14 @@ class SupplierBoxState extends State<SupplierBox> {
                 ? const CircularProgressIndicator()
                 : CustomDropdown<SupplierDTO>(
                     themeData: ThemeData(),
-                    modelList: widget.supplierList,
-                    model: widget.supplierList.isNotEmpty ? widget.supplierList[0] : null,
+                    modelList: _supplierList,
+                    model: _supplierList.isNotEmpty ? _supplierList[0] : null,
                     callback: (supplier) {
                       setState(() {
-                        widget.selectedSupplier = {
-                          'id': supplier?.supplierId,
-                          'name': supplier?.name,
-                        };
+                        widget.onSelectedSupplierIdChanged(supplier!.supplierId!);
                       });
                     },
-                  ),
+                ),
           ],
         ),
       ),
@@ -82,27 +80,29 @@ class SupplierBoxState extends State<SupplierBox> {
     });
 
     try {
-       await fetchSupplierList(widget.supplierList).then((value) {
-         widget.supplierList.insert(
-             0,
-             SupplierDTO(
-               isFirst: true,
-               name: defaultTextFromDropdownMenu,
-               supplierId: 0,
-             ));
-       });
-
+      await fetchSupplierList(_supplierList).then((value) {
+        _supplierList.insert(
+          0,
+          SupplierDTO(
+            isFirst: true,
+            name: defaultTextFromDropdownMenu,
+            supplierId: 0,
+          ),
+        );
+        widget.onSelectedSupplierIdChanged(0);
+      });
     } catch (error) {
-        _showMessageConnectionError(context);
-
+      _showMessageConnectionError(context);
     } finally {
-      if (widget.supplierList.isEmpty) {
-        widget.supplierList.add(
-            SupplierDTO(
-              isFirst: true,
-              name: defaultTextFromDropdownMenu,
-              supplierId: 0,
-            ));
+      if (_supplierList.isEmpty) {
+        _supplierList.add(
+          SupplierDTO(
+            isFirst: true,
+            name: defaultTextFromDropdownMenu,
+            supplierId: 0,
+          ),
+        );
+        widget.onSelectedSupplierIdChanged(0);
       }
       setState(() {
         _isLoading = false;
@@ -120,17 +120,14 @@ class SupplierBoxState extends State<SupplierBox> {
 }
 
 
-
-
-
 /*class SupplierBox extends StatefulWidget {
-  final List<SupplierDTO> supplierList;
-  late final Map<String, dynamic> selectedSupplier;
+  //late final List<SupplierDTO> supplierList;
+  int selectedSupplierId;
 
   SupplierBox({
     super.key,
-    required this.supplierList,
-    required this.selectedSupplier,
+    //required this.supplierList,
+    required this.selectedSupplierId,
   });
 
   @override
@@ -138,13 +135,13 @@ class SupplierBoxState extends State<SupplierBox> {
 }
 
 class SupplierBoxState extends State<SupplierBox> {
-
-   final ThemeData _themeData = ThemeData();
+  List<SupplierDTO> _supplierList = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    fetchSupplierList(widget.supplierList); // Carga inicial de proveedores
+    _updateSupplierList();
   }
 
   @override
@@ -158,7 +155,11 @@ class SupplierBoxState extends State<SupplierBox> {
             Row(
               children: [
                 IconButton(
-                  onPressed: () async => await fetchSupplierList(widget.supplierList),
+                  onPressed: () {
+                    if (!_isLoading) {
+                      _updateSupplierList();
+                    }
+                  },
                   icon: const Icon(
                     Icons.refresh_rounded,
                     color: Colors.blue,
@@ -168,27 +169,69 @@ class SupplierBoxState extends State<SupplierBox> {
                 const Text('Proveedor:', style: TextStyle(fontSize: 16.0)),
               ],
             ),
-            Row(
-              children: [
-                CustomDropdown<SupplierDTO>(
-                  themeData: _themeData,
-                  modelList: widget.supplierList,
-                  model: widget.supplierList[0],
-                  callback: (supplier) {
-                    setState(() {
-                      widget.selectedSupplier = {
-                        'id': supplier?.supplierId,
-                        'name': supplier?.name,
-                      };
-                    });
-                  },
-                ),
-              ],
-            ),
+            _isLoading
+                ? const CircularProgressIndicator()
+                : CustomDropdown<SupplierDTO>(
+                    themeData: ThemeData(),
+                    modelList: _supplierList,
+                    model: _supplierList.isNotEmpty ? _supplierList[0] : null,
+                    callback: (supplier) {
+                      setState(() {
+                        widget.selectedSupplierId = supplier!.supplierId!;
+                      });
+                    },
+                  ),
           ],
         ),
       ),
     );
   }
+
+  Future<void> _updateSupplierList() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+       await fetchSupplierList(_supplierList).then((value) {
+         _supplierList.insert(
+             0,
+             SupplierDTO(
+               isFirst: true,
+               name: defaultTextFromDropdownMenu,
+               supplierId: 0,
+         ));
+         widget.selectedSupplierId = 0;
+       });
+
+    } catch (error) {
+        _showMessageConnectionError(context);
+
+    } finally {
+      if (_supplierList.isEmpty) {
+        _supplierList.add(
+            SupplierDTO(
+              isFirst: true,
+              name: defaultTextFromDropdownMenu,
+              supplierId: 0,
+            ));
+        widget.selectedSupplierId = 0;
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showMessageConnectionError(BuildContext context) {
+    floatingMessage(
+      context: context,
+      text: "Error de conexión",
+      messageTypeEnum: MessageTypeEnum.error,
+    );
+  }
 }
 */
+
+
+

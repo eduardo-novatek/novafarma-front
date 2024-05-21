@@ -33,10 +33,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
   //bool _loading = false;
   String _selectedMovementType = defaultTextFromDropdownMenu;
 
-  Map<String, dynamic> _selectedSupplier = {
-    'id': 0,
-    'name': '',
-  };
+  int _selectedSupplierId = 0;
+  //final List<SupplierDTO> _supplierList = [];
 
   // documento de identidad del cliente (o RUT del proveedor si se implementa)
   final TextEditingController _documentController = TextEditingController();
@@ -46,7 +44,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
   final FocusNode _dateFocusNode = FocusNode();
   final FocusNode _timeFocusNode = FocusNode();
 
-  late final List<SupplierDTO> _supplierList = [];
 
   @override
   void initState() {
@@ -115,6 +112,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
           _buildMovementTypeBox(),
           _buildClientOrSupplierBox(),
           _buildDateTimeBox(),
+          //@1
+          IconButton(onPressed: () => print(_selectedSupplierId), icon: Icon(Icons.abc)),
         ],
       ),
     );
@@ -161,76 +160,18 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
-//@1
-  Widget _buildSupplierBox() {
-    if (_supplierList.isEmpty) {
-      //Actualiza lista de proveedores
-      fetchSupplierList(_supplierList);//_fetchSupplierList();
-    }
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () => fetchSupplierList(_supplierList), //_fetchSupplierList,
-                  icon: const Icon(
-                    Icons.refresh_rounded,
-                    color: Colors.blue,
-                    size: 16.0,
-                  ),
-
-                ),
-                const Text('Proveedor:', style: TextStyle(fontSize: 16.0),),
-              ],
-            ),
-            Row(
-              children: [
-                CustomDropdown<SupplierDTO>(
-                  themeData: _themeData,
-                  modelList: _supplierList,
-                  model: _supplierList[0],
-                  callback: (supplier) {
-                    setState(() {
-                      _selectedSupplier = {
-                        'id': supplier?.supplierId,
-                        'name': supplier?.name,
-                      };
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildBody() {
     return const SizedBox();
   }
 
-  /*Widget _buildClientOrSupplierBox() {
-    if (_selectedMovementType != defaultTextFromDropdownMenu) {
-      if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase)
-            || _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)) {
-        return _buildSupplierBox();
-      } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
-          return _buildClientBox();
-      }
-    }
-    return const SizedBox();
-  }*/
   Widget _buildClientOrSupplierBox() {
     if (_selectedMovementType != defaultTextFromDropdownMenu) {
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
           _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)) {
         return SupplierBox(
-            supplierList: _supplierList, selectedSupplier: _selectedSupplier);
+          selectedSupplierId: _selectedSupplierId,
+          onSelectedSupplierIdChanged: (value) => _selectedSupplierId = value,
+        );
       } else
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
         //return CustomerBox(customerList: _customerList, selectedCustomer: _selectedCustomer);
