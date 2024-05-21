@@ -10,9 +10,11 @@ import '../../model/globals/tools/floating_message.dart';
 class SupplierBox extends StatefulWidget {
   final int selectedSupplierId;
   final ValueChanged<int> onSelectedSupplierIdChanged;
+  final ValueChanged<bool>? onRefreshButtonChange;
 
   const SupplierBox({
     super.key,
+    this.onRefreshButtonChange,
     required this.selectedSupplierId,
     required this.onSelectedSupplierIdChanged,
   });
@@ -42,9 +44,13 @@ class SupplierBoxState extends State<SupplierBox> {
             Row(
               children: [
                 IconButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (!_isLoading) {
-                      _updateSupplierList();
+                      // llama al callback: esta haciendo el refresh...
+                      if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(true);
+                      await _updateSupplierList();
+                      // llama al callback: no está haciendo el refresh...
+                      if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(false);
                     }
                   },
                   icon: const Icon(
@@ -118,6 +124,7 @@ class SupplierBoxState extends State<SupplierBox> {
     );
   }
 }
+
 
 
 /*class SupplierBox extends StatefulWidget {
