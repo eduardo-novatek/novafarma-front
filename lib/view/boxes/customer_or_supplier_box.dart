@@ -35,13 +35,13 @@ class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
   final List<SupplierDTO> _supplierList = [];
 
   bool _isLoading = false;
-  late final bool isCustomer;
+  late final bool _isCustomer;
 
   @override
   void initState() {
     super.initState();
-    isCustomer = (widget.movementType == MovementTypeEnum.sale);
-    isCustomer ? _updateCustomerList() : _updateSupplierList();
+    _isCustomer = (widget.movementType == MovementTypeEnum.sale);
+    _isCustomer ? _updateCustomerList() : _updateSupplierList();
   }
 
   @override
@@ -55,15 +55,15 @@ class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                _buildRefreshButton(isCustomer),
-                Text(isCustomer ? 'Cliente:' : 'Proveedor:',
+                _buildRefreshButton(_isCustomer),
+                Text(_isCustomer ? 'Cliente:' : 'Proveedor:',
                      style: const TextStyle(fontSize: 16.0)
                 ),
               ],
             ),
             _isLoading
                 ? buildCircularProgress()
-                : isCustomer
+                : _isCustomer
                     ? _buildCustomDropdownCustomer()
                     : _buildCustomDropdownSupplier()
           ],
@@ -175,7 +175,7 @@ class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
     } catch (error) {
       _showMessageConnectionError(context);
     } finally {
-      if (_supplierList.isEmpty) {
+      if (_customerList.isEmpty) {
         _customerList.insert(
           0,
           CustomerDTO(

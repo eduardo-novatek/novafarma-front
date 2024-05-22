@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
@@ -56,7 +57,7 @@ class CustomerDTO extends Deserializable<CustomerDTO> {
       lastname: json['lastname'],
       document: json['document'],
       telephone: json['telephone'],
-      addDate: json['addDate'],
+      addDate: DateFormat("dd/MM/yyyy").parse(json['addDate']),
       paymentNumber: json['paymentNumber'],
       partner: json['partner'],
       deleted: json['deleted'],
