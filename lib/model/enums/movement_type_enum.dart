@@ -14,3 +14,13 @@ String nameMovementType(MovementTypeEnum movementTypeEnum) {
     default:  return "";
   }
 }
+
+MovementTypeEnum? toMovementTypeEnum(String movementType) {
+  switch (movementType) {
+    case "Compra": return MovementTypeEnum.purchase;
+    case "Venta": return MovementTypeEnum.sale;
+    case "Devolución al proveedor": return MovementTypeEnum.returnToSupplier;
+    case "Ajuste de stock": return MovementTypeEnum.adjustmentStock;
+    default: return null;
+  }
+}

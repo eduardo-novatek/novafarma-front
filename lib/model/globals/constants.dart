@@ -36,5 +36,8 @@ const String uriUserFindAll = "/user/findAll";
 const String uriUserFindId = "/user/findId";
 const String uriUserNameExist = "user/userNameExist";
 
+//Clientes
+const String uriCustomerFindAll = "/customer/findAll";
+
 //Proveedores
 const String uriSupplierFindAll = "/supplier/findAll";

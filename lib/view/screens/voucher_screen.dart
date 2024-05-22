@@ -1,24 +1,15 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_supplierList.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
-import 'package:novafarma_front/view/boxes/supplier_box.dart';
+import 'package:novafarma_front/view/boxes/customer_or_supplier_box.dart';
 
-import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/data_type_enum.dart';
-import '../../model/enums/message_type_enum.dart';
-import '../../model/enums/request_type_enum.dart';
 import '../../model/globals/publics.dart';
-import '../../model/globals/requests/fetch_data_object.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-    defaultTextFromDropdownMenu, uriSupplierFindAll;
-
-import '../../model/globals/tools/floating_message.dart';
+    defaultTextFromDropdownMenu;
 
 class VoucherScreen extends StatefulWidget {
   const VoucherScreen({super.key});
@@ -39,9 +30,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   final FocusNode _timeFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
-
-  int _selectedSupplierId = 0;
-  //final ValueNotifier<int> _<selectedSupplierId = ValueNotifier<int>(0);
+  int _selectedCustomerOrSupplierId = 0;
 
   @override
   void initState() {
@@ -110,7 +99,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           _buildClientOrSupplierBox(),
           _buildDateTimeBox(),
           //IconButton(onPressed: () => print(_selectedSupplierId.value), icon: Icon(Icons.abc)),
-          IconButton(onPressed: () => print(_selectedSupplierId), icon: Icon(Icons.abc)),
+          IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
 
         ],
       ),
@@ -182,16 +171,27 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Widget _buildClientOrSupplierBox() {
     if (_selectedMovementType != defaultTextFromDropdownMenu) {
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
-          _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)) {
-        return SupplierBox(
-          selectedSupplierId: _selectedSupplierId,
-          onSelectedSupplierIdChanged: (value) => setState(() {
-            _selectedSupplierId = value;
+          _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier) ||
+          _selectedMovementType == nameMovementType(MovementTypeEnum.sale)
+      ) {
+        return CustomerOrSupplierBox(
+          movementType: toMovementTypeEnum(_selectedMovementType)!,
+          selectedId: _selectedCustomerOrSupplierId,
+          onSelectedIdChanged: (value) => setState(() {
+            _selectedCustomerOrSupplierId = value;
           }),
         );
-      } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
-        // return CustomerBox(customerList: _customerList, selectedCustomer: _selectedCustomer);
       }
+      /*if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
+          _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)) {
+        return SupplierBox(
+          movementType: toMovementTypeEnum(_selectedMovementType)!,
+          selectedId: _selectedCustomerOrSupplierId,
+          onSelectedIdChanged: (value) => setState(() {
+            _selectedCustomerOrSupplierId = value;
+          }),
+        );
+      }*/
     }
     return const SizedBox.shrink();
   }
