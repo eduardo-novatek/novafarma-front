@@ -74,19 +74,14 @@ class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DropdownButton<T>(
-
         menuMaxHeight: menuMaxHeight,
         dropdownColor: widget.themeData.colorScheme.secondaryContainer,
-
         style: TextStyle(
           color: widget.themeData.primaryColor,
           fontSize: widget.themeData.textTheme.bodyMedium?.fontSize,
         ),
-
         isDense: true,
-
         value: object,
-
         items: widget.modelList.map((T? value) {
           return DropdownMenuItem<T>(
             value: value,

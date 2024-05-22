@@ -5,43 +5,36 @@ import 'package:novafarma_front/model/globals/build_circular_progress.dart';
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/requests/fetch_customer_list.dart';
 import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
 
-class CustomerOrSupplierBox extends StatefulWidget {
-  final MovementTypeEnum movementType;
+class SupplierBox extends StatefulWidget {
   final int selectedId;
   final ValueChanged<int> onSelectedIdChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
-  const CustomerOrSupplierBox({
+  const SupplierBox({
     super.key,
     this.onRefreshButtonChange,
-    required this.movementType,
     required this.selectedId,
     required this.onSelectedIdChanged,
   });
 
   @override
-  CustomerOrSupplierBoxState createState() => CustomerOrSupplierBoxState();
+  SupplierBoxState createState() => SupplierBoxState();
 }
 
-class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
+class SupplierBoxState extends State<SupplierBox> {
 
-  final List<CustomerDTO> _customerList = [];
   final List<SupplierDTO> _supplierList = [];
-
   bool _isLoading = false;
-  late final bool _isCustomer;
 
   @override
   void initState() {
     super.initState();
-    _isCustomer = (widget.movementType == MovementTypeEnum.sale);
-    _isCustomer ? _updateCustomerList() : _updateSupplierList();
+    _updateSupplierList();
   }
 
   @override
@@ -55,34 +48,30 @@ class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                _buildRefreshButton(_isCustomer),
-                Text(_isCustomer ? 'Cliente:' : 'Proveedor:',
-                     style: const TextStyle(fontSize: 16.0)
+                _buildRefreshButton(),
+                const Text('Proveedor:',
+                     style: TextStyle(fontSize: 16.0)
                 ),
               ],
             ),
             _isLoading
                 ? buildCircularProgress()
-                : _isCustomer
-                    ? _buildCustomDropdownCustomer()
-                    : _buildCustomDropdownSupplier()
+                : _buildCustomDropdown()
           ],
         ),
       ),
     );
   }
 
-  IconButton _buildRefreshButton(bool isCustomer) {
+  IconButton _buildRefreshButton() {
     return IconButton(
       onPressed: () async {
         if (!_isLoading) {
           // llama al callback: esta haciendo el refresh...
-          if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(true);
-          if (isCustomer) {
-            await _updateCustomerList();
-          } else {
-            await _updateSupplierList();
+          if (widget.onRefreshButtonChange != null) {
+            widget.onRefreshButtonChange!(true);
           }
+          await _updateSupplierList();
           // llama al callback: no está haciendo el refresh...
           if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(false);
         }
@@ -95,20 +84,7 @@ class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
     );
   }
 
-  CustomDropdown<CustomerDTO> _buildCustomDropdownCustomer() {
-    return CustomDropdown<CustomerDTO>(
-      themeData: ThemeData(),
-      modelList: _customerList,
-      model: _customerList.isNotEmpty ? _customerList[0] : null,
-      callback: (customer) {
-        setState(() {
-          widget.onSelectedIdChanged(customer!.customerId!);
-        });
-      },
-    );
-  }
-
-  CustomDropdown<SupplierDTO> _buildCustomDropdownSupplier() {
+  CustomDropdown<SupplierDTO> _buildCustomDropdown() {
     return CustomDropdown<SupplierDTO>(
       themeData: ThemeData(),
       modelList: _supplierList,
@@ -146,42 +122,6 @@ class CustomerOrSupplierBoxState extends State<CustomerOrSupplierBox> {
             isFirst: true,
             name: defaultTextFromDropdownMenu,
             supplierId: 0,
-          ),
-        );
-        widget.onSelectedIdChanged(0);
-      }
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _updateCustomerList() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      await fetchCustomerList(_customerList).then((value) {
-        _customerList.insert(
-          0,
-          CustomerDTO(
-            isFirst: true,
-            name: defaultTextFromDropdownMenu,
-            customerId: 0,
-          ),
-        );
-        widget.onSelectedIdChanged(0);
-      });
-    } catch (error) {
-      _showMessageConnectionError(context);
-    } finally {
-      if (_customerList.isEmpty) {
-        _customerList.insert(
-          0,
-          CustomerDTO(
-            isFirst: true,
-            name: defaultTextFromDropdownMenu,
-            customerId: 0,
           ),
         );
         widget.onSelectedIdChanged(0);
