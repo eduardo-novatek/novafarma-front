@@ -39,7 +39,7 @@ const String uriUserNameExist = "user/userNameExist";
 //Customers
 const String uriCustomerFindAll = "/customer/findAll";
 const String uriCustomerFindDocument = "/customer/findDocument";
-const String uriCustomerFindLastname = "/customer/findLastname";
+const String uriCustomerFindLastnameName = "/customer/findLastnameName";
 
 //Suppliers
 const String uriSupplierFindAll = "/supplier/findAll";

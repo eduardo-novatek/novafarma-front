@@ -11,11 +11,11 @@ import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
 
 class CustomerBox extends StatefulWidget {
-  final int selectedId;
+  int selectedId;
   final ValueChanged<int> onSelectedIdChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
-  const CustomerBox({
+  CustomerBox({
     super.key,
     this.onRefreshButtonChange,
     required this.selectedId,
@@ -45,7 +45,6 @@ class CustomerBoxState extends State<CustomerBox> {
   @override
   void initState() {
     super.initState();
-    _updateCustomerList();
     _createListeners();
   }
 
@@ -66,20 +65,13 @@ class CustomerBoxState extends State<CustomerBox> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _buildRefreshButton(),
-                const Text('Cliente:',
-                     style: TextStyle(fontSize: 16.0)
-                ),
-              ],
-            ),
             _isLoading
                 ? buildCircularProgress()
                 : _buildSearchBox(),
             _customerFound != null
-                ? Text(_customerFound!)
+                ? Text(_customerFound!,
+                    style: const TextStyle(fontSize: 16.0)
+                  )
                 : const SizedBox.shrink(),
           ],
         ),
@@ -124,22 +116,26 @@ class CustomerBoxState extends State<CustomerBox> {
       _isLoading = true;
     });
     try {
+      //Busca por documento o po apellido.
+      //Por documento, se devuelve la lista solo con el cliente encontrado (sin "seleccione...")
+      //Por apellido, se devuelve la lista con las coincidencias (con "seleccione...")
       await fetchCustomerList(
-          customerList: _customerList,
-          searchByDocument: isDocument)
-          .then((value) {
-            if (! isDocument) {
-              _customerList.insert(
-                0,
-                CustomerDTO(
-                  isFirst: true,
-                  name: defaultTextFromDropdownMenu,
-                  customerId: 0,
-                ),
-              );
-            }
-            widget.onSelectedIdChanged(0);
-          });
+        customerList: _customerList,
+        searchByDocument: isDocument,
+        value: value,
+      ).then((value) {
+          if (! isDocument) {
+            _customerList.insert(
+              0,
+              CustomerDTO(
+                isFirst: true,
+                name: defaultTextFromDropdownMenu,
+                customerId: 0,
+              ),
+            );
+          }
+          widget.onSelectedIdChanged(0);
+        });
     } catch (error) {
       _showMessageConnectionError(context);
     } finally {
@@ -157,25 +153,6 @@ class CustomerBoxState extends State<CustomerBox> {
         _isLoading = false;
       });
     }
-  }
-
-  IconButton _buildRefreshButton() {
-    return IconButton(
-      onPressed: () async {
-        if (!_isLoading) {
-          // llama al callback: esta haciendo el refresh...
-          if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(true);
-          await _updateCustomerList();
-          // llama al callback: no está haciendo el refresh...
-          if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(false);
-        }
-      },
-      icon: const Icon(
-        Icons.refresh_rounded,
-        color: Colors.blue,
-        size: 16.0,
-      ),
-    );
   }
 
   CustomDropdown<CustomerDTO> _buildCustomDropdown() {
@@ -200,20 +177,52 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   void _createListeners() {
-    _documentFocusNode.addListener(() {
-      // perdida de foco
+    _documentFocusNode.addListener(() async {
+
+      // perdida de foco;
       if (!_documentFocusNode.hasFocus) {
-
+        if (_documentController.text.trim().isNotEmpty) {
+          await _updateCustomerList(_documentController.text);
+          if (_customerList.length == 1) {
+            _customerFound =
+                '${_customerList[0].name} '
+                '${_customerList[0].lastname} '
+                '(${_customerList[0].document})';
+            widget.selectedId = _customerList[0].customerId!;
+          } else {
+            _customerFound = null;
+            widget.selectedId = 0;
+            //FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
+            floatingMessage(
+                context: context,
+                text: 'Cédula no registrada',
+                messageTypeEnum: MessageTypeEnum.warning
+            );
+          }
+        }
       }
-
     });
 
-    _lastnameFocusNode.addListener(() {
+    _lastnameFocusNode.addListener(() async {
       // perdida de foco
-      if (!_documentFocusNode.hasFocus) {
+      if (!_lastnameFocusNode.hasFocus) {
+        if (_lastnameController.text.trim().isNotEmpty) {
+          await _updateCustomerList(_lastnameController.text);
+          if (_customerList.length > 1) {
+            //@1
+          } else {
+            _customerFound = null;
+            widget.selectedId = 0;
+            //FocusScope.of(context).requestFocus(_lastnameFocusNode); //foco a apellido
+            floatingMessage(
+                context: context,
+                text: 'Apellido no registrado',
+                messageTypeEnum: MessageTypeEnum.warning
+            );
 
+          }
+        }
       }
-
     });
 
 
