@@ -2,10 +2,13 @@ import '../../DTOs/customer_dto.dart';
 import '../constants.dart' show uriCustomerFindAll;
 import 'fetch_data_object.dart';
 
-Future<void> fetchCustomerList(List<CustomerDTO> customerList) async {
+Future<void> fetchCustomerList({
+  required List<CustomerDTO> customerList,
+  required bool searchByDocument //true=buscar por documento. false=buscar por apellido
+}) async {
 
   await fetchDataObject<CustomerDTO>(
-    uri: uriCustomerFindAll,
+    uri: searchByDocument ? uriCustomerFindDocument : uriCustomerFindLastname,
     classObject: CustomerDTO.empty(),
   ).then((data) {
       customerList.clear();

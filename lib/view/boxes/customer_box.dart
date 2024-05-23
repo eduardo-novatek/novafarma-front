@@ -46,6 +46,7 @@ class CustomerBoxState extends State<CustomerBox> {
   void initState() {
     super.initState();
     _updateCustomerList();
+    _createListeners();
   }
 
   @override
@@ -116,26 +117,33 @@ class CustomerBoxState extends State<CustomerBox> {
     );
   }
 
-  Future<void> _updateCustomerList() async {
+  Future<void> _updateCustomerList(String value) async {
+    bool isDocument = int.tryParse(value) != null;
+
     setState(() {
       _isLoading = true;
     });
     try {
-      await fetchCustomerList(_customerList).then((value) {
-        _customerList.insert(
-          0,
-          CustomerDTO(
-            isFirst: true,
-            name: defaultTextFromDropdownMenu,
-            customerId: 0,
-          ),
-        );
-        widget.onSelectedIdChanged(0);
-      });
+      await fetchCustomerList(
+          customerList: _customerList,
+          searchByDocument: isDocument)
+          .then((value) {
+            if (! isDocument) {
+              _customerList.insert(
+                0,
+                CustomerDTO(
+                  isFirst: true,
+                  name: defaultTextFromDropdownMenu,
+                  customerId: 0,
+                ),
+              );
+            }
+            widget.onSelectedIdChanged(0);
+          });
     } catch (error) {
       _showMessageConnectionError(context);
     } finally {
-      if (_customerList.isEmpty) {
+      if (_customerList.isEmpty && !isDocument) {
         _customerList.add(
           CustomerDTO(
             isFirst: true,
@@ -190,6 +198,29 @@ class CustomerBoxState extends State<CustomerBox> {
       messageTypeEnum: MessageTypeEnum.error,
     );
   }
+
+  void _createListeners() {
+    _documentFocusNode.addListener(() {
+      // perdida de foco
+      if (!_documentFocusNode.hasFocus) {
+
+      }
+
+    });
+
+    _lastnameFocusNode.addListener(() {
+      // perdida de foco
+      if (!_documentFocusNode.hasFocus) {
+
+      }
+
+    });
+
+
+  }
+
+
+
 }
 
 
