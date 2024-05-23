@@ -94,7 +94,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        verticalDirection: VerticalDirection.down,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _buildMovementTypeBox(),
           _buildSupplierOrCustomerBox(),

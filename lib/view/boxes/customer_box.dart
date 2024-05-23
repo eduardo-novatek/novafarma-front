@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 
 import '../../model/DTOs/customer_dto.dart';
-import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
-import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
@@ -40,6 +37,10 @@ class CustomerBoxState extends State<CustomerBox> {
   final FocusNode _lastnameFocusNode = FocusNode();
 
   bool _isLoading = false;
+
+  //guarda los datos del cliente encontrado ("JUAN PEREZ (12345678)")
+  //Si no existe: "PEPE (cliente no registrado)"
+  String? _customerFound;
 
   @override
   void initState() {
@@ -75,31 +76,37 @@ class CustomerBoxState extends State<CustomerBox> {
             ),
             _isLoading
                 ? buildCircularProgress()
-                : _buildBox()
+                : _buildSearchBox(),
+            _customerFound != null
+                ? Text(_customerFound!)
+                : const SizedBox.shrink(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBox() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildSearchBox() {
+    return Row(
       children: [
-        CreateTextFormField(
-          controller: _documentController,
-          focusNode: _documentFocusNode,
-          label: 'Documento',
-          dataType: DataTypeEnum.identificationDocument,
-          acceptEmpty: true,
+        Expanded(
+          child: CreateTextFormField(
+            controller: _documentController,
+            focusNode: _documentFocusNode,
+            label: 'Documento',
+            dataType: DataTypeEnum.identificationDocument,
+            acceptEmpty: true,
+          ),
         ),
-        CreateTextFormField(
-          controller: _lastnameController,
-          focusNode: _lastnameFocusNode,
-          label: 'Apellido',
-          dataType: DataTypeEnum.text,
-          maxValueForValidation: 25,
-          acceptEmpty: true,
+        Expanded(
+          child: CreateTextFormField(
+            controller: _lastnameController,
+            focusNode: _lastnameFocusNode,
+            label: 'Apellido',
+            dataType: DataTypeEnum.text,
+            maxValueForValidation: 25,
+            acceptEmpty: true,
+          ),
         ),
       ],
     );
