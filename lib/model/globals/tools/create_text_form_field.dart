@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +12,7 @@ class CreateTextFormField extends StatefulWidget {
   final int? maxValueForValidation;
   final String textForValidation; //texto de validacion si esta ocurre
   final DataTypeEnum dataType;
+  final bool? viewCharactersCount; //Mostrar contador de caracteres
   final int maxLines; //cantidad de lineas 'visibles'
   final bool? isUnderline; // Underline=true: coloca una linea debajo del texto (false: la linea rodea el texto)
   final TextEditingController controller;
@@ -26,7 +28,8 @@ class CreateTextFormField extends StatefulWidget {
     required this.dataType,
     this.validationStates,
     this.maxLines = 1, //solo para campos de texto
-    this.isUnderline = true,
+    this.viewCharactersCount = true,
+    this.isUnderline = true, //solo para campos de texto
     this.validate = true,  //si desea validar el campo
     this.acceptEmpty = false, //si acepta el campo vacío (si validar=true, lo valida solo si no es vacio)
     this.textForValidation = "Por favor, ingrese el dato correcto",
@@ -72,29 +75,14 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
               controller: widget.controller,
               keyboardType: _determinateInputType(),
               maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
-              maxLength:
-                  (widget.dataType == DataTypeEnum.text
-                      || widget.dataType == DataTypeEnum.password)
-                  && widget.maxValueForValidation != null
-                      ? widget.maxValueForValidation
-                      : null,
-
+              maxLength:_maxLength(),
               inputFormatters: _determinateMask(),
-              decoration: InputDecoration(
-                  labelText: widget.label,
-                  labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
-                  border: widget.isUnderline!
-                    ? const UnderlineInputBorder()
-                    : OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      )
-              ),
+              decoration: _buildInputDecoration(themeData),
               style: TextStyle(
                   fontSize: themeData.textTheme.bodyMedium?.fontSize,
                   color: themeData.colorScheme.primary,
               ),
               obscureText: _isObscureText,
-
               onChanged: (value) {
                if (widget.onChange != null) widget.onChange!(value);
               },
@@ -212,6 +200,27 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
         );
 
   }
+
+    InputDecoration _buildInputDecoration(ThemeData themeData) {
+      return InputDecoration(
+                labelText: widget.label,
+                labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
+                counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
+                border: widget.isUnderline!
+                  ? const UnderlineInputBorder()
+                  : OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    )
+            );
+    }
+
+    int? _maxLength() {
+      return (widget.dataType == DataTypeEnum.text
+                    || widget.dataType == DataTypeEnum.password)
+                && widget.maxValueForValidation != null
+                    ? widget.maxValueForValidation
+                    : null;
+    }
 
   //"document" Debe incluir el digito verificador
   bool _validateDocument(String? document) {

@@ -88,6 +88,7 @@ class CustomerBoxState extends State<CustomerBox> {
 
   Widget _buildSearchBox() {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: CreateTextFormField(
@@ -96,8 +97,10 @@ class CustomerBoxState extends State<CustomerBox> {
             label: 'Documento',
             dataType: DataTypeEnum.identificationDocument,
             acceptEmpty: true,
+            viewCharactersCount: false,
           ),
         ),
+        const SizedBox(width: 16.0),
         Expanded(
           child: CreateTextFormField(
             controller: _lastnameController,
@@ -106,6 +109,7 @@ class CustomerBoxState extends State<CustomerBox> {
             dataType: DataTypeEnum.text,
             maxValueForValidation: 25,
             acceptEmpty: true,
+            viewCharactersCount: false,
           ),
         ),
       ],
@@ -152,9 +156,7 @@ class CustomerBoxState extends State<CustomerBox> {
       onPressed: () async {
         if (!_isLoading) {
           // llama al callback: esta haciendo el refresh...
-          if (widget.onRefreshButtonChange != null) {
-            widget.onRefreshButtonChange!(true);
-          }
+          if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(true);
           await _updateCustomerList();
           // llama al callback: no está haciendo el refresh...
           if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(false);
