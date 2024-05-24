@@ -12,12 +12,16 @@ import '../../model/globals/tools/floating_message.dart';
 
 class CustomerBox extends StatefulWidget {
   int selectedId;
+  final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
+  final FocusNode? previousFocusNode; // Anterior textFormField para dar el foco
   final ValueChanged<int> onSelectedIdChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
   CustomerBox({
     super.key,
     this.onRefreshButtonChange,
+    this.nextFocusNode,
+    this.previousFocusNode,
     required this.selectedId,
     required this.onSelectedIdChanged,
   });
@@ -87,6 +91,9 @@ class CustomerBoxState extends State<CustomerBox> {
           child: CreateTextFormField(
             controller: _documentController,
             focusNode: _documentFocusNode,
+            //@1
+            nextNode: widget.nextFocusNode,
+            previousNode: widget.previousFocusNode,
             label: 'Documento',
             dataType: DataTypeEnum.identificationDocument,
             acceptEmpty: true,
@@ -98,6 +105,8 @@ class CustomerBoxState extends State<CustomerBox> {
           child: CreateTextFormField(
             controller: _lastnameController,
             focusNode: _lastnameFocusNode,
+            nextNode: widget.nextFocusNode,
+            previousNode: widget.previousFocusNode,
             label: 'Apellido',
             dataType: DataTypeEnum.text,
             maxValueForValidation: 25,
@@ -177,37 +186,11 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   void _createListeners() {
-    _documentFocusNode.addListener(() async {
+    _documentOnFocus();
+    _lastnameOnFocus();
+  }
 
-      // perdida de foco;
-      if (!_documentFocusNode.hasFocus) {
-        if (_documentController.text.trim().isNotEmpty) {
-          await _updateCustomerList(_documentController.text);
-          if (_customerList.length == 1) {
-            _customerFound =
-                '${_customerList[0].name} '
-                '${_customerList[0].lastname} '
-                '(${_customerList[0].document})';
-            widget.selectedId = _customerList[0].customerId!;
-          } else {
-            _customerFound = null;
-            widget.selectedId = 0;
-            floatingMessage(
-                context: context,
-                text: 'Cédula no registrada',
-                messageTypeEnum: MessageTypeEnum.warning
-            );
-            setState(() {
-              Future.delayed(const Duration(milliseconds: 10), (){
-                FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
-              });
-            });
-
-          }
-        }
-      }
-    });
-
+  void _lastnameOnFocus() {
     _lastnameFocusNode.addListener(() async {
       // perdida de foco
       if (!_lastnameFocusNode.hasFocus) {
@@ -232,8 +215,54 @@ class CustomerBoxState extends State<CustomerBox> {
         }
       }
     });
+  }
 
+  void _documentOnFocus() {
+    return _documentFocusNode.addListener(() async {
 
+    // perdida de foco;
+    if (!_documentFocusNode.hasFocus) {
+      if (_documentController.text.trim().isNotEmpty) {
+        await _updateCustomerList(_documentController.text);
+        if (_customerList.length == 1) {
+          _customerFound =
+              '${_customerList[0].name} '
+              '${_customerList[0].lastname} '
+              '(${_customerList[0].document})';
+          widget.selectedId = _customerList[0].customerId!;
+         /* if (_documentFocusNode.nextFocus() && widget.nextFocusNode != null) {
+            setState(() {
+              Future.delayed(const Duration(milliseconds: 10), () {
+                FocusScope.of(context).requestFocus(widget.nextFocusNode); //foco al proxmimo widget
+              });
+            });
+          } else if (_documentFocusNode.previousFocus() &&
+              widget.previousFocusNode != null) {
+            setState(() {
+              Future.delayed(const Duration(milliseconds: 10), () {
+                FocusScope.of(context).requestFocus(widget.previousFocusNode); //foco al anterior widget
+              });
+            });
+          }*/
+
+        } else {
+          _customerFound = null;
+          widget.selectedId = 0;
+          floatingMessage(
+              context: context,
+              text: 'Cédula no registrada',
+              messageTypeEnum: MessageTypeEnum.warning
+          );
+          setState(() {
+            Future.delayed(const Duration(milliseconds: 10), (){
+              FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
+            });
+          });
+
+        }
+      }
+    }
+  });
   }
 
 

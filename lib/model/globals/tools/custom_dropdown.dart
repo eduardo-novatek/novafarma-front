@@ -46,9 +46,11 @@ class CustomDropdown<T extends Object> extends StatefulWidget {
   final List<T?> modelList;
   final T? model;
   final Function(T?) callback;
+  final FocusNode? focusNode;
 
   const CustomDropdown({
         super.key,
+        this.focusNode,
         required this.themeData,
         required this.modelList,
         required this.model,
@@ -71,30 +73,33 @@ class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DropdownButton<T>(
-        menuMaxHeight: menuMaxHeight,
-        dropdownColor: widget.themeData.colorScheme.secondaryContainer,
-        style: TextStyle(
-          color: widget.themeData.primaryColor,
-          fontSize: widget.themeData.textTheme.bodyMedium?.fontSize,
-        ),
-        isDense: true,
-        value: object,
-        items: widget.modelList.map((T? value) {
-          return DropdownMenuItem<T>(
-            value: value,
-            child: Text(value != null ? value.toString() : ''),
-          );
-        }).toList(),
+    return Focus(
+      focusNode: widget.focusNode,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DropdownButton<T>(
+          menuMaxHeight: menuMaxHeight,
+          dropdownColor: widget.themeData.colorScheme.secondaryContainer,
+          style: TextStyle(
+            color: widget.themeData.primaryColor,
+            fontSize: widget.themeData.textTheme.bodyMedium?.fontSize,
+          ),
+          isDense: true,
+          value: object,
+          items: widget.modelList.map((T? value) {
+            return DropdownMenuItem<T>(
+              value: value,
+              child: Text(value != null ? value.toString() : ''),
+            );
+          }).toList(),
 
-        onChanged: (val) {
-          widget.callback(val);
-          setState(() {
-            object = val;
-          });
-        },
+          onChanged: (val) {
+            widget.callback(val);
+            setState(() {
+              object = val;
+            });
+          },
+        ),
       ),
     );
   }

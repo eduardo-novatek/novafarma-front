@@ -17,6 +17,8 @@ class CreateTextFormField extends StatefulWidget {
   final bool? isUnderline; // Underline=true: coloca una linea debajo del texto (false: la linea rodea el texto)
   final TextEditingController controller;
   final FocusNode? focusNode;
+  final FocusNode? nextNode;
+  final FocusNode? previousNode;
   final Function(String)? onChange;
 
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
@@ -37,6 +39,8 @@ class CreateTextFormField extends StatefulWidget {
     this.maxValueForValidation,
     this.onChange,
     this.focusNode,
+    this.nextNode,
+    this.previousNode,
   });
 
   @override
@@ -46,6 +50,7 @@ class CreateTextFormField extends StatefulWidget {
 class _CreateTextFormFieldState extends State<CreateTextFormField> {
   late int _index;
   bool _isObscureText = false;
+  bool _focusForward = true;
 
   @override
   void initState() {
@@ -57,10 +62,24 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
       widget.validationStates!.add(true); // Inicializar el estado de validación
     }
     _isObscureText = (widget.dataType == DataTypeEnum.password);
+
+    widget.focusNode?.addListener(_handleFocusChange);
+    widget.focusNode?.onKeyEvent = (focusNode, keyEvent) {
+      if (keyEvent.logicalKey == LogicalKeyboardKey.shift
+          && keyEvent.logicalKey == LogicalKeyboardKey.tab) {
+        print("shif tab");
+        _focusForward = false; // Retroceder el foco
+      } else if (keyEvent.logicalKey == LogicalKeyboardKey.tab) {
+        print("tab");
+        _focusForward = true; // Avanzar el foco
+      }
+      return KeyEventResult.ignored; // Ignorar el evento después de manejarlo
+    };
   }
 
   @override
   void dispose() {
+    widget.focusNode?.removeListener(_handleFocusChange);
     super.dispose();
   }
 
@@ -294,4 +313,23 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     return true;
   }*/
 
+  void _handleFocusChange() {
+    if (!widget.focusNode!.hasFocus) {
+      if (_focusForward) {
+        // Avanza el foco
+        if (widget.nextNode != null) {
+          Future.delayed(const Duration(milliseconds: 10), () {
+            FocusScope.of(context).requestFocus(widget.nextNode);
+          });
+        }
+      } else {
+        // Retrocede el foco
+        if (widget.previousNode != null) {
+          Future.delayed(const Duration(milliseconds: 10), () {
+            FocusScope.of(context).requestFocus(widget.previousNode);
+          });
+        }
+      }
+    }
+  }
 }

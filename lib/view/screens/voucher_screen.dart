@@ -29,6 +29,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   final FocusNode _documentFocusNode = FocusNode();
   final FocusNode _dateFocusNode = FocusNode();
   final FocusNode _timeFocusNode = FocusNode();
+  final FocusNode _movementTypeFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
@@ -166,6 +167,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
       } else { //Es Cliente
         return CustomerBox(
             selectedId: _selectedCustomerOrSupplierId,
+            nextFocusNode: _dateFocusNode,
+            previousFocusNode: _movementTypeFocusNode,
             onSelectedIdChanged: (value) => setState(() {
               _selectedCustomerOrSupplierId = value;
             })
