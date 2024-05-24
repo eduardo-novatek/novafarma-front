@@ -192,12 +192,17 @@ class CustomerBoxState extends State<CustomerBox> {
           } else {
             _customerFound = null;
             widget.selectedId = 0;
-            //FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
             floatingMessage(
                 context: context,
                 text: 'Cédula no registrada',
                 messageTypeEnum: MessageTypeEnum.warning
             );
+            setState(() {
+              Future.delayed(const Duration(milliseconds: 10), (){
+                FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
+              });
+            });
+
           }
         }
       }
@@ -213,13 +218,16 @@ class CustomerBoxState extends State<CustomerBox> {
           } else {
             _customerFound = null;
             widget.selectedId = 0;
-            //FocusScope.of(context).requestFocus(_lastnameFocusNode); //foco a apellido
+            setState(() {
+              Future.delayed(const Duration(milliseconds: 10), (){
+                FocusScope.of(context).requestFocus(_lastnameFocusNode); //foco a documento
+              });
+            });
             floatingMessage(
                 context: context,
                 text: 'Apellido no registrado',
                 messageTypeEnum: MessageTypeEnum.warning
             );
-
           }
         }
       }
