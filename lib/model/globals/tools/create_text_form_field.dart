@@ -16,6 +16,7 @@ class CreateTextFormField extends StatefulWidget {
   final int maxLines; //cantidad de lineas 'visibles'
   final bool? isUnderline; // Underline=true: coloca una linea debajo del texto (false: la linea rodea el texto)
   final TextEditingController controller;
+  final bool? initialFocus; //Si debe tener el foco inicial (por defecto es false. Debe ser true solo 1 TextFormField del formulario)
   final FocusNode? focusNode;
   final FocusNode? nextNode;
   final FocusNode? previousNode;
@@ -34,6 +35,7 @@ class CreateTextFormField extends StatefulWidget {
     this.isUnderline = true, //solo para campos de texto
     this.validate = true,  //si desea validar el campo
     this.acceptEmpty = false, //si acepta el campo vacío (si validar=true, lo valida solo si no es vacio)
+    this.initialFocus = false,
     this.textForValidation = "Por favor, ingrese el dato correcto",
     this.minValueForValidation,
     this.maxValueForValidation,
@@ -63,23 +65,25 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     }
     _isObscureText = (widget.dataType == DataTypeEnum.password);
 
-    widget.focusNode?.addListener(_handleFocusChange);
+    /*widget.focusNode?.addListener(_handleFocusChange);
     widget.focusNode?.onKeyEvent = (focusNode, keyEvent) {
-      if (keyEvent.logicalKey == LogicalKeyboardKey.shift
-          && keyEvent.logicalKey == LogicalKeyboardKey.tab) {
-        print("shif tab");
-        _focusForward = false; // Retroceder el foco
-      } else if (keyEvent.logicalKey == LogicalKeyboardKey.tab) {
+      if (keyEvent.logicalKey.keyId == LogicalKeyboardKey.shiftLeft.keyId
+         && keyEvent.logicalKey == LogicalKeyboardKey.tab) {*/
+
+
+      /*  _focusForward = false; // Retroceder el foco
+      if (keyEvent.logicalKey == LogicalKeyboardKey.tab) {
         print("tab");
         _focusForward = true; // Avanzar el foco
       }
       return KeyEventResult.ignored; // Ignorar el evento después de manejarlo
-    };
+    };*/
   }
 
   @override
   void dispose() {
-    widget.focusNode?.removeListener(_handleFocusChange);
+    //ServicesBinding.instance.keyboard.removeHandler(_onKey);
+    //widget.focusNode?.removeListener(_handleFocusChange);
     super.dispose();
   }
 
@@ -92,6 +96,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
             TextFormField (
               focusNode: widget.focusNode,
               controller: widget.controller,
+              autofocus: widget.initialFocus!,
               keyboardType: _determinateInputType(),
               maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
               maxLength:_maxLength(),
