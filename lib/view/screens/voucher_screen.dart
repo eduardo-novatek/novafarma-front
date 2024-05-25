@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
@@ -92,20 +93,36 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildHead() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          _buildMovementTypeBox(),
-          _buildSupplierOrCustomerBox(),
-          _buildDateTimeBox(),
-          //IconButton(onPressed: () => print(_selectedSupplierId.value), icon: Icon(Icons.abc)),
-          IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
+    return FocusTraversalGroup(
+      policy:  CustomOrderedTraversalPolicy(),
+      child: Shortcuts(shortcuts: <LogicalKeySet, Intent> {
+          LogicalKeySet(LogicalKeyboardKey.enter): const NextFocusIntent(),
+        },
+        child: Actions(
+          actions: <Type, Action<Intent>> {
+            NextFocusIntent: CallbackAction<NextFocusIntent> (
+              onInvoke: (NextFocusIntent intent) {
+                FocusScope.of(context).nextFocus();
+                return null;
+              },
+            ),
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildMovementTypeBox(),
+              _buildSupplierOrCustomerBox(),
+              _buildDateTimeBox(),
+              //IconButton(onPressed: () => print(_selectedSupplierId.value), icon: Icon(Icons.abc)),
+              IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
 
-        ],
+            ],
+          ),
+        ),
       ),
-    );
+    ));
   }
 
   Widget _buildMovementTypeBox() {
@@ -168,7 +185,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         return CustomerBox(
             selectedId: _selectedCustomerOrSupplierId,
             nextFocusNode: _dateFocusNode,
-            previousFocusNode: _movementTypeFocusNode,
+            //previousFocusNode: _movementTypeFocusNode,
             onSelectedIdChanged: (value) => setState(() {
               _selectedCustomerOrSupplierId = value;
             })
@@ -215,6 +232,33 @@ class _VoucherScreenState extends State<VoucherScreen> {
     return formatter.format(DateTime.now());
   }
 
+
+}
+
+class NextFocusIntent extends Intent {
+  const NextFocusIntent();
+}
+
+class CustomOrderedTraversalPolicy extends OrderedTraversalPolicy {
+  @override
+  bool inDirection(FocusNode currentNode, TraversalDirection direction) {
+    if (direction == TraversalDirection.right) {
+      return true;
+    }
+    return super.inDirection(currentNode, direction);
+  }
+
+  /*bool didPopRoute() {
+    return true;
+  }
+
+  bool onKey(FocusNode node, RawKeyEvent event) {
+    if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
+      FocusScope.of(node.context!).nextFocus();
+      return true;
+    }
+    return super.onKey(node, event);
+  }*/
 }
 
 

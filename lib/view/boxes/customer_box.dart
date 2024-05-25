@@ -13,7 +13,7 @@ import '../../model/globals/tools/floating_message.dart';
 class CustomerBox extends StatefulWidget {
   int selectedId;
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
-  final FocusNode? previousFocusNode; // Anterior textFormField para dar el foco
+  //final FocusNode? previousFocusNode; // Anterior textFormField para dar el foco
   final ValueChanged<int> onSelectedIdChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
@@ -21,7 +21,7 @@ class CustomerBox extends StatefulWidget {
     super.key,
     this.onRefreshButtonChange,
     this.nextFocusNode,
-    this.previousFocusNode,
+    //this.previousFocusNode,
     required this.selectedId,
     required this.onSelectedIdChanged,
   });
@@ -43,7 +43,6 @@ class CustomerBoxState extends State<CustomerBox> {
   bool _isLoading = false;
 
   //guarda los datos del cliente encontrado ("JUAN PEREZ (12345678)")
-  //Si no existe: "PEPE (cliente no registrado)"
   String? _customerFound;
 
   @override
@@ -91,9 +90,8 @@ class CustomerBoxState extends State<CustomerBox> {
           child: CreateTextFormField(
             controller: _documentController,
             focusNode: _documentFocusNode,
-            //@1
-            nextNode: widget.nextFocusNode,
-            previousNode: widget.previousFocusNode,
+           // nextNode: widget.nextFocusNode,
+           // previousNode: widget.previousFocusNode,
             label: 'Documento',
             dataType: DataTypeEnum.identificationDocument,
             acceptEmpty: true,
@@ -105,8 +103,8 @@ class CustomerBoxState extends State<CustomerBox> {
           child: CreateTextFormField(
             controller: _lastnameController,
             focusNode: _lastnameFocusNode,
-            nextNode: widget.nextFocusNode,
-            previousNode: widget.previousFocusNode,
+            //nextNode: widget.nextFocusNode,
+            //previousNode: widget.previousFocusNode,
             label: 'Apellido',
             dataType: DataTypeEnum.text,
             maxValueForValidation: 25,
@@ -164,7 +162,7 @@ class CustomerBoxState extends State<CustomerBox> {
     }
   }
 
-  CustomDropdown<CustomerDTO> _buildCustomDropdown() {
+  /*CustomDropdown<CustomerDTO> _buildCustomDropdown() {
     return CustomDropdown<CustomerDTO>(
       themeData: ThemeData(),
       modelList: _customerList,
@@ -175,7 +173,7 @@ class CustomerBoxState extends State<CustomerBox> {
         });
       },
     );
-  }
+  }*/
 
   void _showMessageConnectionError(BuildContext context) {
     floatingMessage(
@@ -219,50 +217,47 @@ class CustomerBoxState extends State<CustomerBox> {
 
   void _documentOnFocus() {
     return _documentFocusNode.addListener(() async {
+      // perdida de foco;
+      if (!_documentFocusNode.hasFocus) {
+        if (_documentController.text.trim().isNotEmpty) {
 
-    // perdida de foco;
-    if (!_documentFocusNode.hasFocus) {
-      if (_documentController.text.trim().isNotEmpty) {
-        await _updateCustomerList(_documentController.text);
-        if (_customerList.length == 1) {
-          _customerFound =
-              '${_customerList[0].name} '
-              '${_customerList[0].lastname} '
-              '(${_customerList[0].document})';
-          widget.selectedId = _customerList[0].customerId!;
-         /* if (_documentFocusNode.nextFocus() && widget.nextFocusNode != null) {
+          await _updateCustomerList(_documentController.text);
+          if (_customerList.length == 1) {
+            _customerFound =
+                '${_customerList[0].name} '
+                '${_customerList[0].lastname} '
+                '(${_customerList[0].document})';
+
+            //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
+            widget.selectedId = _customerList[0].customerId!;
+            widget.onSelectedIdChanged(widget.selectedId);
+
+            if (widget.nextFocusNode != null) {
+              setState(() {
+                Future.delayed(const Duration(milliseconds: 10), () {
+                  FocusScope.of(context).requestFocus(widget.nextFocusNode);
+                });
+              });
+            }
+
+          } else {
+            _customerFound = null;
+            widget.selectedId = 0;
+            floatingMessage(
+                context: context,
+                text: 'Cédula no registrada',
+                messageTypeEnum: MessageTypeEnum.warning
+            );
             setState(() {
-              Future.delayed(const Duration(milliseconds: 10), () {
-                FocusScope.of(context).requestFocus(widget.nextFocusNode); //foco al proxmimo widget
+              Future.delayed(const Duration(milliseconds: 10), (){
+                FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
               });
             });
-          } else if (_documentFocusNode.previousFocus() &&
-              widget.previousFocusNode != null) {
-            setState(() {
-              Future.delayed(const Duration(milliseconds: 10), () {
-                FocusScope.of(context).requestFocus(widget.previousFocusNode); //foco al anterior widget
-              });
-            });
-          }*/
 
-        } else {
-          _customerFound = null;
-          widget.selectedId = 0;
-          floatingMessage(
-              context: context,
-              text: 'Cédula no registrada',
-              messageTypeEnum: MessageTypeEnum.warning
-          );
-          setState(() {
-            Future.delayed(const Duration(milliseconds: 10), (){
-              FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
-            });
-          });
-
+          }
         }
       }
-    }
-  });
+    });
   }
 
 

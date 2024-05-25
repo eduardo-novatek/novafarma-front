@@ -18,8 +18,8 @@ class CreateTextFormField extends StatefulWidget {
   final TextEditingController controller;
   final bool? initialFocus; //Si debe tener el foco inicial (por defecto es false. Debe ser true solo 1 TextFormField del formulario)
   final FocusNode? focusNode;
-  final FocusNode? nextNode;
-  final FocusNode? previousNode;
+  //final FocusNode? nextNode;
+  //final FocusNode? previousNode;
   final Function(String)? onChange;
 
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
@@ -41,8 +41,8 @@ class CreateTextFormField extends StatefulWidget {
     this.maxValueForValidation,
     this.onChange,
     this.focusNode,
-    this.nextNode,
-    this.previousNode,
+    //this.nextNode,
+    //this.previousNode,
   });
 
   @override
@@ -52,7 +52,7 @@ class CreateTextFormField extends StatefulWidget {
 class _CreateTextFormFieldState extends State<CreateTextFormField> {
   late int _index;
   bool _isObscureText = false;
-  bool _focusForward = true;
+  //bool _focusForward = true;
 
   @override
   void initState() {
@@ -318,7 +318,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     return true;
   }*/
 
-  void _handleFocusChange() {
+  /*void _handleFocusChange() {
     if (!widget.focusNode!.hasFocus) {
       if (_focusForward) {
         // Avanza el foco
@@ -336,5 +336,5 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
         }
       }
     }
-  }
+  }*/
 }
