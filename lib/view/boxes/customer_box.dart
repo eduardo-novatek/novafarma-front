@@ -118,6 +118,7 @@ class CustomerBoxState extends State<CustomerBox> {
     );
   }
 
+  //"value": es el dato a buscar (documento o apellido del cliente)
   Future<void> _updateCustomerList(String value) async {
     bool isDocument = int.tryParse(value) != null;
 
@@ -125,14 +126,12 @@ class CustomerBoxState extends State<CustomerBox> {
       _isLoading = true;
     });
     try {
-      //Busca por documento o po apellido.
-      //Por documento, se devuelve la lista solo con el cliente encontrado (sin "seleccione...")
-      //Por apellido, se devuelve la lista con las coincidencias (con "seleccione...")
       await fetchCustomerList(
         customerList: _customerList,
         searchByDocument: isDocument,
         value: value,
-      ).then((value) {
+        // Se comentó porque no se incluye "Seleccione...". Se deja por si se debe incluir luego.
+      );/*.then((value) {
           if (! isDocument) {
             _customerList.insert(
               0,
@@ -144,7 +143,7 @@ class CustomerBoxState extends State<CustomerBox> {
             );
           }
           widget.onSelectedIdChanged(0);
-        });
+        });*/
     } catch (error) {
       _showMessageConnectionError(context);
     } finally {
@@ -196,43 +195,48 @@ class CustomerBoxState extends State<CustomerBox> {
       if (!_lastnameFocusNode.hasFocus) {
         if (_lastnameController.text.trim().isNotEmpty) {
           await _updateCustomerList(_lastnameController.text);
-          if (_customerList.length > 1) {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return CustomerSelectionDialog(
-                  customers: _customerList,
-                  onSelect: (selectedIndex) {
-                    if (selectedIndex > -1) {
-                      _customerFound =
-                      '${_customerList[selectedIndex].name} '
-                          '${_customerList[selectedIndex].lastname} '
-                          '(${_customerList[selectedIndex].document})';
-
-                      //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
-                      widget.selectedId = _customerList[selectedIndex].customerId!;
-                      widget.onSelectedIdChanged(widget.selectedId);
-                      nextFocus();
-
-                    } else {
-                      _customerFound = null;
-                      widget.selectedId = 0;
-
-                      Future.delayed(Duration(milliseconds: 10), () {
-                        FocusScope.of(context).requestFocus(_lastnameFocusNode);
-                      });
-                    }
-                  },
-                );
-              },
-            );
-
+          if (_customerList.isNotEmpty) {
+            if (_customerList.length == 1) {
+              _updateSelectedClient(0);
+            } else {
+              _clientSelection();
+            }
           } else {
-            notFound(isDocument: false);
+            _notFound(viewMessage: true, isDocument: false);
           }
         }
       }
     });
+  }
+
+  void _clientSelection() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomerSelectionDialog(
+          customers: _customerList,
+          onSelect: (selectedIndex) {
+            if (selectedIndex > -1) {
+              _updateSelectedClient(selectedIndex);
+            } else {
+              _notFound(viewMessage: false, isDocument: false);
+            }
+          },
+        );
+      },
+    );
+  }
+
+  void _updateSelectedClient(int selectedIndex) {
+     _customerFound =
+    '${_customerList[selectedIndex].name} '
+        '${_customerList[selectedIndex].lastname} '
+        '(${_customerList[selectedIndex].document})';
+    
+    //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
+    widget.selectedId = _customerList[selectedIndex].customerId!;
+    widget.onSelectedIdChanged(widget.selectedId);
+    _nextFocus();
   }
 
   void _documentListener() {
@@ -241,27 +245,17 @@ class CustomerBoxState extends State<CustomerBox> {
       if (!_documentFocusNode.hasFocus) {
         if (_documentController.text.trim().isNotEmpty) {
           await _updateCustomerList(_documentController.text);
-          if (_customerList.length == 1) {
-            _customerFound =
-                '${_customerList[0].name} '
-                '${_customerList[0].lastname} '
-                '(${_customerList[0].document})';
-
-            //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
-            widget.selectedId = _customerList[0].customerId!;
-            widget.onSelectedIdChanged(widget.selectedId);
-
-            nextFocus();
-
+          if (_customerList.isNotEmpty) {
+            _updateSelectedClient(0);
           } else {
-            notFound(isDocument: true);
+            _notFound(viewMessage: true, isDocument: true);
           }
         }
       }
     });
   }
 
-  void nextFocus() {
+  void _nextFocus() {
      if (widget.nextFocusNode != null) {
       setState(() {
         Future.delayed(const Duration(milliseconds: 10), () {
@@ -271,14 +265,16 @@ class CustomerBoxState extends State<CustomerBox> {
     }
   }
 
-  void notFound({required bool isDocument}) {
+  void _notFound({required bool viewMessage, required bool isDocument}) {
     _customerFound = null;
     widget.selectedId = 0;
-    floatingMessage(
-        context: context,
-        text: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
-        messageTypeEnum: MessageTypeEnum.warning
-    );
+    if (viewMessage) {
+      floatingMessage(
+          context: context,
+          text: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
+          messageTypeEnum: MessageTypeEnum.warning
+      );
+    }
     setState(() {
       Future.delayed(const Duration(milliseconds: 10), (){
         FocusScope.of(context)

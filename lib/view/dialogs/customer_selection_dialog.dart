@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/DTOs/customer_dto.dart';
@@ -15,6 +16,55 @@ class CustomerSelectionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Esquinas rectas
+      ),
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.3, // 30% del ancho de la pantalla
+        height: MediaQuery.of(context).size.height * 0.5, // 50% del alto de la pantalla
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8.0,),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(), // Permitir desplazamiento siempre
+                itemCount: customers.length,
+                itemBuilder: (context, index) {
+                  final customer = customers[index];
+                  return ListTile(
+                    title: Text('${customer.name} ${customer.lastname} (${customer.document})'),
+                    onTap: () {
+                      onSelect(index); //devuelve el índice seleccionado
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+              ),
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  onSelect(-1); // Se retorna -1 en caso de cancelación
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancelar'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+/*@override
+  Widget build(BuildContext context) {
+    return Dialog(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -23,13 +73,19 @@ class CustomerSelectionDialog extends StatelessWidget {
             itemCount: customers.length,
             itemBuilder: (context, index) {
               final customer = customers[index];
-              return ListTile(
-                title: Text('${customer.name} ${customer.lastname}'),
-                subtitle: Text('${customer.document}'),
-                onTap: () {
-                  onSelect(index); //devuelve el indice seleccionado
-                  Navigator.of(context).pop();
-                },
+              return Container(
+                padding: const EdgeInsetsDirectional.all(20.0),
+                width: MediaQuery.of(context).size.width * 0.2,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ListTile(
+                    title: Text('${customer.name} ${customer.lastname} (${customer.document})'),
+                    onTap: () {
+                      onSelect(index); //devuelve el indice seleccionado
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
               );
             },
           ),
@@ -43,5 +99,6 @@ class CustomerSelectionDialog extends StatelessWidget {
         ],
       ),
     );
-  }
+  }*/
+
 }
