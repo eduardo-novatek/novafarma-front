@@ -115,7 +115,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
               _buildMovementTypeBox(),
               _buildSupplierOrCustomerBox(),
               _buildDateTimeBox(),
-              //IconButton(onPressed: () => print(_selectedSupplierId.value), icon: Icon(Icons.abc)),
               IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
 
             ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
@@ -9,6 +10,7 @@ import '../../model/globals/requests/fetch_customer_list.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
+import '../dialogs/customer_selection_dialog.dart';
 
 class CustomerBox extends StatefulWidget {
   int selectedId;
@@ -184,43 +186,60 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   void _createListeners() {
-    _documentOnFocus();
-    _lastnameOnFocus();
+    _documentListener();
+    _lastnameListener();
   }
 
-  void _lastnameOnFocus() {
+  void _lastnameListener() {
     _lastnameFocusNode.addListener(() async {
       // perdida de foco
       if (!_lastnameFocusNode.hasFocus) {
         if (_lastnameController.text.trim().isNotEmpty) {
           await _updateCustomerList(_lastnameController.text);
           if (_customerList.length > 1) {
-            //@1
-          } else {
-            _customerFound = null;
-            widget.selectedId = 0;
-            setState(() {
-              Future.delayed(const Duration(milliseconds: 10), (){
-                FocusScope.of(context).requestFocus(_lastnameFocusNode); //foco a documento
-              });
-            });
-            floatingMessage(
-                context: context,
-                text: 'Apellido no registrado',
-                messageTypeEnum: MessageTypeEnum.warning
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CustomerSelectionDialog(
+                  customers: _customerList,
+                  onSelect: (selectedIndex) {
+                    if (selectedIndex > -1) {
+                      _customerFound =
+                      '${_customerList[selectedIndex].name} '
+                          '${_customerList[selectedIndex].lastname} '
+                          '(${_customerList[selectedIndex].document})';
+
+                      //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
+                      widget.selectedId = _customerList[selectedIndex].customerId!;
+                      widget.onSelectedIdChanged(widget.selectedId);
+                      nextFocus();
+
+                    } else {
+                      _customerFound = null;
+                      widget.selectedId = 0;
+
+                      Future.delayed(Duration(milliseconds: 10), () {
+                        FocusScope.of(context).requestFocus(_lastnameFocusNode);
+                      });
+                    }
+                  },
+                );
+              },
             );
+
+          } else {
+            notFound(isDocument: false);
           }
         }
       }
     });
   }
 
-  void _documentOnFocus() {
+  void _documentListener() {
     return _documentFocusNode.addListener(() async {
       // perdida de foco;
       if (!_documentFocusNode.hasFocus) {
         if (_documentController.text.trim().isNotEmpty) {
-
           await _updateCustomerList(_documentController.text);
           if (_customerList.length == 1) {
             _customerFound =
@@ -232,31 +251,39 @@ class CustomerBoxState extends State<CustomerBox> {
             widget.selectedId = _customerList[0].customerId!;
             widget.onSelectedIdChanged(widget.selectedId);
 
-            if (widget.nextFocusNode != null) {
-              setState(() {
-                Future.delayed(const Duration(milliseconds: 10), () {
-                  FocusScope.of(context).requestFocus(widget.nextFocusNode);
-                });
-              });
-            }
+            nextFocus();
 
           } else {
-            _customerFound = null;
-            widget.selectedId = 0;
-            floatingMessage(
-                context: context,
-                text: 'Cédula no registrada',
-                messageTypeEnum: MessageTypeEnum.warning
-            );
-            setState(() {
-              Future.delayed(const Duration(milliseconds: 10), (){
-                FocusScope.of(context).requestFocus(_documentFocusNode); //foco a documento
-              });
-            });
-
+            notFound(isDocument: true);
           }
         }
       }
+    });
+  }
+
+  void nextFocus() {
+     if (widget.nextFocusNode != null) {
+      setState(() {
+        Future.delayed(const Duration(milliseconds: 10), () {
+          FocusScope.of(context).requestFocus(widget.nextFocusNode);
+        });
+      });
+    }
+  }
+
+  void notFound({required bool isDocument}) {
+    _customerFound = null;
+    widget.selectedId = 0;
+    floatingMessage(
+        context: context,
+        text: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
+        messageTypeEnum: MessageTypeEnum.warning
+    );
+    setState(() {
+      Future.delayed(const Duration(milliseconds: 10), (){
+        FocusScope.of(context)
+            .requestFocus(isDocument ? _documentFocusNode : _lastnameFocusNode); //foco vuelve al campo
+      });
     });
   }
 
