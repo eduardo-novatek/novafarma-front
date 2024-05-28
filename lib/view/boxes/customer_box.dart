@@ -17,11 +17,9 @@ class CustomerBox extends StatefulWidget {
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
   //final FocusNode? previousFocusNode; // Anterior textFormField para dar el foco
   final ValueChanged<int> onSelectedIdChanged;
-  final ValueChanged<bool>? onRefreshButtonChange;
 
   CustomerBox({
     super.key,
-    this.onRefreshButtonChange,
     this.nextFocusNode,
     //this.previousFocusNode,
     required this.selectedId,
@@ -68,7 +66,7 @@ class CustomerBoxState extends State<CustomerBox> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          //crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _isLoading
                 ? buildCircularProgress()
@@ -86,7 +84,7 @@ class CustomerBoxState extends State<CustomerBox> {
 
   Widget _buildSearchBox() {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      //crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: CreateTextFormField(
@@ -121,7 +119,6 @@ class CustomerBoxState extends State<CustomerBox> {
   //"value": es el dato a buscar (documento o apellido del cliente)
   Future<void> _updateCustomerList(String value) async {
     bool isDocument = int.tryParse(value) != null;
-
     setState(() {
       _isLoading = true;
     });
@@ -147,7 +144,7 @@ class CustomerBoxState extends State<CustomerBox> {
     } catch (error) {
       _showMessageConnectionError(context);
     } finally {
-      if (_customerList.isEmpty && !isDocument) {
+      /*if (_customerList.isEmpty && !isDocument) {
         _customerList.add(
           CustomerDTO(
             isFirst: true,
@@ -156,7 +153,7 @@ class CustomerBoxState extends State<CustomerBox> {
           ),
         );
         widget.onSelectedIdChanged(0);
-      }
+      }*/
       setState(() {
         _isLoading = false;
       });
@@ -236,6 +233,7 @@ class CustomerBoxState extends State<CustomerBox> {
     //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
     widget.selectedId = _customerList[selectedIndex].customerId!;
     widget.onSelectedIdChanged(widget.selectedId);
+    _initializeTextFormFields();
     _nextFocus();
   }
 
@@ -268,6 +266,9 @@ class CustomerBoxState extends State<CustomerBox> {
   void _notFound({required bool viewMessage, required bool isDocument}) {
     _customerFound = null;
     widget.selectedId = 0;
+    widget.onSelectedIdChanged(widget.selectedId);
+    //_initializeTextFormFields();
+
     if (viewMessage) {
       floatingMessage(
           context: context,
@@ -281,6 +282,11 @@ class CustomerBoxState extends State<CustomerBox> {
             .requestFocus(isDocument ? _documentFocusNode : _lastnameFocusNode); //foco vuelve al campo
       });
     });
+  }
+
+  void _initializeTextFormFields() {
+    _lastnameController.value = TextEditingValue.empty;
+    _documentController.value = TextEditingValue.empty;
   }
 
 

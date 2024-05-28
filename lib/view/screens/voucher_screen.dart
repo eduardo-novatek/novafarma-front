@@ -30,7 +30,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   final FocusNode _documentFocusNode = FocusNode();
   final FocusNode _dateFocusNode = FocusNode();
   final FocusNode _timeFocusNode = FocusNode();
-  final FocusNode _movementTypeFocusNode = FocusNode();
+  //final FocusNode _movementTypeFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
@@ -70,6 +70,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           children: [
             _buildTitleBar(),
             _buildHead(),
+            const Divider(),
             _buildBody(),
           ],
         ),
@@ -110,13 +111,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _buildMovementTypeBox(),
               _buildSupplierOrCustomerBox(),
               _buildDateTimeBox(),
               IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
-
             ],
           ),
         ),
@@ -143,25 +142,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
           },
         ),
       ],
-    );
-  }
-
-  Widget _buildClientBox() {
-    return Expanded(
-      child: Row(
-        children: [
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: CreateTextFormField(
-              controller: _documentController,
-              focusNode: _documentFocusNode,
-              label: 'Documento del cliente',
-              dataType: DataTypeEnum.identificationDocument,
-              acceptEmpty: true,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
