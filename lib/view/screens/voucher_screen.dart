@@ -26,10 +26,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   final TextEditingController _documentController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _timeController = TextEditingController();
   final FocusNode _documentFocusNode = FocusNode();
   final FocusNode _dateFocusNode = FocusNode();
-  final FocusNode _timeFocusNode = FocusNode();
   //final FocusNode _movementTypeFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
@@ -39,7 +37,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
   void initState() {
     super.initState();
     _dateController.value = TextEditingValue(text: dateNow());
-    _timeController.value = TextEditingValue(text: timeNow());
   }
 
   @override
@@ -47,10 +44,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
     super.dispose();
     _documentController.dispose();
     _dateController.dispose();
-    _timeController.dispose();
     _documentFocusNode.dispose();
     _dateFocusNode.dispose();
-    _timeFocusNode.dispose();
   }
 
   @override
@@ -107,16 +102,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
                 return null;
               },
             ),
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              _buildMovementTypeBox(),
-              _buildSupplierOrCustomerBox(),
-              _buildDateTimeBox(),
-              IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
-            ],
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                _buildMovementTypeBox(),
+                _buildSupplierOrCustomerBox(),
+                _buildDateTimeBox(),
+                IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
+              ],
           ),
         ),
       ),
@@ -160,7 +155,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
             _selectedCustomerOrSupplierId = value;
           }),
         );
-      } else { //Es Cliente
+        //Es Cliente?
+      } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
         return CustomerBox(
             selectedId: _selectedCustomerOrSupplierId,
             nextFocusNode: _dateFocusNode,
@@ -187,17 +183,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
               dataType: DataTypeEnum.date,
             ),
           ),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: CreateTextFormField(
-              controller: _timeController,
-              focusNode: _timeFocusNode,
-              label: 'Hora',
-              dataType: DataTypeEnum.time,
-            ),
-          ),
-        ],
-      ),
+        ]
+      )
     );
   }
 
