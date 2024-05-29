@@ -15,13 +15,11 @@ import '../dialogs/customer_selection_dialog.dart';
 class CustomerBox extends StatefulWidget {
   int selectedId;
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
-  //final FocusNode? previousFocusNode; // Anterior textFormField para dar el foco
   final ValueChanged<int> onSelectedIdChanged;
 
   CustomerBox({
     super.key,
     this.nextFocusNode,
-    //this.previousFocusNode,
     required this.selectedId,
     required this.onSelectedIdChanged,
   });
@@ -90,8 +88,6 @@ class CustomerBoxState extends State<CustomerBox> {
           child: CreateTextFormField(
             controller: _documentController,
             focusNode: _documentFocusNode,
-           // nextNode: widget.nextFocusNode,
-           // previousNode: widget.previousFocusNode,
             label: 'Documento',
             dataType: DataTypeEnum.identificationDocument,
             acceptEmpty: true,
@@ -103,8 +99,6 @@ class CustomerBoxState extends State<CustomerBox> {
           child: CreateTextFormField(
             controller: _lastnameController,
             focusNode: _lastnameFocusNode,
-            //nextNode: widget.nextFocusNode,
-            //previousNode: widget.previousFocusNode,
             label: 'Apellido',
             dataType: DataTypeEnum.text,
             maxValueForValidation: 25,

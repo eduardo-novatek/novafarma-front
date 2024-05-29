@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
@@ -32,6 +33,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
+
+  List<VoucherItemDTO> _voucherItemList = [];
 
   @override
   void initState() {
@@ -141,7 +144,63 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildBody() {
-    return const SizedBox.shrink();
+    return Expanded(
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: _voucherItemList.length,
+              itemBuilder: (context, index) {
+                return _buildVoucherItem(_voucherItemList[index], index);
+              },
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: _addVoucherItem,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVoucherItem(VoucherItemDTO item, int index) {
+    return Row(
+      children: [
+        const Expanded(child: Text("Artículo")),
+        const Expanded(child: Text("Precio")),
+        const Expanded(child: Text("Cantidad")),
+        IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () => _editVoucherItem(index),
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () => _deleteVoucherItem(index),
+        ),
+      ],
+    );
+  }
+
+  void _addVoucherItem() {
+    setState(() {
+      _voucherItemList.add(VoucherItemDTO.empty());
+    });
+  }
+
+  void _editVoucherItem(int index) {
+    // Implementa la lógica para editar el item
+  }
+
+  void _deleteVoucherItem(int index) {
+    setState(() {
+      _voucherItemList.removeAt(index);
+    });
   }
 
   Widget _buildSupplierOrCustomerBox() {
@@ -160,7 +219,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
         return CustomerBox(
             selectedId: _selectedCustomerOrSupplierId,
             nextFocusNode: _dateFocusNode,
-            //previousFocusNode: _movementTypeFocusNode,
             onSelectedIdChanged: (value) => setState(() {
               _selectedCustomerOrSupplierId = value;
             })
@@ -171,21 +229,23 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildDateTimeBox() {
-    return Expanded(
-      child: Row(
-        children: [
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: CreateTextFormField(
-              controller: _dateController,
-              focusNode: _dateFocusNode,
-              label: 'Fecha',
-              dataType: DataTypeEnum.date,
-            ),
-          ),
-        ]
-      )
-    );
+    return _selectedMovementType != defaultTextFromDropdownMenu
+      ? Expanded(
+          child: Row(
+            children: [
+              const SizedBox(width: 16.0),
+              Expanded(
+                child: CreateTextFormField(
+                  controller: _dateController,
+                  focusNode: _dateFocusNode,
+                  label: 'Fecha',
+                  dataType: DataTypeEnum.date,
+                ),
+              ),
+            ]
+          )
+        )
+      : const SizedBox.shrink();
   }
 
   String timeNow() {

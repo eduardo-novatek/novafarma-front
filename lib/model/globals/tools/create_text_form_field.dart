@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:intl/intl.dart';
@@ -18,8 +17,6 @@ class CreateTextFormField extends StatefulWidget {
   final TextEditingController controller;
   final bool? initialFocus; //Si debe tener el foco inicial (por defecto es false. Debe ser true solo 1 TextFormField del formulario)
   final FocusNode? focusNode;
-  //final FocusNode? nextNode;
-  //final FocusNode? previousNode;
   final Function(String)? onChange;
 
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
@@ -41,8 +38,6 @@ class CreateTextFormField extends StatefulWidget {
     this.maxValueForValidation,
     this.onChange,
     this.focusNode,
-    //this.nextNode,
-    //this.previousNode,
   });
 
   @override
@@ -64,26 +59,10 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
       widget.validationStates!.add(true); // Inicializar el estado de validación
     }
     _isObscureText = (widget.dataType == DataTypeEnum.password);
-
-    /*widget.focusNode?.addListener(_handleFocusChange);
-    widget.focusNode?.onKeyEvent = (focusNode, keyEvent) {
-      if (keyEvent.logicalKey.keyId == LogicalKeyboardKey.shiftLeft.keyId
-         && keyEvent.logicalKey == LogicalKeyboardKey.tab) {*/
-
-
-      /*  _focusForward = false; // Retroceder el foco
-      if (keyEvent.logicalKey == LogicalKeyboardKey.tab) {
-        print("tab");
-        _focusForward = true; // Avanzar el foco
-      }
-      return KeyEventResult.ignored; // Ignorar el evento después de manejarlo
-    };*/
   }
 
   @override
   void dispose() {
-    //ServicesBinding.instance.keyboard.removeHandler(_onKey);
-    //widget.focusNode?.removeListener(_handleFocusChange);
     super.dispose();
   }
 
@@ -318,23 +297,4 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     return true;
   }*/
 
-  /*void _handleFocusChange() {
-    if (!widget.focusNode!.hasFocus) {
-      if (_focusForward) {
-        // Avanza el foco
-        if (widget.nextNode != null) {
-          Future.delayed(const Duration(milliseconds: 10), () {
-            FocusScope.of(context).requestFocus(widget.nextNode);
-          });
-        }
-      } else {
-        // Retrocede el foco
-        if (widget.previousNode != null) {
-          Future.delayed(const Duration(milliseconds: 10), () {
-            FocusScope.of(context).requestFocus(widget.previousNode);
-          });
-        }
-      }
-    }
-  }*/
 }
