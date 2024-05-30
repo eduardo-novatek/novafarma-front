@@ -144,9 +144,37 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildBody() {
-    return Expanded(
+    return _selectedMovementType != defaultTextFromDropdownMenu
+        ? Expanded(
       child: Column(
         children: [
+          Table(
+            columnWidths: const {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(1),
+              2: FlexColumnWidth(1),
+              3: FixedColumnWidth(96),
+            },
+            children: const [
+              TableRow(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("PRECIO UNITARIO", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("CANTIDAD", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  SizedBox.shrink(), // Celda vacía para los botones de acción
+                ],
+              ),
+            ],
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: _voucherItemList.length,
@@ -159,38 +187,116 @@ class _VoucherScreenState extends State<VoucherScreen> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                icon: Icon(Icons.add),
-                onPressed: _addVoucherItem,
+                icon: const Icon(Icons.add),
+                onPressed: _showAddVoucherItemDialog,
               ),
             ],
           ),
         ],
       ),
-    );
+    )
+        : const SizedBox.shrink();
   }
 
   Widget _buildVoucherItem(VoucherItemDTO item, int index) {
-    return Row(
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(2),
+        1: FlexColumnWidth(1),
+        2: FlexColumnWidth(1),
+        3: FixedColumnWidth(96), // Ajusta el ancho según sea necesario para los botones de acción
+      },
       children: [
-        const Expanded(child: Text("Artículo")),
-        const Expanded(child: Text("Precio")),
-        const Expanded(child: Text("Cantidad")),
-        IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () => _editVoucherItem(index),
-        ),
-        IconButton(
-          icon: const Icon(Icons.delete),
-          onPressed: () => _deleteVoucherItem(index),
+        TableRow(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('${item.medicineId}'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(item.unitPrice.toString()),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(item.quantity.toString()),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _editVoucherItem(index),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => _deleteVoucherItem(index),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );
   }
 
-  void _addVoucherItem() {
-    setState(() {
-      _voucherItemList.add(VoucherItemDTO.empty());
-    });
+  void _showAddVoucherItemDialog() {
+    String articulo = '';
+    double precio = 0;
+    int cantidad = 0;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Agregar Artículo"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Artículo'),
+                onChanged: (value) {
+                  articulo = value;
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Precio Unitario'),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  precio = double.tryParse(value) ?? 0;
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Cantidad'),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  cantidad = int.tryParse(value) ?? 0;
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Aceptar"),
+              onPressed: () {
+                setState(() {
+                  _voucherItemList.add(
+                    VoucherItemDTO(medicineId: int.tryParse(articulo), unitPrice: precio, quantity: cantidad),
+                  );
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _editVoucherItem(int index) {
