@@ -14,6 +14,8 @@ import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
     defaultTextFromDropdownMenu;
 
+import '../dialogs/add_voucher_item_dialog.dart';
+
 class VoucherScreen extends StatefulWidget {
   const VoucherScreen({super.key});
 
@@ -146,55 +148,69 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Widget _buildBody() {
     return _selectedMovementType != defaultTextFromDropdownMenu
         ? Expanded(
-      child: Column(
-        children: [
-          Table(
-            columnWidths: const {
-              0: FlexColumnWidth(2),
-              1: FlexColumnWidth(1),
-              2: FlexColumnWidth(1),
-              3: FixedColumnWidth(96),
-            },
-            children: const [
-              TableRow(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Column(
+              children: [
+                Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(2),
+                    1: FlexColumnWidth(1),
+                    2: FlexColumnWidth(1),
+                    3: FixedColumnWidth(96),
+                  },
+                  children: const [
+                    TableRow(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("PRECIO UNITARIO", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("CANTIDAD", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        SizedBox.shrink(), // Celda vacía para los botones de acción
+                      ],
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _voucherItemList.length,
+                    itemBuilder: (context, index) {
+                      return _buildVoucherItem(_voucherItemList[index], index);
+                    },
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("PRECIO UNITARIO", style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("CANTIDAD", style: TextStyle(fontWeight: FontWeight.bold)),
-                  ),
-                  SizedBox.shrink(), // Celda vacía para los botones de acción
-                ],
-              ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _voucherItemList.length,
-              itemBuilder: (context, index) {
-                return _buildVoucherItem(_voucherItemList[index], index);
-              },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AddVoucherItemDialog(
+                              onAdd: (newVoucherItemDTO) {
+                                setState(() {
+                                  _voucherItemList.add(newVoucherItemDTO);
+                                });
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: _showAddVoucherItemDialog,
-              ),
-            ],
-          ),
-        ],
-      ),
-    )
+          )
+
         : const SizedBox.shrink();
   }
 
@@ -237,65 +253,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
           ],
         ),
       ],
-    );
-  }
-
-  void _showAddVoucherItemDialog() {
-    String articulo = '';
-    double precio = 0;
-    int cantidad = 0;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Agregar Artículo"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Artículo'),
-                onChanged: (value) {
-                  articulo = value;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Precio Unitario'),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  precio = double.tryParse(value) ?? 0;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Cantidad'),
-                keyboardType: TextInputType.number,
-                onChanged: (value) {
-                  cantidad = int.tryParse(value) ?? 0;
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text("Cancelar"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text("Aceptar"),
-              onPressed: () {
-                setState(() {
-                  _voucherItemList.add(
-                    VoucherItemDTO(medicineId: int.tryParse(articulo), unitPrice: precio, quantity: cantidad),
-                  );
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 
