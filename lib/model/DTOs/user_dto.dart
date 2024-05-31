@@ -42,6 +42,7 @@ class UserDTO extends Deserializable<UserDTO> {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'userId': userId,

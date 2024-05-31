@@ -46,6 +46,7 @@ class SupplierDTO extends Deserializable<SupplierDTO> {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'supplierId': supplierId,

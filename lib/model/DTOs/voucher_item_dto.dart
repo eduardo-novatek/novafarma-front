@@ -1,17 +1,17 @@
-import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
-import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
 class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   final int? voucherItemId;
   final int? medicineId;
-  final int? quantity;
+  final String? medicineName;
+  late final int? quantity;
   final double? unitPrice;
   //final bool? isFirst;
 
   VoucherItemDTO.empty():
     voucherItemId = null,
     medicineId = null,
+    medicineName = null,
     quantity = null,
     unitPrice = null
     //isFirst = null
@@ -20,6 +20,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   VoucherItemDTO({
     this.voucherItemId,
     this.medicineId,
+    this.medicineName,
     this.quantity,
     this.unitPrice,
     //this.isFirst,

@@ -227,7 +227,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('${item.medicineId}'),
+              child: Text(item.medicineName ?? '<sin especificar>'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
