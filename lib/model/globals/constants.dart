@@ -43,3 +43,6 @@ const String uriCustomerFindLastnameName = "/customer/findLastnameName";
 
 //Suppliers
 const String uriSupplierFindAll = "/supplier/findAll";
+
+//Medicines
+const String uriMedicineFindBarCode = "/medicine/findBarCode";

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
+import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
@@ -26,6 +28,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   final FocusNode _quantityFocusNode = FocusNode();
 
   final VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
+  MedicineDTO _medicine = MedicineDTO();
 
   @override
   void initState() {
@@ -56,7 +59,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment:  CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CreateTextFormField(
               controller: _barCodeController,
@@ -71,7 +74,15 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               child: Text('Artículo: ${_voucherItem.medicineName ?? ''}'),
             ),
 
-            Text('Precio unitario: ${_voucherItem.unitPrice ?? ''}'),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Text('Presentación: ${_voucherItem.presentation ?? ''}'),
+            ),
+
+            Text('Precio unitario: ${_voucherItem.unitPrice != null
+                ? '\$${_voucherItem.unitPrice}'
+                : ''}'
+            ),
 
             CreateTextFormField(
               controller: _quantityController,
@@ -79,50 +90,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               label: 'Cantidad',
               dataType: DataTypeEnum.number,
             ),
-            /*TextFormField(
-              decoration: const InputDecoration(labelText: 'Artículo'),
-              onChanged: (value) {
-                setState(() {
-                  articulo = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingrese un artículo';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(labelText: 'Precio Unitario'),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  precio = double.tryParse(value) ?? 0;
-                });
-              },
-              validator: (value) {
-                if (value == null || double.tryParse(value) == null) {
-                  return 'Por favor ingrese un precio válido';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Cantidad'),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  cantidad = int.tryParse(value) ?? 0;
-                });
-              },
-              validator: (value) {
-                if (value == null || int.tryParse(value) == null) {
-                  return 'Por favor ingrese una cantidad válida';
-                }
-                return null;
-              },
-            ),*/
           ],
         ),
       ),
@@ -135,6 +102,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                 VoucherItemDTO(
                   medicineId: _voucherItem.medicineId,
                   medicineName: _voucherItem.medicineName,
+                  presentation: _voucherItem.presentation,
                   unitPrice: _voucherItem.unitPrice,
                   quantity: _voucherItem.quantity,
                 ),
@@ -163,19 +131,29 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
       // perdida de foco
       if (!_barCodeFocusNode.hasFocus) {
         if (_barCodeController.text.trim().isNotEmpty) {
-          await _updateCustomerList(_lastnameController.text);
-          if (_customerList.isNotEmpty) {
-            if (_customerList.length == 1) {
-              _updateSelectedClient(0);
-            } else {
-              _clientSelection();
-            }
+          _medicine = MedicineDTO.empty();
+          await fetchMedicineBarCode(
+            barCode: _barCodeController.text,
+            medicine: _medicine,
+          );
+          if (_medicine.medicineId != null) {
+              setState(() {
+                _voucherItem.medicineId = _medicine.medicineId;
+                _voucherItem.medicineName = _medicine.name;
+                _voucherItem.presentation =
+                    '${_medicine.presentation!.name} '
+                    '${_medicine.presentation!.quantity} '
+                    '${_medicine.presentation!.unitName}';
+                _voucherItem.unitPrice = _medicine.lastSalePrice;
+                _voucherItem.quantity = 0;
+              });
           } else {
             floatingMessage(
                 context: context,
                 text: 'Artículo no encontrado',
                 messageTypeEnum: MessageTypeEnum.warning
             );
+            _barCodeFocusNode.requestFocus();
           }
         }
       }
@@ -185,8 +163,18 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   void _quantityListener() {
     _quantityFocusNode.addListener(() async {
       // perdida de foco
-      if (!_quantityFocusNode.hasFocus) {
-        _voucherItem.quantity = int.tryParse(_quantityController.text);
+      if (!_quantityFocusNode.hasFocus && _quantityController.text.trim().isNotEmpty) {
+        if (int.tryParse(_quantityController.text) != null) {
+          _voucherItem.quantity = int.tryParse(_quantityController.text);
+        } else {
+          floatingMessage(
+              context: context,
+              text: 'Ingrese una cantidad válida',
+              messageTypeEnum: MessageTypeEnum.warning
+          );
+          _quantityFocusNode.requestFocus();
+        }
       }
     });
   }
+}

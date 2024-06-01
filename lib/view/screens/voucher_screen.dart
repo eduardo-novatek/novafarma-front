@@ -155,7 +155,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
                     0: FlexColumnWidth(2),
                     1: FlexColumnWidth(1),
                     2: FlexColumnWidth(1),
-                    3: FixedColumnWidth(96),
+                    3: FlexColumnWidth(1),
+                    4: FixedColumnWidth(96),
                   },
                   children: const [
                     TableRow(
@@ -163,6 +164,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("PRESENTACI\xD3N", style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                         Padding(
                           padding: EdgeInsets.all(8.0),
@@ -220,7 +225,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
         0: FlexColumnWidth(2),
         1: FlexColumnWidth(1),
         2: FlexColumnWidth(1),
-        3: FixedColumnWidth(96), // Ajusta el ancho según sea necesario para los botones de acción
+        3: FlexColumnWidth(1),
+        4: FixedColumnWidth(96),
       },
       children: [
         TableRow(
@@ -228,6 +234,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(item.medicineName ?? '<sin especificar>'),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(item.presentation ?? '<sin especificar>'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -337,17 +347,7 @@ class CustomOrderedTraversalPolicy extends OrderedTraversalPolicy {
     return super.inDirection(currentNode, direction);
   }
 
-  /*bool didPopRoute() {
-    return true;
-  }
 
-  bool onKey(FocusNode node, RawKeyEvent event) {
-    if (event is RawKeyDownEvent && event.logicalKey == LogicalKeyboardKey.enter) {
-      FocusScope.of(node.context!).nextFocus();
-      return true;
-    }
-    return super.onKey(node, event);
-  }*/
 }
 
 

@@ -1,26 +1,33 @@
-import '../../DTOs/supplier_dto.dart';
-import '../constants.dart' show uriSupplierFindAll;
+import 'package:flutter/foundation.dart';
+import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
+
+import '../../DTOs/medicine_dto.dart';
+import '../constants.dart' show uriMedicineFindBarCode;
 import 'fetch_data_object.dart';
 
-Future<void> fetchMedicineBarCode(MedicineDTO medicine) async {
+Future<void> fetchMedicineBarCode({
+  required String barCode,
+  required MedicineDTO medicine,
+}) async {
 
-  await fetchDataObject<SupplierDTO>(
-    uri: uriSupplierFindAll,
-    classObject: SupplierDTO.empty(),
+  await fetchDataObject<MedicineDTO>(
+    uri: '$uriMedicineFindBarCode/$barCode',
+    classObject: MedicineDTO.empty(),
   ).then((data) {
-      supplierList.clear();
-      supplierList.addAll(data.cast<SupplierDTO>().map((e) =>
-          SupplierDTO(
-            supplierId: e.supplierId,
-            name: e.name,
-            telephone1: e.telephone1,
-            telephone2: e.telephone2,
-            address: e.address,
-            email: e.email,
-            notes: e.notes,
-          )
-      ));
+    if (data.isNotEmpty) {
+      final MedicineDTO fetchedMedicine = data.first as MedicineDTO;
+      medicine.medicineId = fetchedMedicine.medicineId;
+      medicine.name = fetchedMedicine.name;
+      medicine.presentation = PresentationDTO()
+          .fromJson(fetchedMedicine.presentation!.toJson());
+      medicine.lastAddDate = fetchedMedicine.lastAddDate;
+      medicine.lastCostPrice = fetchedMedicine.lastCostPrice;
+      medicine.lastSalePrice = fetchedMedicine.lastSalePrice;
+      medicine.currentStock = fetchedMedicine.currentStock;
+      medicine.controlled = fetchedMedicine.controlled;
+    }
   }).onError((error, stackTrace) {
+    if (kDebugMode) print(error);
     throw Exception(error);
   });
 }
