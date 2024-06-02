@@ -1,20 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 
 
-void floatingMessage({
+Future<void> floatingMessage({
   required BuildContext context,
   required String text,
   required MessageTypeEnum messageTypeEnum,
-}) {
+  bool? allowFlow = false, // Si debe "permitir el flujo" de la app mientras se muestra el mensaje (por defecto, espera)
+}) async {
+
   final overlay = Overlay.of(context);
   late OverlayEntry overlayEntry;
   bool isRemoved = false;
+  final completer = Completer(); //Controla el Future manualmente (captura la instancia del Future actual)
 
   void removeOverlay() {
     if (!isRemoved) {
       isRemoved = true;
       overlayEntry.remove();
+      completer.complete(); // Completa el Future y notifica a cualquier codigo que esté esperando por este Future
     }
   }
 
@@ -43,10 +49,12 @@ void floatingMessage({
                   style: const TextStyle(fontSize: 17.0, color: Colors.black),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.black),
-                onPressed: removeOverlay,
-              ),
+              ! allowFlow! // Permite cerrar manualmente solo si se detiene el flujo de la app
+                ? IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black),
+                    onPressed: removeOverlay,
+                  )
+                : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -56,6 +64,8 @@ void floatingMessage({
 
   overlay.insert(overlayEntry);
   Future.delayed(const Duration(seconds: 3), removeOverlay);
+
+  if (! allowFlow!) return completer.future; // Espera antes de continuar
 }
 
   /*ScaffoldMessenger.of(context).clearSnackBars();

@@ -24,7 +24,7 @@ class OpenDialog {
 
   Future<int> view() async {
     Completer<int> completer = Completer<int>();
-    double fontSize = smallFont ? 13.0 : 20.0;
+    double fontSize = smallFont ? 13.0 : 18.0;
 
     showDialog(
       context: context,

@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../../DTOs/customer_dto.dart';
 import '../constants.dart' show uriCustomerFindDocument, uriCustomerFindLastnameName;
 import 'fetch_data_object.dart';
@@ -32,6 +34,7 @@ Future<void> fetchCustomerList({
           )
       ));
   }).onError((error, stackTrace) {
+    if (kDebugMode) print(error);
     throw Exception(error);
   });
 }

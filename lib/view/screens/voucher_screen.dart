@@ -241,11 +241,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(item.unitPrice.toString()),
+              child: Text(item.unitPrice != null ? item.unitPrice.toString() : '0'),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(item.quantity.toString()),
+              child: Text(item.quantity != null ? item.quantity.toString() : '0'),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,

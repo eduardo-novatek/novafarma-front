@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
-import '../../model/globals/tools/custom_dropdown.dart';
-import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/customer_selection_dialog.dart';
 
@@ -111,8 +109,10 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   //"value": es el dato a buscar (documento o apellido del cliente)
-  Future<void> _updateCustomerList(String value) async {
-    bool isDocument = int.tryParse(value) != null;
+  Future<void> _updateCustomerList({
+    required bool isDocument,
+    required String value}) async {
+
     setState(() {
       _isLoading = true;
     });
@@ -136,7 +136,10 @@ class CustomerBoxState extends State<CustomerBox> {
           widget.onSelectedIdChanged(0);
         });*/
     } catch (error) {
-      _showMessageConnectionError(context);
+      //_showMessageConnectionError(context);
+      //throw Exception(error);
+      return Future.error(error);
+
     } finally {
       /*if (_customerList.isEmpty && !isDocument) {
         _customerList.add(
@@ -167,12 +170,17 @@ class CustomerBoxState extends State<CustomerBox> {
     );
   }*/
 
-  void _showMessageConnectionError(BuildContext context) {
-    floatingMessage(
+  Future<Null> _showMessageConnectionError({
+    required BuildContext context,
+    required bool isDocument
+  }) async {
+    await floatingMessage(
       context: context,
       text: "Error de conexión",
       messageTypeEnum: MessageTypeEnum.error,
+      allowFlow: true,
     );
+    _pushFocus(context: context, isDocument: isDocument);
   }
 
   void _createListeners() {
@@ -180,21 +188,57 @@ class CustomerBoxState extends State<CustomerBox> {
     _lastnameListener();
   }
 
+  void _documentListener() {
+    return _documentFocusNode.addListener(() async {
+      // perdida de foco;
+      if (!_documentFocusNode.hasFocus) {
+        if (_documentController.text.trim().isNotEmpty) {
+          if (int.tryParse(_documentController.text.trim()) != null) {
+            await _updateCustomerList(
+                isDocument: true, value: _documentController.text)
+                .then((value) {
+              if (_customerList.isNotEmpty) {
+                _updateSelectedClient(0);
+              } else {
+                _notFound(viewMessage: true, isDocument: true);
+              }
+            }).onError((error, stackTrace) =>
+                _showMessageConnectionError(context: context, isDocument: true)
+            );
+          } else {
+            await OpenDialog(
+              context: context,
+              title: 'Atención',
+              content: 'Cédula incorrecta',
+            ).view();
+            _pushFocus(context: context, isDocument: true);
+          }
+        }
+      }
+    });
+  }
+
   void _lastnameListener() {
     _lastnameFocusNode.addListener(() async {
       // perdida de foco
       if (!_lastnameFocusNode.hasFocus) {
         if (_lastnameController.text.trim().isNotEmpty) {
-          await _updateCustomerList(_lastnameController.text);
-          if (_customerList.isNotEmpty) {
-            if (_customerList.length == 1) {
-              _updateSelectedClient(0);
-            } else {
-              _clientSelection();
-            }
-          } else {
-            _notFound(viewMessage: true, isDocument: false);
-          }
+          await _updateCustomerList(isDocument: false, value: _lastnameController.text)
+            .then((value) {
+              if (_customerList.isNotEmpty) {
+                if (_customerList.length == 1) {
+                  _updateSelectedClient(0);
+                } else {
+                  _clientSelection();
+                }
+              } else {
+                _notFound(viewMessage: true, isDocument: false);
+              }
+            }).onError((error, stackTrace) =>
+              _showMessageConnectionError(context: context, isDocument: false)
+            );
+
+
         }
       }
     });
@@ -231,22 +275,6 @@ class CustomerBoxState extends State<CustomerBox> {
     _nextFocus();
   }
 
-  void _documentListener() {
-    return _documentFocusNode.addListener(() async {
-      // perdida de foco;
-      if (!_documentFocusNode.hasFocus) {
-        if (_documentController.text.trim().isNotEmpty) {
-          await _updateCustomerList(_documentController.text);
-          if (_customerList.isNotEmpty) {
-            _updateSelectedClient(0);
-          } else {
-            _notFound(viewMessage: true, isDocument: true);
-          }
-        }
-      }
-    });
-  }
-
   void _nextFocus() {
      if (widget.nextFocusNode != null) {
       setState(() {
@@ -257,19 +285,28 @@ class CustomerBoxState extends State<CustomerBox> {
     }
   }
 
-  void _notFound({required bool viewMessage, required bool isDocument}) {
+  Future<void> _notFound({required bool viewMessage, required bool isDocument}) async {
     _customerFound = null;
     widget.selectedId = 0;
     widget.onSelectedIdChanged(widget.selectedId);
     //_initializeTextFormFields();
 
     if (viewMessage) {
-      floatingMessage(
+      /*await floatingMessage(
           context: context,
           text: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
-          messageTypeEnum: MessageTypeEnum.warning
-      );
+          messageTypeEnum: MessageTypeEnum.warning,
+      );*/
+      await OpenDialog(
+        context: context,
+        title: 'Atención',
+        content: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
+      ).view();
     }
+    _pushFocus(context: context, isDocument: isDocument);
+  }
+
+  void _pushFocus({required BuildContext context, required bool isDocument}) {
     setState(() {
       Future.delayed(const Duration(milliseconds: 10), (){
         FocusScope.of(context)
@@ -282,7 +319,6 @@ class CustomerBoxState extends State<CustomerBox> {
     _lastnameController.value = TextEditingValue.empty;
     _documentController.value = TextEditingValue.empty;
   }
-
 
 
 }
