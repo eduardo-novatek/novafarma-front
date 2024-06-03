@@ -69,7 +69,7 @@ class CustomerBoxState extends State<CustomerBox> {
                 : _buildSearchBox(),
             _customerFound != null
                 ? Text(_customerFound!,
-                    style: const TextStyle(fontSize: 16.0)
+                    style: const TextStyle(fontSize: 14.0)
                   )
                 : const SizedBox.shrink(),
           ],
@@ -79,30 +79,25 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   Widget _buildSearchBox() {
-    return Row(
-      //crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
       children: [
-        Expanded(
-          child: CreateTextFormField(
-            controller: _documentController,
-            focusNode: _documentFocusNode,
-            label: 'Documento',
-            dataType: DataTypeEnum.identificationDocument,
-            acceptEmpty: true,
-            viewCharactersCount: false,
-          ),
+        CreateTextFormField(
+          controller: _documentController,
+          focusNode: _documentFocusNode,
+          label: 'Documento',
+          dataType: DataTypeEnum.identificationDocument,
+          acceptEmpty: true,
+          viewCharactersCount: false,
         ),
         const SizedBox(width: 16.0),
-        Expanded(
-          child: CreateTextFormField(
-            controller: _lastnameController,
-            focusNode: _lastnameFocusNode,
-            label: 'Apellido',
-            dataType: DataTypeEnum.text,
-            maxValueForValidation: 25,
-            acceptEmpty: true,
-            viewCharactersCount: false,
-          ),
+        CreateTextFormField(
+          controller: _lastnameController,
+          focusNode: _lastnameFocusNode,
+          label: 'Apellido',
+          dataType: DataTypeEnum.text,
+          maxValueForValidation: 25,
+          acceptEmpty: true,
+          viewCharactersCount: false,
         ),
       ],
     );
