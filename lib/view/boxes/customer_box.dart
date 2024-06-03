@@ -58,23 +58,18 @@ class CustomerBoxState extends State<CustomerBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          //crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _isLoading
-                ? buildCircularProgress()
-                : _buildSearchBox(),
-            _customerFound != null
-                ? Text(_customerFound!,
-                    style: const TextStyle(fontSize: 14.0)
-                  )
-                : const SizedBox.shrink(),
-          ],
-        ),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _isLoading
+            ? buildCircularProgress()
+            : _buildSearchBox(),
+        _customerFound != null
+            ? Text(_customerFound!,
+                style: const TextStyle(fontSize: 14.0)
+              )
+            : const SizedBox.shrink(),
+      ],
     );
   }
 
@@ -89,7 +84,6 @@ class CustomerBoxState extends State<CustomerBox> {
           acceptEmpty: true,
           viewCharactersCount: false,
         ),
-        const SizedBox(width: 16.0),
         CreateTextFormField(
           controller: _lastnameController,
           focusNode: _lastnameFocusNode,

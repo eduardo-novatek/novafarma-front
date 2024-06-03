@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/build_circular_progress.dart';
-
-import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_supplier_list.dart';
@@ -39,13 +36,14 @@ class SupplierBoxState extends State<SupplierBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildRefreshButton(),
               const Text('Proveedor:',
@@ -56,8 +54,8 @@ class SupplierBoxState extends State<SupplierBox> {
                   : _buildCustomDropdown(),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -85,7 +83,7 @@ class SupplierBoxState extends State<SupplierBox> {
   Widget _buildCustomDropdown() {
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.only(left: 8.0),
+        padding: const EdgeInsets.only(left: 10.0),
         child: CustomDropdown<SupplierDTO>(
           themeData: ThemeData(),
           modelList: _supplierList,

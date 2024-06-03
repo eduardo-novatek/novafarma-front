@@ -1,15 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
+import 'package:novafarma_front/model/globals/tools/parse_date.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
-
 import '../../model/enums/data_type_enum.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
@@ -33,7 +31,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
   final TextEditingController _dateController = TextEditingController();
   final FocusNode _documentFocusNode = FocusNode();
   final FocusNode _dateFocusNode = FocusNode();
-  //final FocusNode _movementTypeFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
@@ -43,6 +40,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   @override
   void initState() {
     super.initState();
+    _createListeners();
     _dateController.value = TextEditingValue(text: dateNow());
   }
 
@@ -98,7 +96,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Widget _buildSectionTitleBar({required String sectionTitle}) {
     return Container(
       color: Colors.blue.shade100,
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(3.0),
       child: Text(
         sectionTitle,
         style: TextStyle(
@@ -106,6 +104,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           fontSize: 15.0,
         ),
         textAlign: TextAlign.center,
+
       ),
     );
   }
@@ -113,8 +112,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Widget _buildHead() {
     return FocusTraversalGroup(
       policy:  CustomOrderedTraversalPolicy(),
-      child: Shortcuts(shortcuts: <LogicalKeySet, Intent> {
-          LogicalKeySet(LogicalKeyboardKey.enter): const NextFocusIntent(),
+        child: Shortcuts(shortcuts: <LogicalKeySet, Intent> {
+            LogicalKeySet(LogicalKeyboardKey.enter): const NextFocusIntent(),
         },
         child: Actions(
           actions: <Type, Action<Intent>> {
@@ -128,10 +127,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildMovementTypeBox(),
                 _buildSupplierOrCustomerBox(),
-                _buildDateTimeBox(),
+                //_buildDateTimeBox(),
                 IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
               ],
           ),
@@ -153,31 +153,34 @@ class _VoucherScreenState extends State<VoucherScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildSectionTitleBar(sectionTitle: "Datos comprobante"),
-          Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  "Tipo: ",
+          _buildDateTimeBox(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Tipo:',
                   style: TextStyle(fontSize: 16.0),
                 ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
-                  child: CustomDropdown<String>(
-                    themeData: _themeData,
-                    modelList: movementTypes,
-                    model: movementTypes[0],
-                    callback: (movementType) {
-                      setState(() {
-                        _selectedMovementType = movementType!;
-                      });
-                    },
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: CustomDropdown<String>(
+                      themeData: _themeData,
+                      modelList: movementTypes,
+                      model: movementTypes[0],
+                      callback: (movementType) {
+                        setState(() {
+                          _selectedMovementType = movementType!;
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -324,7 +327,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
           _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)){
         return Container(
-          width: MediaQuery.of(context).size.width * 0.3,
+          width: MediaQuery.of(context).size.width * 0.275,
           margin: const EdgeInsets.symmetric(horizontal: 16.0),
           decoration: BoxDecoration(
             border: Border.all(
@@ -345,10 +348,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
             ],
           ),
         );
+
         //Es Cliente?
       } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
         return Container(
           width: MediaQuery.of(context).size.width * 0.3,
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
           decoration: BoxDecoration(
             border: Border.all(
               color: Colors.blue,
@@ -374,23 +379,15 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildDateTimeBox() {
-    return _selectedMovementType != defaultTextFromDropdownMenu
-      ? Expanded(
-          child: Row(
-            children: [
-              const SizedBox(width: 16.0),
-              Expanded(
-                child: CreateTextFormField(
-                  controller: _dateController,
-                  focusNode: _dateFocusNode,
-                  label: 'Fecha',
-                  dataType: DataTypeEnum.date,
-                ),
-              ),
-            ]
-          )
-        )
-      : const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: CreateTextFormField(
+        controller: _dateController,
+        focusNode: _dateFocusNode,
+        label: 'Fecha',
+        dataType: DataTypeEnum.date,
+      ),
+    );
   }
 
   String timeNow() {
@@ -403,8 +400,22 @@ class _VoucherScreenState extends State<VoucherScreen> {
     return formatter.format(DateTime.now());
   }
 
+  void _createListeners() {
+    _dateListener();
+  }
+  void _dateListener() {
+    _dateFocusNode.addListener(() {
+      // Perdida de foco
+      if (! _dateFocusNode.hasFocus) {
+        if (parseDate(_dateController.text) == null) {
+          _dateController.value = TextEditingValue(text: dateNow());
+        }
+      }
+    });
 
+  }
 }
+
 
 class NextFocusIntent extends Intent {
   const NextFocusIntent();
@@ -418,8 +429,6 @@ class CustomOrderedTraversalPolicy extends OrderedTraversalPolicy {
     }
     return super.inDirection(currentNode, direction);
   }
-
-
 }
 
 
