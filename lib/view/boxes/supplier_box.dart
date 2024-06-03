@@ -39,26 +39,24 @@ class SupplierBoxState extends State<SupplierBox> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                _buildRefreshButton(),
-                const Text('Proveedor:',
-                     style: TextStyle(fontSize: 16.0)
-                ),
-              ],
-            ),
-            _isLoading
-                ? buildCircularProgress()
-                : _buildCustomDropdown()
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              _buildRefreshButton(),
+              const Text('Proveedor:',
+                   style: TextStyle(fontSize: 16.0)
+              ),
+              _isLoading
+                  ? buildCircularProgress()
+                  : _buildCustomDropdown(),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -84,16 +82,21 @@ class SupplierBoxState extends State<SupplierBox> {
     );
   }
 
-  CustomDropdown<SupplierDTO> _buildCustomDropdown() {
-    return CustomDropdown<SupplierDTO>(
-      themeData: ThemeData(),
-      modelList: _supplierList,
-      model: _supplierList.isNotEmpty ? _supplierList[0] : null,
-      callback: (supplier) {
-        setState(() {
-          widget.onSelectedIdChanged(supplier!.supplierId!);
-        });
-      },
+  Widget _buildCustomDropdown() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: CustomDropdown<SupplierDTO>(
+          themeData: ThemeData(),
+          modelList: _supplierList,
+          model: _supplierList.isNotEmpty ? _supplierList[0] : null,
+          callback: (supplier) {
+            setState(() {
+              widget.onSelectedIdChanged(supplier!.supplierId!);
+            });
+          },
+        ),
+      ),
     );
   }
 

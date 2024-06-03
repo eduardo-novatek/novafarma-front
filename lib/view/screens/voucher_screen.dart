@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
@@ -86,7 +88,22 @@ class _VoucherScreenState extends State<VoucherScreen> {
         'Comprobantes',
         style: TextStyle(
           color: Colors.white,
-          fontSize: 16.0,
+          fontSize: 19.0,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildSectionTitleBar({required String sectionTitle}) {
+    return Container(
+      color: Colors.blue.shade100,
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        sectionTitle,
+        style: TextStyle(
+          color: Colors.blue.shade900,
+          fontSize: 15.0,
         ),
         textAlign: TextAlign.center,
       ),
@@ -124,26 +141,51 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildMovementTypeBox() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Tipo: ",
-          style: TextStyle(fontSize: 16.0),
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.17,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.blue,
+          width: 1.0,
         ),
-        const SizedBox(width: 8.0,),
-        CustomDropdown<String>(
-          themeData: _themeData,
-          modelList: movementTypes,
-          model: movementTypes[0],
-          callback: (movementType) {
-            setState(() {
-              _selectedMovementType = movementType!;
-            });
-          },
-        ),
-      ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildSectionTitleBar(sectionTitle: "Datos comprobante"),
+          Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  "Tipo: ",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                  child: CustomDropdown<String>(
+                    themeData: _themeData,
+                    modelList: movementTypes,
+                    model: movementTypes[0],
+                    callback: (movementType) {
+                      setState(() {
+                        _selectedMovementType = movementType!;
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
+
+
+
 
   Widget _buildBody() {
     return _selectedMovementType != defaultTextFromDropdownMenu
@@ -281,20 +323,50 @@ class _VoucherScreenState extends State<VoucherScreen> {
      //Es Proveedor?
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
           _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)){
-        return SupplierBox(
-          selectedId: _selectedCustomerOrSupplierId,
-          onSelectedIdChanged: (value) => setState(() {
-            _selectedCustomerOrSupplierId = value;
-          }),
+        return Container(
+          width: MediaQuery.of(context).size.width * 0.3,
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.blue,
+              width: 1.0,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSectionTitleBar(sectionTitle: "Datos proveedor"),
+              SupplierBox(
+                selectedId: _selectedCustomerOrSupplierId,
+                onSelectedIdChanged: (value) => setState(() {
+                  _selectedCustomerOrSupplierId = value;
+                }),
+              ),
+            ],
+          ),
         );
         //Es Cliente?
       } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
-        return CustomerBox(
-            selectedId: _selectedCustomerOrSupplierId,
-            nextFocusNode: _dateFocusNode,
-            onSelectedIdChanged: (value) => setState(() {
-              _selectedCustomerOrSupplierId = value;
-            })
+        return Container(
+          width: MediaQuery.of(context).size.width * 0.3,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.blue,
+              width: 1.0,
+            ),
+          ),child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildSectionTitleBar(sectionTitle: "Datos cliente"),
+              CustomerBox(
+                  selectedId: _selectedCustomerOrSupplierId,
+                  nextFocusNode: _dateFocusNode,
+                  onSelectedIdChanged: (value) => setState(() {
+                    _selectedCustomerOrSupplierId = value;
+                  })
+              ),
+            ],
+          ),
         );
       }
     }
