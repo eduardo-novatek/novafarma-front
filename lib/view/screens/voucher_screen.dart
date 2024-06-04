@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -29,13 +30,14 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   final TextEditingController _documentController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-  final FocusNode _documentFocusNode = FocusNode();
+
   final FocusNode _dateFocusNode = FocusNode();
+  final FocusNode _documentFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
 
-  List<VoucherItemDTO> _voucherItemList = [];
+  final List<VoucherItemDTO> _voucherItemList = [];
 
   @override
   void initState() {
@@ -110,6 +112,21 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Widget _buildHead() {
+    return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildMovementTypeBox(),
+                  _buildSupplierOrCustomerBox(),
+                  IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
+                ],
+              ),
+            );
+
+  }
+
+  /*Widget _buildHead() {
     return FocusTraversalGroup(
       policy:  CustomOrderedTraversalPolicy(),
         child: Shortcuts(shortcuts: <LogicalKeySet, Intent> {
@@ -131,14 +148,13 @@ class _VoucherScreenState extends State<VoucherScreen> {
               children: [
                 _buildMovementTypeBox(),
                 _buildSupplierOrCustomerBox(),
-                //_buildDateTimeBox(),
                 IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
               ],
           ),
         ),
       ),
     ));
-  }
+  }*/
 
   Widget _buildMovementTypeBox() {
     return Container(
@@ -186,9 +202,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
       ),
     );
   }
-
-
-
 
   Widget _buildBody() {
     return _selectedMovementType != defaultTextFromDropdownMenu
@@ -245,6 +258,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                           context: context,
                           builder: (BuildContext context) {
                             return AddVoucherItemDialog(
+                              movementType: toMovementTypeEnum(_selectedMovementType)!,
                               onAdd: (newVoucherItemDTO) {
                                 setState(() {
                                   _voucherItemList.add(newVoucherItemDTO);
@@ -365,7 +379,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
               _buildSectionTitleBar(sectionTitle: "Datos cliente"),
               CustomerBox(
                   selectedId: _selectedCustomerOrSupplierId,
-                  nextFocusNode: _dateFocusNode,
                   onSelectedIdChanged: (value) => setState(() {
                     _selectedCustomerOrSupplierId = value;
                   })
@@ -386,6 +399,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         focusNode: _dateFocusNode,
         label: 'Fecha',
         dataType: DataTypeEnum.date,
+        initialFocus: true,
       ),
     );
   }
@@ -417,7 +431,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 }
 
 
-class NextFocusIntent extends Intent {
+/*class NextFocusIntent extends Intent {
   const NextFocusIntent();
 }
 
@@ -429,6 +443,6 @@ class CustomOrderedTraversalPolicy extends OrderedTraversalPolicy {
     }
     return super.inDirection(currentNode, direction);
   }
-}
+}*/
 
 

@@ -4,6 +4,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   int? voucherItemId;
   int? medicineId;
   String? medicineName;
+  double? currentStock;
   String? presentation;
   int? quantity;
   double? unitPrice;
@@ -15,7 +16,8 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     medicineName = null,
     presentation = null,
     quantity = null,
-    unitPrice = null
+    unitPrice = null,
+    currentStock = null
     //isFirst = null
   ;
 
@@ -26,6 +28,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     this.presentation,
     this.quantity,
     this.unitPrice,
+    this.currentStock,
     //this.isFirst,
   });
 
@@ -39,12 +42,14 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'voucherItemId': voucherItemId,
       'medicineId': medicineId,
       'quantity': quantity,
       'unitPrice': unitPrice,
+      'currentStock': currentStock,
     };
   }
 }

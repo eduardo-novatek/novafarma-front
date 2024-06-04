@@ -7,12 +7,17 @@ import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
+import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class AddVoucherItemDialog extends StatefulWidget {
+  final MovementTypeEnum? movementType;
   final Function(VoucherItemDTO) onAdd;
 
-  const AddVoucherItemDialog({super.key, required this.onAdd});
+  const AddVoucherItemDialog({
+    super.key,
+    required this.movementType,
+    required this.onAdd});
 
   @override
   _AddVoucherItemDialogState createState() => _AddVoucherItemDialogState();
@@ -65,7 +70,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               children: [
                 const Text(
                   "Agregar artículos",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 Flexible(
@@ -112,6 +117,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                                 presentation: _voucherItem.presentation,
                                 unitPrice: _voucherItem.unitPrice,
                                 quantity: _voucherItem.quantity,
+                                currentStock: _voucherItem.currentStock,
                               ),
                             );
                             _initialize(initializeCodeBar: true);
@@ -151,8 +157,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         ),
         const TableRow(
           children: [
-            SizedBox(height: 20),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+            SizedBox(height: 10),
           ],
         ),
         TableRow(
@@ -163,8 +169,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         ),
         const TableRow(
           children: [
-            SizedBox(height: 20),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
+            SizedBox(height: 10),
           ],
         ),
         TableRow(
@@ -174,6 +180,20 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                 ? '\$${_voucherItem.unitPrice}'
                 : ''
             ),
+          ],
+        ),
+        const TableRow(
+          children: [
+            SizedBox(height: 10),
+            SizedBox(height: 10),
+          ],
+        ),
+        TableRow(
+          children: [
+            const Text('Stock:'),
+            Text(_voucherItem.currentStock != null
+                ? '${_voucherItem.currentStock}'
+                : ''),
           ],
         ),
       ],
@@ -197,22 +217,30 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
       ).then((value) async {
         if (_medicine.medicineId != null) {
-          setState(() {
-            _voucherItem.medicineId = _medicine.medicineId;
-            _voucherItem.medicineName = _medicine.name;
-            _voucherItem.presentation =
-            '${_medicine.presentation!.name} '
-                '${_medicine.presentation!.quantity} '
-                '${_medicine.presentation!.unitName}';
-            _voucherItem.unitPrice = _medicine.lastSalePrice;
-            _voucherItem.quantity = 0;
-          });
+          if (_isSupplier() || _medicine.currentStock! > 0) {
+            setState(() {
+              _voucherItem.medicineId = _medicine.medicineId;
+              _voucherItem.medicineName = _medicine.name;
+              _voucherItem.presentation =
+              '${_medicine.presentation!.name} '
+                  '${_medicine.presentation!.quantity} '
+                  '${_medicine.presentation!.unitName}';
+              _voucherItem.unitPrice = unitPrice();
+              _voucherItem.currentStock = _medicine.currentStock;
+              _voucherItem.quantity = 0;
+            });
+          } else {
+            await OpenDialog(
+              context: context,
+              title: 'Sin stock',
+              content: '${_medicine.name} '
+                           '${_medicine.presentation!.name} '
+                           '${_medicine.presentation!.quantity} '
+                           '${_medicine.presentation!.unitName}',
+            ).view();
+            _barCodeFocusNode.requestFocus();
+          }
         } else {
-          /*await floatingMessage(
-            context: context,
-            text: 'Artículo no encontrado',
-            messageTypeEnum: MessageTypeEnum.warning
-        );*/
           _initialize(initializeCodeBar: false);
           await OpenDialog(
               context: context,
@@ -226,6 +254,20 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           _showMessageConnectionError(context: context, isBarCode: true)
       );
     });
+  }
+
+  double? unitPrice() {
+    if (widget.movementType == MovementTypeEnum.sale) {
+      return _medicine.lastSalePrice;
+    } else if (_isSupplier()) {
+      return _medicine.lastCostPrice;
+    }
+    return null;
+  }
+
+  bool _isSupplier() {
+    return widget.movementType == MovementTypeEnum.purchase ||
+      widget.movementType == MovementTypeEnum.returnToSupplier;
   }
 
   void _quantityListener() {

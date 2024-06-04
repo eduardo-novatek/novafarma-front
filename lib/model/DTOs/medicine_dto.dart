@@ -11,7 +11,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
   DateTime? lastAddDate;
   double? lastCostPrice;
   double? lastSalePrice;
-  int? currentStock;
+  double? currentStock;
   bool? controlled;
 
   //final bool? isFirst;
