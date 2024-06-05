@@ -13,13 +13,16 @@ import '../../model/globals/tools/create_text_form_field.dart';
 class AddVoucherItemDialog extends StatefulWidget {
   final MovementTypeEnum? movementType;
   final List<String>? barCodeList; // ID's de medicamentos agregados al voucher
-  final Function(VoucherItemDTO) onAdd;
+  final VoucherItemDTO? modifyVoucherItem; //Si es una modificacion, el voucher viene cargado
+  final Function(VoucherItemDTO)? onAdd;
 
   const AddVoucherItemDialog({
     super.key,
-    required this.movementType,
-    required this.barCodeList,
-    required this.onAdd});
+    this.modifyVoucherItem,
+    this.movementType,
+    this.barCodeList,
+    this.onAdd,
+  });
 
   @override
   _AddVoucherItemDialogState createState() => _AddVoucherItemDialogState();
@@ -70,9 +73,10 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [
-                const Text(
-                  "Agregar artículos",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Text(widget.modifyVoucherItem == null
+                    ? 'Agregar artículos'
+                    : 'Modificar artículo)',
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 Flexible(
@@ -82,23 +86,31 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CreateTextFormField(
-                            controller: _barCodeController,
-                            focusNode: _barCodeFocusNode,
-                            label: 'Código',
-                            dataType: DataTypeEnum.text,
-                            initialFocus: true,
-                          ),
+
+                          widget.modifyVoucherItem == null
+                            ? CreateTextFormField(
+                                controller: _barCodeController,
+                                focusNode: _barCodeFocusNode,
+                                label: 'Código',
+                                dataType: DataTypeEnum.text,
+                                initialFocus: true,
+                              )
+                            : Text('Çódigo: ${widget.modifyVoucherItem?.barCode}'),
+
                           const SizedBox(height: 20),
                           buildTable(),
                           const SizedBox(height: 5),
-                          CreateTextFormField(
-                            controller: _quantityController,
-                            focusNode: _quantityFocusNode,
-                            label: 'Cantidad',
-                            dataType: DataTypeEnum.number,
-                          ),
-                        ],
+
+                          widget.modifyVoucherItem == null
+                            ? CreateTextFormField(
+                                controller: _quantityController,
+                                focusNode: _quantityFocusNode,
+                                label: 'Cantidad',
+                                dataType: DataTypeEnum.number,
+
+                              )
+                            : _fieldQuantityForModify(),
+                          ],
                       ),
                     ),
                   ),
@@ -112,18 +124,20 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                         child: const Text("Aceptar"),
                         onPressed: () {
                           if (_formKey.currentState?.validate() == true) {
-                            widget.onAdd(
-                              VoucherItemDTO(
-                                medicineId: _voucherItem.medicineId,
-                                barCode: _voucherItem.barCode,
-                                medicineName: _voucherItem.medicineName,
-                                presentation: _voucherItem.presentation,
-                                unitPrice: _voucherItem.unitPrice,
-                                quantity: _voucherItem.quantity,
-                                currentStock: _voucherItem.currentStock,
-                              ),
-                            );
-                            _initialize(initializeCodeBar: true);
+                            if (widget.onAdd != null) {
+                              widget.onAdd!(
+                                VoucherItemDTO(
+                                  medicineId: _voucherItem.medicineId,
+                                  barCode: _voucherItem.barCode,
+                                  medicineName: _voucherItem.medicineName,
+                                  presentation: _voucherItem.presentation,
+                                  unitPrice: _voucherItem.unitPrice,
+                                  quantity: _voucherItem.quantity,
+                                  currentStock: _voucherItem.currentStock,
+                                ),
+                              );
+                              _initialize(initializeCodeBar: true);
+                            }
                           }
                         },
                       ),
@@ -145,6 +159,17 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     );
   }
 
+  Widget _fieldQuantityForModify(){
+    _quantityController.value = TextEditingValue(
+        text: widget.modifyVoucherItem?.quantity as String);
+    return CreateTextFormField(
+        controller: _quantityController,
+        focusNode: _quantityFocusNode,
+        label: 'Cantidad',
+        dataType: DataTypeEnum.number,
+    );
+  }
+
   Table buildTable() {
     return Table(
       columnWidths: const {
@@ -155,8 +180,9 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         TableRow(
           children: [
             const Text('Artículo:'),
-            Text(_voucherItem.medicineName ?? ''),
-          ],
+            widget.modifyVoucherItem == null
+                ? Text(_voucherItem.medicineName ?? '')
+                : Text(widget.modifyVoucherItem!.medicineName!),          ],
         ),
         const TableRow(
           children: [
@@ -167,7 +193,9 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         TableRow(
           children: [
             const Text('Presentación:'),
-            Text(_voucherItem.presentation ?? ''),
+            widget.modifyVoucherItem == null
+              ? Text(_voucherItem.presentation ?? '')
+              : Text(widget.modifyVoucherItem!.presentation!),
           ],
         ),
         const TableRow(
@@ -179,10 +207,11 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         TableRow(
           children: [
             const Text('Precio unitario:'),
-            Text(_voucherItem.unitPrice != null
-                ? '\$${_voucherItem.unitPrice}'
-                : ''
-            ),
+            widget.modifyVoucherItem == null
+              ? Text(_voucherItem.unitPrice != null
+                    ? '\$${_voucherItem.unitPrice}'
+                    : '')
+              : Text('\$${widget.modifyVoucherItem!.unitPrice!}'),
           ],
         ),
         const TableRow(
@@ -194,9 +223,11 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         TableRow(
           children: [
             const Text('Stock:'),
-            Text(_voucherItem.currentStock != null
-                ? '${_voucherItem.currentStock}'
-                : ''),
+            widget.modifyVoucherItem == null
+              ? Text(_voucherItem.currentStock != null
+                  ? '${_voucherItem.currentStock}'
+                  : '')
+              : Text('${widget.modifyVoucherItem!.currentStock!}'),
           ],
         ),
       ],

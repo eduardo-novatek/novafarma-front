@@ -334,6 +334,35 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   void _editVoucherItem(int index) {
 
+    VoucherItemDTO modifyVoucherItem = VoucherItemDTO(
+      voucherItemId: _voucherItemList[index].voucherItemId,
+      medicineId: _voucherItemList[index].medicineId,
+      barCode: _voucherItemList[index].barCode,
+      medicineName: _voucherItemList[index].medicineName,
+      presentation: _voucherItemList[index].presentation,
+      currentStock: _voucherItemList[index].currentStock,
+      unitPrice: _voucherItemList[index].unitPrice,
+      quantity: _voucherItemList[index].quantity,
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddVoucherItemDialog(
+          modifyVoucherItem: modifyVoucherItem,
+          /*onAdd: (newVoucherItemDTO) {
+            setState(() {
+              _voucherItemList[index] = newVoucherItemDTO;
+              // Si el código de barras ha cambiado, actualiza la lista de códigos de barras
+              if (_voucherItemList[index].barCode != newVoucherItemDTO.barCode) {
+                _barCodeList[index] = newVoucherItemDTO.barCode!;
+              }
+            });
+          },*/
+        );
+      },
+    );
+
   }
 
   void _deleteVoucherItem(int index) {
