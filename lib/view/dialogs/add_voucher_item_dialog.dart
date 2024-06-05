@@ -209,7 +209,15 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     _barCodeFocusNode.addListener(() async {
       if (_barCodeFocusNode.hasFocus) return;  // Si recibe el foco, sale
       if (_barCodeController.text.trim().isEmpty) return;
-
+      if (barCodeExistOnVoucher()) {
+        await OpenDialog(
+          context: context,
+          title: 'Atención',
+          content: 'El artículo ya está agregado al comprobante',
+        ).view();
+        _barCodeFocusNode.requestFocus();
+        return;
+      }
       _medicine = MedicineDTO.empty();
       await fetchMedicineBarCode(
         barCode: _barCodeController.text,
@@ -254,6 +262,10 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           _showMessageConnectionError(context: context, isBarCode: true)
       );
     });
+  }
+
+  bool barCodeExistOnVoucher() {
+      
   }
 
   double? unitPrice() {
