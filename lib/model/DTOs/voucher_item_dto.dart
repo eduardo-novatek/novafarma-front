@@ -3,6 +3,7 @@ import 'package:novafarma_front/model/globals/deserializable.dart';
 class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   int? voucherItemId;
   int? medicineId;
+  String? barCode;
   String? medicineName;
   double? currentStock;
   String? presentation;
@@ -13,6 +14,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   VoucherItemDTO.empty():
     voucherItemId = null,
     medicineId = null,
+    barCode = null,
     medicineName = null,
     presentation = null,
     quantity = null,
@@ -24,6 +26,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   VoucherItemDTO({
     this.voucherItemId,
     this.medicineId,
+    this.barCode,
     this.medicineName,
     this.presentation,
     this.quantity,
@@ -37,6 +40,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     return VoucherItemDTO(
       voucherItemId: json['voucherItemId'],
       medicineId: json['medicineId'],
+      barCode: json['barCode'],
       quantity: json['quantity'],
       unitPrice: json['unitPrice'],
     );
@@ -47,6 +51,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     return {
       'voucherItemId': voucherItemId,
       'medicineId': medicineId,
+      'barCode': barCode,
       'quantity': quantity,
       'unitPrice': unitPrice,
       'currentStock': currentStock,

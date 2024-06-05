@@ -17,6 +17,7 @@ Future<void> fetchMedicineBarCode({
     if (data.isNotEmpty) {
       final MedicineDTO fetchedMedicine = data.first as MedicineDTO;
       medicine.medicineId = fetchedMedicine.medicineId;
+      medicine.barCode = fetchedMedicine.barCode;
       medicine.name = fetchedMedicine.name;
       medicine.presentation = PresentationDTO()
           .fromJson(fetchedMedicine.presentation!.toJson());

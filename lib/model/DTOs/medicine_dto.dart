@@ -6,6 +6,7 @@ import '../globals/tools/parse_date.dart';
 
 class MedicineDTO extends Deserializable<MedicineDTO> {
   int? medicineId;
+  String? barCode;
   PresentationDTO? presentation;
   String? name;
   DateTime? lastAddDate;
@@ -18,6 +19,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
 
   MedicineDTO.empty():
     medicineId = null,
+    barCode = null,
     presentation = null,
     name = null,
     lastAddDate = null,
@@ -30,6 +32,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
 
   MedicineDTO({
     this.medicineId,
+    this.barCode,
     this.presentation,
     this.name,
     this.lastAddDate,
@@ -44,6 +47,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
   MedicineDTO fromJson(Map<String, dynamic> json) {
     MedicineDTO m = MedicineDTO(
       medicineId: json['medicineId'],
+      barCode: json['barCode'],
       presentation: json['presentation'] != null
         ? PresentationDTO().fromJson(json['presentation'])
         : null,
@@ -61,6 +65,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
   Map<String, dynamic> toJson() {
     return {
       'medicineId': medicineId,
+      'barCode': barCode,
       'presentation': presentation,
       'name': name,
       'lastAddDate': lastAddDate,

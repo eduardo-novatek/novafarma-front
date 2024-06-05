@@ -12,11 +12,13 @@ import '../../model/globals/tools/create_text_form_field.dart';
 
 class AddVoucherItemDialog extends StatefulWidget {
   final MovementTypeEnum? movementType;
+  final List<String>? barCodeList; // ID's de medicamentos agregados al voucher
   final Function(VoucherItemDTO) onAdd;
 
   const AddVoucherItemDialog({
     super.key,
     required this.movementType,
+    required this.barCodeList,
     required this.onAdd});
 
   @override
@@ -113,6 +115,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                             widget.onAdd(
                               VoucherItemDTO(
                                 medicineId: _voucherItem.medicineId,
+                                barCode: _voucherItem.barCode,
                                 medicineName: _voucherItem.medicineName,
                                 presentation: _voucherItem.presentation,
                                 unitPrice: _voucherItem.unitPrice,
@@ -209,7 +212,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     _barCodeFocusNode.addListener(() async {
       if (_barCodeFocusNode.hasFocus) return;  // Si recibe el foco, sale
       if (_barCodeController.text.trim().isEmpty) return;
-      if (barCodeExistOnVoucher()) {
+      if (widget.barCodeList!.contains(_barCodeController.text)) {
         await OpenDialog(
           context: context,
           title: 'Atención',
@@ -228,6 +231,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           if (_isSupplier() || _medicine.currentStock! > 0) {
             setState(() {
               _voucherItem.medicineId = _medicine.medicineId;
+              _voucherItem.barCode = _medicine.barCode;
               _voucherItem.medicineName = _medicine.name;
               _voucherItem.presentation =
               '${_medicine.presentation!.name} '
@@ -262,10 +266,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           _showMessageConnectionError(context: context, isBarCode: true)
       );
     });
-  }
-
-  bool barCodeExistOnVoucher() {
-      
   }
 
   double? unitPrice() {

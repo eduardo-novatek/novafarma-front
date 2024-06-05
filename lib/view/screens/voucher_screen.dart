@@ -38,6 +38,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   int _selectedCustomerOrSupplierId = 0;
 
   final List<VoucherItemDTO> _voucherItemList = [];
+  final List<String> _barCodeList = []; //Para control de medicamentos ingresados al voucher
 
   @override
   void initState() {
@@ -253,15 +254,21 @@ class _VoucherScreenState extends State<VoucherScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.add),
+                      style: const ButtonStyle(
+                        iconSize: MaterialStatePropertyAll(40.0),
+                        iconColor: MaterialStatePropertyAll(Colors.blue),
+                      ),
                       onPressed: () {
                         showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return AddVoucherItemDialog(
                               movementType: toMovementTypeEnum(_selectedMovementType)!,
+                              barCodeList: _barCodeList,
                               onAdd: (newVoucherItemDTO) {
                                 setState(() {
                                   _voucherItemList.add(newVoucherItemDTO);
+                                  _barCodeList.add(newVoucherItemDTO.barCode!);
                                 });
                               },
                             );
@@ -326,12 +333,13 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   void _editVoucherItem(int index) {
-    // Implementa la lógica para editar el item
+
   }
 
   void _deleteVoucherItem(int index) {
     setState(() {
       _voucherItemList.removeAt(index);
+      _barCodeList.removeAt(index);
     });
   }
 
