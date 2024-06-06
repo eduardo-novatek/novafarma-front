@@ -350,6 +350,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
       builder: (BuildContext context) {
         return AddVoucherItemDialog(
           modifyVoucherItem: modifyVoucherItem,
+          onModify: (modifiedVoucher) {
+            setState(() {
+              _voucherItemList[index].quantity = modifiedVoucher.quantity;
+            });
+          },
           /*onAdd: (newVoucherItemDTO) {
             setState(() {
               _voucherItemList[index] = newVoucherItemDTO;
