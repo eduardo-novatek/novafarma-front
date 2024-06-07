@@ -15,7 +15,7 @@ Map<String, dynamic> userLogged = {
   }
 };
 
-List<String> movementTypes = [
+final List<String> movementTypes = [
   defaultTextFromDropdownMenu,
   nameMovementType(MovementTypeEnum.purchase),
   nameMovementType(MovementTypeEnum.sale),

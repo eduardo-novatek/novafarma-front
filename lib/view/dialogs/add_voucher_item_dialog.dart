@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
+import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -88,7 +89,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           widget.modifyVoucherItem == null
                             ? CreateTextFormField(
                                 controller: _barCodeController,
@@ -109,7 +109,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                                 focusNode: _quantityFocusNode,
                                 label: 'Cantidad',
                                 dataType: DataTypeEnum.number,
-
                               )
                             : _fieldQuantityForModify(),
                           ],
@@ -187,15 +186,15 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
   Future<bool> _validQuantity() async {
     bool isValid = true;
-    if (widget.movementType != MovementTypeEnum.adjustmentStock) {
-      if (int.parse(_quantityController.text) < 1) {
-        await OpenDialog(
-        context: context,
-        title: 'Atención',
-        content: 'Cantidad incorrecta',
-        ).view();
-        isValid = false;
-      }
+    int? quantity = int.parse(_quantityController.text);
+    if ((widget.movementType == MovementTypeEnum.adjustmentStock && quantity == 0)
+        || widget.movementType != MovementTypeEnum.adjustmentStock && quantity < 1) {
+      await OpenDialog(
+      context: context,
+      title: 'Atención',
+      content: 'Cantidad incorrecta',
+      ).view();
+      isValid = false;
     }
     return Future.value(isValid);
   }
@@ -247,19 +246,26 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
             SizedBox(height: 10),
           ],
         ),
-        TableRow(
-          children: [
-            const Text('Precio unitario:'),
-            widget.modifyVoucherItem == null
-              ? Text(_voucherItem.unitPrice != null
-                    ? '\$${_voucherItem.unitPrice}'
-                    : '')
-              : Text(widget.modifyVoucherItem!.unitPrice != null
-                    ? '\$${widget.modifyVoucherItem!.unitPrice!}'
-                    : ''
-                ),
-          ],
-        ),
+        widget.movementType != MovementTypeEnum.adjustmentStock
+          ? TableRow(
+              children: [
+                const Text('Precio unitario:'),
+                widget.modifyVoucherItem == null
+                  ? Text(_voucherItem.unitPrice != null
+                        ? '\$${_voucherItem.unitPrice}'
+                        : '')
+                  : Text(widget.modifyVoucherItem!.unitPrice != null
+                        ? '\$${widget.modifyVoucherItem!.unitPrice!}'
+                        : ''
+                    ),
+              ],
+            )
+          : const TableRow(
+            children: [
+              SizedBox.shrink(),
+              SizedBox.shrink(),
+            ],
+          ),
         const TableRow(
           children: [
             SizedBox(height: 10),
@@ -303,13 +309,11 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
       await fetchMedicineBarCode(
         barCode: _barCodeController.text,
         medicine: _medicine,
-
       ).then((value) async {
         if (_medicine.medicineId != null) {
           if (_isSupplier() ||
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
-
             setState(() {
               _voucherItem.medicineId = _medicine.medicineId;
               _voucherItem.barCode = _medicine.barCode;
@@ -365,16 +369,23 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
   void _quantityListener() {
     _quantityFocusNode.addListener(() async {
-      // perdida de foco
-      if (!_quantityFocusNode.hasFocus && _quantityController.text.trim().isNotEmpty) {
-        if (int.tryParse(_quantityController.text) != null) {
-          _voucherItem.quantity = int.tryParse(_quantityController.text);
-        } else {
-          /*floatingMessage(
+
+      if (!_quantityFocusNode.hasFocus && // perdida de foco
+          _quantityController.text.trim().isNotEmpty) {
+        int? quantity = int.tryParse(_quantityController.text);
+        if (quantity != null) {
+          if (widget.movementType == MovementTypeEnum.sale
+              && quantity > _voucherItem.currentStock!) {
+            await OpenDialog(
               context: context,
-              text: 'Ingrese una cantidad válida',
-              messageTypeEnum: MessageTypeEnum.warning
-          );*/
+              title: 'Atención',
+              content: 'No hay stock suficiente',
+            ).view();
+            _quantityFocusNode.requestFocus();
+          } else {
+            _voucherItem.quantity = quantity;
+          }
+        } else {
           await OpenDialog(
             context: context,
             title: 'Atención',

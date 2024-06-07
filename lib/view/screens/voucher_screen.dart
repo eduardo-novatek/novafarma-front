@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
@@ -189,9 +187,14 @@ class _VoucherScreenState extends State<VoucherScreen> {
                       modelList: movementTypes,
                       model: movementTypes[0],
                       callback: (movementType) {
-                        setState(() {
-                          _selectedMovementType = movementType!;
-                        });
+                        //Si cambió el tipo de comprobante
+                        if (_selectedMovementType != movementType!) {
+                          setState(() {
+                            _selectedMovementType = movementType!;
+                            _voucherItemList.clear();
+                            _barCodeList.clear();
+                          });
+                        }
                       },
                     ),
                   ),
@@ -217,26 +220,30 @@ class _VoucherScreenState extends State<VoucherScreen> {
                     3: FlexColumnWidth(1),
                     4: FixedColumnWidth(96),
                   },
-                  children: const [
+                  children: [
                     TableRow(
                       children: [
-                        Padding(
+                       const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text("PRESENTACI\xD3N", style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                         Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("PRECIO UNITARIO", style: TextStyle(fontWeight: FontWeight.bold)),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                  _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
+                                    ? 'PRECIO UNITARIO'
+                                    : 'STOCK',
+                                  style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text("CANTIDAD", style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox.shrink(), // Celda vacía para los botones de acción
+                        const SizedBox.shrink(), // Celda vacía para los botones de acción
                       ],
                     ),
                   ],
@@ -306,8 +313,15 @@ class _VoucherScreenState extends State<VoucherScreen> {
               child: Text(item.presentation ?? '<sin especificar>'),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(item.unitPrice != null ? item.unitPrice.toString() : '0'),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(_selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
+                            ? item.unitPrice != null
+                              ? item.unitPrice.toString()
+                              : '0'
+                            : item.currentStock != null
+                              ? item.currentStock.toString()
+                              : '0',
+                          ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -349,21 +363,13 @@ class _VoucherScreenState extends State<VoucherScreen> {
       context: context,
       builder: (BuildContext context) {
         return AddVoucherItemDialog(
+          movementType: toMovementTypeEnum(_selectedMovementType),
           modifyVoucherItem: modifyVoucherItem,
           onModify: (modifiedVoucher) {
             setState(() {
               _voucherItemList[index].quantity = modifiedVoucher.quantity;
             });
           },
-          /*onAdd: (newVoucherItemDTO) {
-            setState(() {
-              _voucherItemList[index] = newVoucherItemDTO;
-              // Si el código de barras ha cambiado, actualiza la lista de códigos de barras
-              if (_voucherItemList[index].barCode != newVoucherItemDTO.barCode) {
-                _barCodeList[index] = newVoucherItemDTO.barCode!;
-              }
-            });
-          },*/
         );
       },
     );
@@ -405,6 +411,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           ),
         );
 
+        //Es Cliente?
         //Es Cliente?
       } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
         return Container(
