@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -43,6 +44,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
   VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
   MedicineDTO _medicine = MedicineDTO();
+  bool _cancel = false; //boton cancelar
 
   @override
   void initState() {
@@ -78,7 +80,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               children: [
                 Text(widget.modifyVoucherItem == null
                     ? 'Agregar artículos'
-                    : 'Modificar artículo)',
+                    : 'Modificar artículo',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
@@ -137,7 +139,14 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                       TextButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
+                          setState(() {
+                            _cancel = true;
+                          });
+                          /*Future.delayed(const Duration(milliseconds: 1500), () {
+                            Navigator.of(context).pop();
+                          });*/
                           Navigator.of(context).pop();
+
                         },
                       ),
                     ],
@@ -287,28 +296,34 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _createListeners() {
-    _barCodeListener();
-    _quantityListener();
+    _barCodeFocusNode.addListener(_barCodeListener);
+    _quantityFocusNode.addListener(_quantityListener);
   }
 
   void _barCodeListener() {
-    _barCodeFocusNode.addListener(() async {
-      if (_barCodeFocusNode.hasFocus ||
-          _barCodeController.text.trim().isEmpty) return;
+    if (_cancel) return;
+    Future.microtask(() async {
+      if (_barCodeFocusNode.hasFocus) return;
+      if (_barCodeController.text
+          .trim()
+          .isEmpty) {
+        _barCodeFocusNode.requestFocus();
+        return;
+      }
 
       if (widget.barCodeList!.contains(_barCodeController.text)) {
         await OpenDialog(
-          context: context,
-          title: 'Atención',
-          content: 'El artículo ya está agregado al comprobante',
+        context: context,
+        title: 'Atención',
+        content: 'El artículo ya está agregado al comprobante',
         ).view();
         _barCodeFocusNode.requestFocus();
         return;
       }
       _medicine = MedicineDTO.empty();
       await fetchMedicineBarCode(
-        barCode: _barCodeController.text,
-        medicine: _medicine,
+      barCode: _barCodeController.text,
+      medicine: _medicine,
       ).then((value) async {
         if (_medicine.medicineId != null) {
           if (_isSupplier() ||
@@ -331,25 +346,25 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               context: context,
               title: 'Sin stock',
               content: '${_medicine.name} '
-                           '${_medicine.presentation!.name} '
-                           '${_medicine.presentation!.quantity} '
-                           '${_medicine.presentation!.unitName}',
+                  '${_medicine.presentation!.name} '
+                  '${_medicine.presentation!.quantity} '
+                  '${_medicine.presentation!.unitName}',
             ).view();
             _barCodeFocusNode.requestFocus();
           }
         } else {
           _initialize(initializeCodeBar: false);
           await OpenDialog(
-              context: context,
-              title: 'Atención',
-              content: 'Artículo no encontrado',
+            context: context,
+            title: 'Atención',
+            content: 'Artículo no encontrado',
           ).view();
           _barCodeFocusNode.requestFocus();
         }
-
-      }).onError((error, stackTrace) =>
-          _showMessageConnectionError(context: context, isBarCode: true)
-      );
+      }).onError((error, stackTrace) {
+        if (kDebugMode) print('Error!!: $error');
+        if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
+      });
     });
   }
 
@@ -368,10 +383,12 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _quantityListener() {
-    _quantityFocusNode.addListener(() async {
-
+    if (_cancel) return;
+    Future.microtask(() async {
       if (!_quantityFocusNode.hasFocus && // perdida de foco
-          _quantityController.text.trim().isNotEmpty) {
+          _quantityController.text
+              .trim()
+              .isNotEmpty) {
         int? quantity = int.tryParse(_quantityController.text);
         if (quantity != null) {
           if (widget.movementType == MovementTypeEnum.sale
@@ -384,6 +401,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
             _quantityFocusNode.requestFocus();
           } else {
             _voucherItem.quantity = quantity;
+            print(_voucherItem.quantity);
           }
         } else {
           await OpenDialog(
