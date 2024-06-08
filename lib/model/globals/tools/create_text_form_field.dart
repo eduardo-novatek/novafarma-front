@@ -17,9 +17,8 @@ class CreateTextFormField extends StatefulWidget {
   final TextEditingController controller;
   final bool? initialFocus; //Si debe tener el foco inicial (por defecto es false. Debe ser true solo 1 TextFormField del formulario)
   final FocusNode? focusNode;
-  final Function(String)? onChange;
-
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
+  final Function(String)? onChange;
 
   const CreateTextFormField({
     super.key,

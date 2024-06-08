@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -10,6 +10,7 @@ import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
+import '../../model/globals/requests/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class AddVoucherItemDialog extends StatefulWidget {
@@ -98,6 +99,9 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                                 label: 'Código',
                                 dataType: DataTypeEnum.text,
                                 initialFocus: true,
+                                onChange: (p0) {
+
+                                },
                               )
                             : Text('Çódigo: ${widget.modifyVoucherItem?.barCode}'),
 
@@ -139,12 +143,21 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                       TextButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
+                          print("Cancelar presionado");
                           setState(() {
                             _cancel = true;
+                            print("actualizacion de _cancel finalizado dentro del state: $_cancel");
                           });
-                          /*Future.delayed(const Duration(milliseconds: 1500), () {
+                          print("actualizacion de _cancel finalizado fuera del state: $_cancel");
+
+                          /*Future.delayed(const Duration(milliseconds: 50), () {
                             Navigator.of(context).pop();
                           });*/
+
+                          Future.delayed(Duration.zero, () { // Diferir la pérdida de foco
+                            _barCodeFocusNode.requestFocus();
+                          });
+
                           Navigator.of(context).pop();
 
                         },
@@ -301,7 +314,17 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _barCodeListener() {
+    if (isEscape()) return;
+
+    print("entró a barCode");
+    /*Future.delayed(const Duration(milliseconds: 1000), () {
+      print("barCode: valor de _cancel: $_cancel");
+      if (_cancel) return;
+    });*/
+    print("barCode: valor de _cancel: $_cancel");
     if (_cancel) return;
+
+
     Future.microtask(() async {
       if (_barCodeFocusNode.hasFocus) return;
       if (_barCodeController.text
