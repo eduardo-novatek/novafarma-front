@@ -178,22 +178,22 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _addVoucherItem() async {
-    if (await _validQuantity()) {
-      widget.onAdd!(
-        VoucherItemDTO(
-          medicineId: _voucherItem.medicineId,
-          barCode: _voucherItem.barCode,
-          medicineName: _voucherItem.medicineName,
-          presentation: _voucherItem.presentation,
-          unitPrice: _voucherItem.unitPrice,
-          quantity: _voucherItem.quantity,
-          currentStock: _voucherItem.currentStock,
-        ),
-      );
-      _initialize(initializeCodeBar: true);
-    } else {
-      _quantityFocusNode.requestFocus();
-    }
+    //if (await _validQuantity()) {
+    widget.onAdd!(
+      VoucherItemDTO(
+        medicineId: _voucherItem.medicineId,
+        barCode: _voucherItem.barCode,
+        medicineName: _voucherItem.medicineName,
+        presentation: _voucherItem.presentation,
+        unitPrice: _voucherItem.unitPrice,
+        quantity: _voucherItem.quantity,
+        currentStock: _voucherItem.currentStock,
+      ),
+    );
+    _initialize(initializeCodeBar: true);
+      //} else {
+    //  _quantityFocusNode.requestFocus();
+    //}
   }
 
   Future<bool> _validQuantity() async {
@@ -390,15 +390,16 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
       widget.movementType == MovementTypeEnum.returnToSupplier;
   }
 
-  void _quantityListener() {
-    Future.delayed(const Duration(milliseconds: 100), () async {
+  void _quantityListener() async {
       if (_cancel) return;
       if (!_quantityFocusNode.hasFocus && // perdida de foco
           _quantityController.text
               .trim()
               .isNotEmpty) {
         int? quantity = int.tryParse(_quantityController.text);
-        if (quantity != null) {
+        if (quantity != null &&
+            ((widget.movementType == MovementTypeEnum.adjustmentStock && quantity != 0)
+            || widget.movementType != MovementTypeEnum.adjustmentStock && quantity > 1)) {
           if (widget.movementType == MovementTypeEnum.sale
               && quantity > _voucherItem.currentStock!) {
             await OpenDialog(
@@ -420,7 +421,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           _quantityFocusNode.requestFocus();
         }
       }
-    });
   }
 
   Future<Null> _showMessageConnectionError({
