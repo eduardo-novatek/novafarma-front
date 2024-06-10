@@ -393,9 +393,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   void _quantityListener() async {
       if (_cancel) return;
       if (!_quantityFocusNode.hasFocus && // perdida de foco
-          _quantityController.text
-              .trim()
-              .isNotEmpty) {
+          _quantityController.text.trim().isNotEmpty) {
         int? quantity = int.tryParse(_quantityController.text);
         if (quantity != null &&
             ((widget.movementType == MovementTypeEnum.adjustmentStock && quantity != 0)
