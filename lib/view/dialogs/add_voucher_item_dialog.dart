@@ -143,21 +143,11 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                       TextButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
-                          print("Cancelar presionado");
+                          //print("Cancelar presionado");
                           setState(() {
                             _cancel = true;
-                            print("actualizacion de _cancel finalizado dentro del state: $_cancel");
                           });
-                          print("actualizacion de _cancel finalizado fuera del state: $_cancel");
-
-                          /*Future.delayed(const Duration(milliseconds: 50), () {
-                            Navigator.of(context).pop();
-                          });*/
-
-                          Future.delayed(Duration.zero, () { // Diferir la pérdida de foco
-                            _barCodeFocusNode.requestFocus();
-                          });
-
+                          //print("actualizacion de _cancel finalizado fuera del state: $_cancel");
                           Navigator.of(context).pop();
 
                         },
@@ -315,17 +305,12 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
   void _barCodeListener() {
     if (isEscape()) return;
-
-    print("entró a barCode");
-    /*Future.delayed(const Duration(milliseconds: 1000), () {
-      print("barCode: valor de _cancel: $_cancel");
+    //print("entró a barCode");
+    //Da tiempo a ejecutar evento onChange de los botones del Dialog
+    Future.delayed(const Duration(milliseconds: 100), () async {
+      //print("barCode: valor de _cancel: $_cancel");
       if (_cancel) return;
-    });*/
-    print("barCode: valor de _cancel: $_cancel");
-    if (_cancel) return;
-
-
-    Future.microtask(() async {
+      //print ("Continuando en _barCode. _cancel: $_cancel");
       if (_barCodeFocusNode.hasFocus) return;
       if (_barCodeController.text
           .trim()
@@ -336,17 +321,17 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
       if (widget.barCodeList!.contains(_barCodeController.text)) {
         await OpenDialog(
-        context: context,
-        title: 'Atención',
-        content: 'El artículo ya está agregado al comprobante',
+            context: context,
+            title: 'Atención',
+            content: 'El artículo ya está agregado al comprobante',
         ).view();
         _barCodeFocusNode.requestFocus();
         return;
       }
       _medicine = MedicineDTO.empty();
       await fetchMedicineBarCode(
-      barCode: _barCodeController.text,
-      medicine: _medicine,
+          barCode: _barCodeController.text,
+          medicine: _medicine,
       ).then((value) async {
         if (_medicine.medicineId != null) {
           if (_isSupplier() ||
@@ -406,8 +391,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _quantityListener() {
-    if (_cancel) return;
-    Future.microtask(() async {
+    Future.delayed(const Duration(milliseconds: 100), () async {
+      if (_cancel) return;
       if (!_quantityFocusNode.hasFocus && // perdida de foco
           _quantityController.text
               .trim()
