@@ -52,8 +52,12 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   @override
   void initState() {
     super.initState();
-    // definir 2 listener: para codigo y cantidad. Cada uno debe definir la pardida de foco y actualizar voucherItem.
-    // en el listener del codigo, ademas hace la consulta al endpoint
+    //Si es una modificacion
+    if (widget.modifyVoucherItem != null) {
+      _updateVoucherItem();
+      _quantityController.value = TextEditingValue(
+          text: '${_voucherItem.quantity}');
+    }
     _createListeners();
   }
 
@@ -111,14 +115,12 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                           buildTable(),
                           const SizedBox(height: 5),
 
-                          widget.modifyVoucherItem == null
-                            ? CreateTextFormField(
-                                controller: _quantityController,
-                                focusNode: _quantityFocusNode,
-                                label: 'Cantidad',
-                                dataType: DataTypeEnum.number,
+                          CreateTextFormField(
+                            controller: _quantityController,
+                            focusNode: _quantityFocusNode,
+                            label: 'Cantidad',
+                            dataType: DataTypeEnum.number,
                               )
-                            : _fieldQuantityForModify(),
                           ],
                       ),
                     ),
@@ -171,21 +173,15 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _modifyVoucherItem() {
-    //if (await _validQuantity()) {
-      widget.onModify!(
-        VoucherItemDTO(
-          quantity: _voucherItem.quantity,
-        )
-      );
-      Navigator.of(context).pop();
-
-    //} else {
-    //  _quantityFocusNode.requestFocus();
-    //}
+    widget.onModify!(
+      VoucherItemDTO(
+        quantity: _voucherItem.quantity,
+      )
+    );
+    Navigator.of(context).pop();
   }
 
   void _addVoucherItem() {
-    //if (await _validQuantity()) {
     widget.onAdd!(
       VoucherItemDTO(
         medicineId: _voucherItem.medicineId,
@@ -198,27 +194,9 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
       ),
     );
     _initialize(initializeCodeBar: true);
-      //} else {
-    //  _quantityFocusNode.requestFocus();
-    //}
   }
 
-  Future<bool> _validQuantity() async {
-    bool isValid = true;
-    int? quantity = int.parse(_quantityController.text);
-    if ((widget.movementType == MovementTypeEnum.adjustmentStock && quantity == 0)
-        || widget.movementType != MovementTypeEnum.adjustmentStock && quantity < 1) {
-      await OpenDialog(
-      context: context,
-      title: 'Atención',
-      content: 'Cantidad incorrecta',
-      ).view();
-      isValid = false;
-    }
-    return Future.value(isValid);
-  }
-
-  Widget _fieldQuantityForModify(){
+  /*Widget _fieldQuantityForModify(){
     _quantityController.value = TextEditingValue(
         text: '${widget.modifyVoucherItem?.quantity}'
     );
@@ -229,7 +207,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         dataType: DataTypeEnum.number,
         initialFocus: true,
     );
-  }
+  }*/
 
   Table buildTable() {
     return Table(
@@ -342,7 +320,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           if (_isSupplier() ||
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
-            setState(() {
+            /*setState(() {
               _voucherItem.medicineId = _medicine.medicineId;
               _voucherItem.barCode = _medicine.barCode;
               _voucherItem.medicineName = _medicine.name;
@@ -350,12 +328,13 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               '${_medicine.presentation!.name} '
                   '${_medicine.presentation!.quantity} '
                   '${_medicine.presentation!.unitName}';
-              _voucherItem.unitPrice = unitPrice();
+              _voucherItem.unitPrice = _unitPrice();
               _voucherItem.currentStock = _medicine.currentStock;
               _voucherItem.quantity = 0;
               //
               _barCodeValidated = true;
-            });
+            });*/
+            _updateVoucherItem();
 
           } else {
             _setBarCodeValidated(false);
@@ -387,7 +366,35 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     });
   }
 
-  double? unitPrice() {
+  void _updateVoucherItem() {
+    setState(() {
+      if (widget.modifyVoucherItem == null) {
+        _voucherItem.medicineId = _medicine.medicineId;
+        _voucherItem.barCode = _medicine.barCode;
+        _voucherItem.medicineName = _medicine.name;
+        _voucherItem.presentation =
+        '${_medicine.presentation!.name} '
+            '${_medicine.presentation!.quantity} '
+            '${_medicine.presentation!.unitName}';
+        _voucherItem.unitPrice = _unitPrice();
+        _voucherItem.currentStock = _medicine.currentStock;
+        _voucherItem.quantity = 0;
+        //
+        _barCodeValidated = true;
+
+      } else {
+        _voucherItem.medicineId = widget.modifyVoucherItem?.medicineId;
+        _voucherItem.barCode = widget.modifyVoucherItem?.barCode;
+        _voucherItem.medicineName = widget.modifyVoucherItem?.medicineName;
+        _voucherItem.presentation = widget.modifyVoucherItem?.presentation;
+        _voucherItem.unitPrice = widget.modifyVoucherItem?.unitPrice;
+        _voucherItem.currentStock = widget.modifyVoucherItem?.currentStock;
+        _voucherItem.quantity = widget.modifyVoucherItem?.quantity;
+      }
+    });
+  }
+
+  double? _unitPrice() {
     if (widget.movementType == MovementTypeEnum.sale) {
       return _medicine.lastSalePrice;
     } else if (_isSupplier()) {
@@ -411,7 +418,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
       }
 
       int? quantity = int.tryParse(_quantityController.text);
-      if (_validQuantity1(quantity)) {
+      if (_validQuantity(quantity)) {
         if (widget.movementType == MovementTypeEnum.sale
             && quantity! > _voucherItem.currentStock!) {
           _setQuantityValidated(false);
@@ -423,7 +430,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           _quantityFocusNode.requestFocus();
 
         } else {
-          print("actualizando _quantityValidated");
           setState(() {
             _voucherItem.quantity = quantity;
             _quantityValidated = true;
@@ -454,7 +460,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     });
   }
 
-  bool _validQuantity1(int? quantity) {
+  bool _validQuantity(int? quantity) {
     return quantity != null &&
       ((widget.movementType == MovementTypeEnum.adjustmentStock && quantity != 0)
         || widget.movementType != MovementTypeEnum.adjustmentStock && quantity > 0);
