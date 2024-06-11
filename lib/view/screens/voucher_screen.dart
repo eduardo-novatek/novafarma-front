@@ -259,33 +259,65 @@ class _VoucherScreenState extends State<VoucherScreen> {
                     },
                   ),
                 ),
+                const Divider(),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      style: const ButtonStyle(
-                        iconSize: MaterialStatePropertyAll(40.0),
-                        iconColor: MaterialStatePropertyAll(Colors.blue),
-                      ),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AddVoucherItemDialog(
-                              movementType: toMovementTypeEnum(_selectedMovementType)!,
-                              barCodeList: _barCodeList,
-                              onAdd: (newVoucherItemDTO) {
-                                setState(() {
-                                  _voucherItemList.add(newVoucherItemDTO);
-                                  _barCodeList.add(newVoucherItemDTO.barCode!);
-                                });
+                    Flexible(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: IconButton(
+                              icon: const Icon(Icons.add),
+                              style: const ButtonStyle(
+                                iconSize: MaterialStatePropertyAll(40.0),
+                                iconColor: MaterialStatePropertyAll(Colors.blue),
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AddVoucherItemDialog(
+                                      movementType: toMovementTypeEnum(_selectedMovementType)!,
+                                      barCodeList: _barCodeList,
+                                      onAdd: (newVoucherItemDTO) {
+                                        setState(() {
+                                          _voucherItemList.add(newVoucherItemDTO);
+                                          _barCodeList.add(newVoucherItemDTO.barCode!);
+                                        });
+                                      },
+                                    );
+                                  },
+                                );
                               },
-                            );
-                          },
-                        );
-                      },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          child: const Text('Aceptar', style: TextStyle(fontSize: 20.0),),
+                          onPressed: () {
+
+                          },
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(left: 30.0, right: 8.0),
+                          child: TextButton(
+                            child: const Text('Cancelar', style: TextStyle(fontSize: 20.0),),
+                            onPressed: () {
+
+                            },
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ],
