@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -10,6 +9,7 @@ import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
+import '../../model/globals/message.dart';
 import '../../model/globals/requests/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
@@ -105,9 +105,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                                 label: 'Código',
                                 dataType: DataTypeEnum.text,
                                 initialFocus: true,
-                                onChange: (p0) {
-
-                                },
                               )
                             : Text('Çódigo: ${widget.modifyVoucherItem?.barCode}'),
 
@@ -120,8 +117,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                             focusNode: _quantityFocusNode,
                             label: 'Cantidad',
                             dataType: DataTypeEnum.number,
-                              )
-                          ],
+                          )
+                        ],
                       ),
                     ),
                   ),
@@ -134,19 +131,14 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                       TextButton(
                         child: const Text("Aceptar"),
                         onPressed: () {
-                          //print("clic en aceptar");
                           Future.delayed(const Duration(milliseconds: 150), () {
                             if (!_barCodeValidated || !_quantityValidated) return;
-                            if (_formKey.currentState?.validate() == true) {
-                              if (widget.onAdd != null) {
-                                //print("agregando voucher");
-                                _addVoucherItem();
-                              } else if (widget.onModify != null) {
-                                //print("modificando voucher");
-                                _modifyVoucherItem();
-                              }
+                            if (!_formKey.currentState!.validate()) return;
+                            if (widget.onAdd != null) {
+                              _addVoucherItem();
+                            } else if (widget.onModify != null) {
+                              _modifyVoucherItem();
                             }
-
                           });
                         },
                       ),
@@ -195,19 +187,6 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     );
     _initialize(initializeCodeBar: true);
   }
-
-  /*Widget _fieldQuantityForModify(){
-    _quantityController.value = TextEditingValue(
-        text: '${widget.modifyVoucherItem?.quantity}'
-    );
-    return CreateTextFormField(
-        controller: _quantityController,
-        focusNode: _quantityFocusNode,
-        label: 'Cantidad',
-        dataType: DataTypeEnum.number,
-        initialFocus: true,
-    );
-  }*/
 
   Table buildTable() {
     return Table(
@@ -303,11 +282,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
       }
       if (widget.barCodeList!.contains(_barCodeController.text)) {
         _setBarCodeValidated(false);
-        await OpenDialog(
-            context: context,
-            title: 'Atención',
-            content: 'El artículo ya está agregado al comprobante',
-        ).view();
+        await message(context: context, message:'El artículo ya está agregado al comprobante');
         _barCodeFocusNode.requestFocus();
         return;
       }
@@ -320,42 +295,25 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           if (_isSupplier() ||
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
-            /*setState(() {
-              _voucherItem.medicineId = _medicine.medicineId;
-              _voucherItem.barCode = _medicine.barCode;
-              _voucherItem.medicineName = _medicine.name;
-              _voucherItem.presentation =
-              '${_medicine.presentation!.name} '
-                  '${_medicine.presentation!.quantity} '
-                  '${_medicine.presentation!.unitName}';
-              _voucherItem.unitPrice = _unitPrice();
-              _voucherItem.currentStock = _medicine.currentStock;
-              _voucherItem.quantity = 0;
-              //
-              _barCodeValidated = true;
-            });*/
             _updateVoucherItem();
 
           } else {
             _setBarCodeValidated(false);
-            await OpenDialog(
-              context: context,
-              title: 'Sin stock',
-              content: '${_medicine.name} '
-                  '${_medicine.presentation!.name} '
-                  '${_medicine.presentation!.quantity} '
-                  '${_medicine.presentation!.unitName}',
-            ).view();
+            await message(
+                context: context,
+                title: 'Sin stock',
+                message:'${_medicine.name} '
+                    '${_medicine.presentation!.name} '
+                    '${_medicine.presentation!.quantity} '
+                    '${_medicine.presentation!.unitName}'
+            );
             _barCodeFocusNode.requestFocus();
           }
+
         } else {
           _setBarCodeValidated(false);
           _initialize(initializeCodeBar: false);
-          await OpenDialog(
-            context: context,
-            title: 'Atención',
-            content: 'Artículo no encontrado',
-          ).view();
+          await message(context: context, message: 'Artículo no encontrado');
           _barCodeFocusNode.requestFocus();
         }
       }).onError((error, stackTrace) {
@@ -409,6 +367,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _quantityListener() {
+    if (isEscape()) return;
     Future.delayed(const Duration(milliseconds: 100), () async {
       if (!_focusEnabled ||
           _quantityFocusNode.hasFocus ||
@@ -417,19 +376,17 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         return;
       }
 
-      int? quantity = int.tryParse(_quantityController.text);
+      double? quantity = double.tryParse(_quantityController.text);
       if (_validQuantity(quantity)) {
-        if (widget.movementType == MovementTypeEnum.sale
-            && quantity! > _voucherItem.currentStock!) {
+        //if (widget.movementType == MovementTypeEnum.sale
+        //    && quantity! > _voucherItem.currentStock!) {
+        quantity = _negativeQuantity(quantity);
+        if (quantity! + _voucherItem.currentStock! < 0) {
           _setQuantityValidated(false);
-          await OpenDialog(
-            context: context,
-            title: 'Atención',
-            content: 'No hay stock suficiente',
-          ).view();
+          await message(message: 'No hay stock suficiente', context: context);
           _quantityFocusNode.requestFocus();
-
         } else {
+          quantity = _negativeQuantity(quantity);
           setState(() {
             _voucherItem.quantity = quantity;
             _quantityValidated = true;
@@ -438,29 +395,37 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
       } else {
         _setQuantityValidated(false);
-        await OpenDialog(
-          context: context,
-          title: 'Atención',
-          content: 'Ingrese una cantidad válida',
-        ).view();
+        await message(message: 'Ingrese una cantidad válida', context: context);
         _quantityFocusNode.requestFocus();
       }
     });
   }
 
+  double? _negativeQuantity(double? quantity) {
+     if (widget.movementType == MovementTypeEnum.sale ||
+        widget.movementType == MovementTypeEnum.returnToSupplier) {
+      quantity = quantity! * -1;
+    }
+    return quantity;
+  }
+
   void _setBarCodeValidated(bool value) {
-    return setState(() {
-      _barCodeValidated = value;
-    });
+    if (mounted) {
+      setState(() {
+        _barCodeValidated = value;
+      });
+    }
   }
 
   void _setQuantityValidated(bool value) {
-    return setState(() {
-      _quantityValidated = value;
-    });
+    if (mounted) {
+      setState(() {
+        _quantityValidated = value;
+      });
+    }
   }
 
-  bool _validQuantity(int? quantity) {
+  bool _validQuantity(double? quantity) {
     return quantity != null &&
       ((widget.movementType == MovementTypeEnum.adjustmentStock && quantity != 0)
         || widget.movementType != MovementTypeEnum.adjustmentStock && quantity > 0);

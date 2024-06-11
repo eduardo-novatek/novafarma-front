@@ -72,7 +72,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
             _buildTitleBar(),
             _buildHead(),
             const Divider(),
-            _buildBody(),
+            _selectedCustomerOrSupplierId  > 0
+                || toMovementTypeEnum(_selectedMovementType) == MovementTypeEnum.adjustmentStock
+              ? _buildBody()
+              : const SizedBox.shrink(),
           ],
         ),
       ),
@@ -112,17 +115,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   Widget _buildHead() {
     return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildMovementTypeBox(),
-                  _buildSupplierOrCustomerBox(),
-                  IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
-                ],
-              ),
-            );
-
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildMovementTypeBox(),
+          _buildSupplierOrCustomerBox(),
+          IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
+        ],
+      ),
+    );
   }
 
   /*Widget _buildHead() {
@@ -190,7 +192,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         //Si cambió el tipo de comprobante
                         if (_selectedMovementType != movementType!) {
                           setState(() {
-                            _selectedMovementType = movementType!;
+                            _selectedMovementType = movementType;
+                            _selectedCustomerOrSupplierId = 0;
                             _voucherItemList.clear();
                             _barCodeList.clear();
                           });
@@ -411,7 +414,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
           ),
         );
 
-        //Es Cliente?
         //Es Cliente?
       } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
         return Container(

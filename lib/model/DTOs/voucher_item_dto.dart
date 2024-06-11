@@ -7,7 +7,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   String? medicineName;
   double? currentStock;
   String? presentation;
-  int? quantity;
+  double? quantity;
   double? unitPrice;
   //final bool? isFirst;
 
