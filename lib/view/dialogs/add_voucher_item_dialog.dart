@@ -46,8 +46,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
   MedicineDTO _medicine = MedicineDTO();
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
-  bool _quantityValidated = false;
-  bool _barCodeValidated = false;
+  bool _barCodeValidated = true;
+  bool _quantityValidated = true;
 
   @override
   void initState() {
@@ -170,7 +170,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     );
   }
 
-  void _modifyVoucherItem() async {
+  void _modifyVoucherItem() {
     //if (await _validQuantity()) {
       widget.onModify!(
         VoucherItemDTO(
@@ -184,7 +184,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     //}
   }
 
-  void _addVoucherItem() async {
+  void _addVoucherItem() {
     //if (await _validQuantity()) {
     widget.onAdd!(
       VoucherItemDTO(
@@ -423,6 +423,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           _quantityFocusNode.requestFocus();
 
         } else {
+          print("actualizando _quantityValidated");
           setState(() {
             _voucherItem.quantity = quantity;
             _quantityValidated = true;
