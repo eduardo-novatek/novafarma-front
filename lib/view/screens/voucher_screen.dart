@@ -215,42 +215,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         ? Expanded(
             child: Column(
               children: [
-                Table(
-                  columnWidths: const {
-                    0: FlexColumnWidth(2),
-                    1: FlexColumnWidth(1),
-                    2: FlexColumnWidth(1),
-                    3: FlexColumnWidth(1),
-                    4: FixedColumnWidth(96),
-                  },
-                  children: [
-                    TableRow(
-                      children: [
-                       const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("PRESENTACI\xD3N", style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                  _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
-                                    ? 'PRECIO UNITARIO'
-                                    : 'STOCK',
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("CANTIDAD", style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox.shrink(), // Celda vacía para los botones de acción
-                      ],
-                    ),
-                  ],
-                ),
+                _dataBody(),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _voucherItemList.length,
@@ -260,71 +225,118 @@ class _VoucherScreenState extends State<VoucherScreen> {
                   ),
                 ),
                 const Divider(),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
-                            child: IconButton(
-                              icon: const Icon(Icons.add),
-                              style: const ButtonStyle(
-                                iconSize: MaterialStatePropertyAll(40.0),
-                                iconColor: MaterialStatePropertyAll(Colors.blue),
-                              ),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AddVoucherItemDialog(
-                                      movementType: toMovementTypeEnum(_selectedMovementType)!,
-                                      barCodeList: _barCodeList,
-                                      onAdd: (newVoucherItemDTO) {
-                                        setState(() {
-                                          _voucherItemList.add(newVoucherItemDTO);
-                                          _barCodeList.add(newVoucherItemDTO.barCode!);
-                                        });
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          child: const Text('Aceptar', style: TextStyle(fontSize: 20.0),),
-                          onPressed: () {
-
-                          },
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.only(left: 30.0, right: 8.0),
-                          child: TextButton(
-                            child: const Text('Cancelar', style: TextStyle(fontSize: 20.0),),
-                            onPressed: () {
-
-                            },
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                _footerBody(),
               ],
             ),
           )
 
         : const SizedBox.shrink();
+  }
+
+  Table _dataBody() {
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(2),
+        1: FlexColumnWidth(1),
+        2: FlexColumnWidth(1),
+        3: FlexColumnWidth(1),
+        4: FixedColumnWidth(96),
+      },
+      children: [
+        TableRow(
+          children: [
+           const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("PRESENTACI\xD3N", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                      _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
+                        ? 'PRECIO UNITARIO'
+                        : 'STOCK',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text("CANTIDAD", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox.shrink(), // Celda vacía para los botones de acción
+          ],
+        ),
+      ],
+    );
+  }
+
+  Row _footerBody() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Flexible(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: IconButton(
+                  icon: const Icon(Icons.add),
+                  style: const ButtonStyle(
+                    iconSize: MaterialStatePropertyAll(40.0),
+                    iconColor: MaterialStatePropertyAll(Colors.blue),
+                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false, //lo establece modal
+                      builder: (BuildContext context) {
+                        return PopScope( //Evita salida con flecha atrás del navegador
+                          canPop: false,
+                          child: AddVoucherItemDialog(
+                            movementType: toMovementTypeEnum(_selectedMovementType)!,
+                            barCodeList: _barCodeList,
+                            onAdd: (newVoucherItemDTO) {
+                              setState(() {
+                                _voucherItemList.add(newVoucherItemDTO);
+                                _barCodeList.add(newVoucherItemDTO.barCode!);
+                              });
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
+              onPressed: () {
+
+              },
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(left: 25.0, right: 8.0),
+              child: TextButton(
+                child: const Text('Cancelar', style: TextStyle(fontSize: 17.0),),
+                onPressed: () {
+
+                },
+              ),
+            ),
+          ],
+        )
+      ],
+    );
   }
 
   Widget _buildVoucherItem(VoucherItemDTO item, int index) {
@@ -348,15 +360,15 @@ class _VoucherScreenState extends State<VoucherScreen> {
               child: Text(item.presentation ?? '<sin especificar>'),
             ),
             Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(_selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
-                            ? item.unitPrice != null
-                              ? item.unitPrice.toString()
-                              : '0'
-                            : item.currentStock != null
-                              ? item.currentStock.toString()
-                              : '0',
-                          ),
+              padding: const EdgeInsets.all(8.0),
+              child: Text(_selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
+                        ? item.unitPrice != null
+                          ? item.unitPrice.toString()
+                          : '0'
+                        : item.currentStock != null
+                          ? item.currentStock.toString()
+                          : '0',
+                      ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -396,15 +408,19 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
     showDialog(
       context: context,
+      barrierDismissible: false, //lo hace modal
       builder: (BuildContext context) {
-        return AddVoucherItemDialog(
-          movementType: toMovementTypeEnum(_selectedMovementType),
-          modifyVoucherItem: modifyVoucherItem,
-          onModify: (modifiedVoucher) {
-            setState(() {
-              _voucherItemList[index].quantity = modifiedVoucher.quantity;
-            });
-          },
+        return PopScope( //Evita salida con flecha atras del navegador
+          canPop: false,
+          child: AddVoucherItemDialog(
+            movementType: toMovementTypeEnum(_selectedMovementType),
+            modifyVoucherItem: modifyVoucherItem,
+            onModify: (modifiedVoucher) {
+              setState(() {
+                _voucherItemList[index].quantity = modifiedVoucher.quantity;
+              });
+            },
+          ),
         );
       },
     );
