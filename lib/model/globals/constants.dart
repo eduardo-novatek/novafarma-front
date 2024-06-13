@@ -23,26 +23,30 @@ const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1
 // EndPoints
 //
 
-//Roles
+//Role
 const String uriRoleAdd = "/role/add";
 const String uriRoleUpdate = "/role/update";
 const String uriRoleDelete = "/role/delete";
 const String uriRoleFindAll = "/role/findAll";
 const String uriRoleFindId = "/role/findId";
 
-//Users
+//User
 const String uriUserAdd = "/user/add";
 const String uriUserFindAll = "/user/findAll";
 const String uriUserFindId = "/user/findId";
 const String uriUserNameExist = "user/userNameExist";
 
-//Customers
+//Customer
 const String uriCustomerFindAll = "/customer/findAll";
 const String uriCustomerFindDocument = "/customer/findDocument";
 const String uriCustomerFindLastnameName = "/customer/findLastnameName";
 
-//Suppliers
+//Supplier
 const String uriSupplierFindAll = "/supplier/findAll";
 
-//Medicines
+//Medicine
 const String uriMedicineFindBarCode = "/medicine/findBarCode";
+
+//Voucher
+const String uriVoucherAdd = "/voucher/add";
+

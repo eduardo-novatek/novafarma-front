@@ -34,9 +34,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
+  double _totalPriceVoucher = 0;
 
   final List<VoucherItemDTO> _voucherItemList = [];
   final List<String> _barCodeList = []; //Para control de medicamentos ingresados al voucher
+
 
   @override
   void initState() {
@@ -224,6 +226,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
                     },
                   ),
                 ),
+                _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
+                    ? _boxTotalVoucher()
+                    : const SizedBox.shrink(),
+
                 const Divider(),
                 _footerBody(),
               ],
@@ -231,6 +237,41 @@ class _VoucherScreenState extends State<VoucherScreen> {
           )
 
         : const SizedBox.shrink();
+  }
+
+  Widget _boxTotalVoucher() {
+    return Column (
+      children: [
+        const Divider(),
+        _totalsBody(),
+      ],
+    );
+  }
+
+  Widget _totalsBody() {
+    _updateTotalVoucher();
+    return Row (
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Text('Total: ',
+          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),),
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: Text('$_totalPriceVoucher',
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),),
+        ),
+      ],
+    );
+  }
+
+  void _updateTotalVoucher() {
+    _totalPriceVoucher = 0;
+    setState(() {
+      for (var voucherItemDTO in _voucherItemList) {
+        _totalPriceVoucher += voucherItemDTO.unitPrice! * voucherItemDTO.quantity!;
+      }
+    });
   }
 
   Table _dataBody() {
