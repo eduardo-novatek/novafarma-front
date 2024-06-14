@@ -276,15 +276,21 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Table _columnsBody() {
     return Table(
       columnWidths: const {
-        0: FlexColumnWidth(2),
-        1: FlexColumnWidth(1),
+        0: FlexColumnWidth(0.2),
+        1: FlexColumnWidth(2),
         2: FlexColumnWidth(1),
         3: FlexColumnWidth(1),
-        4: FixedColumnWidth(96),
+        4: FlexColumnWidth(1),
+        5: FixedColumnWidth(96),
       },
       children: [
         TableRow(
           children: [
+            //Icono de "medicamento controlado"
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: SizedBox.shrink(),
+            ),
            const Padding(
               padding: EdgeInsets.all(8.0),
               child: Text("ARTÍCULO", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -324,6 +330,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: IconButton(
                   icon: const Icon(Icons.add),
+                  tooltip: 'Agregar items',
                   style: const ButtonStyle(
                     iconSize: MaterialStatePropertyAll(40.0),
                     iconColor: MaterialStatePropertyAll(Colors.blue),
@@ -382,15 +389,25 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Widget _buildVoucherItem(VoucherItemDTO item, int index) {
     return Table(
       columnWidths: const {
-        0: FlexColumnWidth(2),
-        1: FlexColumnWidth(1),
+        0: FlexColumnWidth(0.2),
+        1: FlexColumnWidth(2),
         2: FlexColumnWidth(1),
         3: FlexColumnWidth(1),
-        4: FixedColumnWidth(96),
+        4: FlexColumnWidth(1),
+        5: FixedColumnWidth(96),
       },
       children: [
         TableRow(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: item.controlled != null &&  item.controlled!
+                ? const Tooltip(
+                    message: 'Medicamento controlado',
+                    child: Icon(Icons.copyright, color: Colors.red,)
+                  )
+                : const SizedBox.shrink(),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(item.medicineName ?? '<sin especificar>'),
@@ -409,14 +426,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
                           ? NumberFormat('#,##0.00', 'es_ES').format(item.currentStock)
                           //? item.currentStock.toString()
                           : '0,00',
-                      ),
+                      textAlign: TextAlign.right
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(item.quantity != null
                   ? NumberFormat('#,##0.00', 'es_ES').format(item.quantity)
                   //? item.quantity.toString()
-                  : '0,00'
+                  : '0,00',
+                  textAlign: TextAlign.right,
               ),
             ),
             Row(
@@ -424,10 +443,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit),
+                  tooltip: 'Editar item',
                   onPressed: () => _editVoucherItem(index),
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete),
+                  tooltip: 'Borrar item',
                   onPressed: () => _deleteVoucherItem(index),
                 ),
               ],
@@ -449,6 +470,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
       currentStock: _voucherItemList[index].currentStock,
       unitPrice: _voucherItemList[index].unitPrice,
       quantity: _voucherItemList[index].quantity,
+      controlled: _voucherItemList[index].controlled,
     );
 
     showDialog(

@@ -5,12 +5,11 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/message.dart';
-import '../../model/globals/requests/create_key_pressed.dart';
+import '../../model/globals/tools/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class AddVoucherItemDialog extends StatefulWidget {
@@ -183,6 +182,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         unitPrice: _voucherItem.unitPrice,
         quantity: _voucherItem.quantity,
         currentStock: _voucherItem.currentStock,
+        controlled: _voucherItem.controlled,
       ),
     );
     _initialize(initializeCodeBar: true);
@@ -199,8 +199,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           children: [
             const Text('Artículo:'),
             widget.modifyVoucherItem == null
-                ? Text(_voucherItem.medicineName ?? '')
-                : Text(widget.modifyVoucherItem!.medicineName!),          ],
+                ? _addMedicineName()
+                : _modifyMedicineName(),          ],
         ),
         const TableRow(
           children: [
@@ -260,6 +260,33 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         ),
       ],
     );
+  }
+
+  Widget _modifyMedicineName() {
+    return Row (
+      children: [
+        _controlledIcon(),
+        Text(widget.modifyVoucherItem!.medicineName!),
+      ],
+    );
+  }
+
+  Widget _addMedicineName() {
+    return Row (
+      children: [
+        _controlledIcon(),
+        Text(_voucherItem.medicineName ?? ''),
+      ],
+    );
+  }
+
+  Widget _controlledIcon() {
+    return _voucherItem.controlled != null &&_voucherItem.controlled!
+        ? const Tooltip(
+            message: 'Medicamento controlado',
+            child: Icon(Icons.copyright, color: Colors.red,)
+          )
+        : const SizedBox.shrink();
   }
 
   void _createListeners() {
@@ -337,6 +364,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         _voucherItem.unitPrice = _unitPrice();
         _voucherItem.currentStock = _medicine.currentStock;
         _voucherItem.quantity = 0;
+        _voucherItem.controlled = _medicine.controlled;
         //
         _barCodeValidated = true;
 
@@ -348,6 +376,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         _voucherItem.unitPrice = widget.modifyVoucherItem?.unitPrice;
         _voucherItem.currentStock = widget.modifyVoucherItem?.currentStock;
         _voucherItem.quantity = widget.modifyVoucherItem?.quantity;
+        _voucherItem.controlled = widget.modifyVoucherItem?.controlled;
       }
     });
   }

@@ -9,6 +9,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   String? presentation;
   double? quantity;
   double? unitPrice;
+  bool? controlled;
   //final bool? isFirst;
 
   VoucherItemDTO.empty():
@@ -19,7 +20,8 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     presentation = null,
     quantity = null,
     unitPrice = null,
-    currentStock = null
+    currentStock = null,
+    controlled = null
     //isFirst = null
   ;
 
@@ -32,6 +34,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     this.quantity,
     this.unitPrice,
     this.currentStock,
+    this.controlled,
     //this.isFirst,
   });
 
@@ -43,6 +46,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
       barCode: json['barCode'],
       quantity: json['quantity'],
       unitPrice: json['unitPrice'],
+      controlled: json['controlled'],
     );
   }
 
@@ -55,6 +59,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
       'quantity': quantity,
       'unitPrice': unitPrice,
       'currentStock': currentStock,
+      'controlled': controlled,
     };
   }
 }
