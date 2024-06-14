@@ -109,7 +109,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
                             : Text('Çódigo: ${widget.modifyVoucherItem?.barCode}'),
 
                           const SizedBox(height: 20),
-                          buildTable(),
+                          _buildTable(),
                           const SizedBox(height: 5),
 
                           CreateTextFormField(
@@ -188,7 +188,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     _initialize(initializeCodeBar: true);
   }
 
-  Table buildTable() {
+  Table _buildTable() {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1),

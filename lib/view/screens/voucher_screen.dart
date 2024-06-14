@@ -217,7 +217,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         ? Expanded(
             child: Column(
               children: [
-                _dataBody(),
+                _columnsBody(),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _voucherItemList.length,
@@ -254,11 +254,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const Text('Total: ',
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),),
+        const Text('Total: \$ ',
+          style: TextStyle(fontSize: 17,),),
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: Text('$_totalPriceVoucher',
+          child: Text(
+            NumberFormat('#,##0.00', 'es_ES').format(_totalPriceVoucher),
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),),
         ),
       ],
@@ -267,14 +268,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   void _updateTotalVoucher() {
     _totalPriceVoucher = 0;
-    setState(() {
-      for (var voucherItemDTO in _voucherItemList) {
-        _totalPriceVoucher += voucherItemDTO.unitPrice! * voucherItemDTO.quantity!;
-      }
-    });
+    for (var voucherItemDTO in _voucherItemList) {
+      _totalPriceVoucher += voucherItemDTO.unitPrice! * voucherItemDTO.quantity!;
+    }
   }
 
-  Table _dataBody() {
+  Table _columnsBody() {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(2),
@@ -295,12 +294,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
               child: Text("PRESENTACI\xD3N", style: TextStyle(fontWeight: FontWeight.bold)),
             ),
             Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(
                       _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
                         ? 'PRECIO UNITARIO'
                         : 'STOCK',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
             const Padding(
               padding: EdgeInsets.all(8.0),
@@ -404,16 +403,21 @@ class _VoucherScreenState extends State<VoucherScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Text(_selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
                         ? item.unitPrice != null
-                          ? item.unitPrice.toString()
-                          : '0'
+                          ? NumberFormat('#,##0.00', 'es_ES').format(item.unitPrice)
+                          : '0,00'
                         : item.currentStock != null
-                          ? item.currentStock.toString()
-                          : '0',
+                          ? NumberFormat('#,##0.00', 'es_ES').format(item.currentStock)
+                          //? item.currentStock.toString()
+                          : '0,00',
                       ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(item.quantity != null ? item.quantity.toString() : '0'),
+              child: Text(item.quantity != null
+                  ? NumberFormat('#,##0.00', 'es_ES').format(item.quantity)
+                  //? item.quantity.toString()
+                  : '0,00'
+              ),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
