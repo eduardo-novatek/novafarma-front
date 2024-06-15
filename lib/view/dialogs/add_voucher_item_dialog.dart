@@ -4,6 +4,7 @@ import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
+import 'package:novafarma_front/model/globals/requests/fetch_medicine_date_authorization_sale.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
@@ -322,7 +323,16 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           if (_isSupplier() ||
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
-            _updateVoucherItem();
+            if (await _medicineControlledValidated()) {
+              _updateVoucherItem();
+            } else {
+              await message(
+                context: context,
+                title: 'No autorizado',
+                message: 'Próxima fecha de retiro: '
+              );
+              _barCodeFocusNode.requestFocus();
+            }
 
           } else {
             _setBarCodeValidated(false);
@@ -349,6 +359,16 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
         if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
       });
     });
+  }
+
+  Future<(bool, DateTime?)> _medicineControlledValidated() async {
+    bool validate = false;
+    if (! _voucherItem.controlled!) validate = true;
+    DateTime? fetchDate =
+      await fetchMedicineDateAuthorizationSale(customerId: 1, medicineId: 1
+    );
+    validate = (fetchDate != null && fetchDate <= ):
+    return Future.value((validate, fetchDate));
   }
 
   void _updateVoucherItem() {

@@ -6,6 +6,5 @@ DateTime? parseDate(String? dateString) {
     return DateFormat('dd/MM/yyyy').parse(dateString);
   } catch (e) {
     return null;
-    //throw('Error convirtiendo fecha: $e');
   }
 }
