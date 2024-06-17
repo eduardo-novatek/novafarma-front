@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
+import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
 class CustomerDTO extends Deserializable<CustomerDTO> {
   final int? customerId;
@@ -56,7 +57,8 @@ class CustomerDTO extends Deserializable<CustomerDTO> {
       lastname: json['lastname'],
       document: json['document'],
       telephone: json['telephone'],
-      addDate: DateFormat("dd/MM/yyyy").parse(json['addDate']),
+      //addDate: DateFormat("dd/MM/yyyy").parse(json['addDate']),
+      addDate: strToDate(json['addDate']),
       paymentNumber: json['paymentNumber'],
       partner: json['partner'],
       deleted: json['deleted'],

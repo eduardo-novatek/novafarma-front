@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:novafarma_front/model/globals/tools/date_time.dart' show strToDate;
 
 import '../../DTOs/date_authorization_sale_dto.dart';
 import '../constants.dart' show uriDteAuthorizationSale;
@@ -13,12 +14,11 @@ Future<DateTime?> fetchMedicineDateAuthorizationSale({
   await fetchDataObject<DateAuthorizationSaleDTO>(
     uri: '$uriDteAuthorizationSale/$customerId/$medicineId',
     classObject: DateAuthorizationSaleDTO.empty(),
+
   ).then((data) {
     if (data.isEmpty) return Future.value(null);
-    //final DateAuthorizationSaleDTO fetchDateAuth = data.first as DateAuthorizationSaleDTO;
-    //if (fetchDateAuth. == null) return Future.value(null);
-    //return Future.value(parseDate(fetchDateAuth.dateAuthorization!));
-    date = Future.value(DateTime.parse(data.first as String));
+    date = Future.value(strToDate(data.first as String));
+
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
     throw Exception(error);

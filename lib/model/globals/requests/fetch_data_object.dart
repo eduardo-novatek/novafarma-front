@@ -20,6 +20,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
 
   Uri url;
   Response response;
+  bool generalException = true;
 
   try {
     url = Uri.http(socket, uri);
@@ -48,7 +49,6 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
 
     if (response.statusCode == 200) {
       try {
-
         if (response.body.isEmpty) return [];
 
         //Asume que el cuerpo de la respuesta está codificado en UTF-8 por defecto
@@ -82,20 +82,26 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
 
         }
       } catch (e) {
+        generalException = false;
         if (kDebugMode) print("Error al decodificar la respuesta JSON $e");
         throw Exception('Error al decodificar la respuesta JSON $e');
       }
 
     } else {
-      if (response.statusCode == HttpStatus.notFound) return [];
-      String msg = "\nRespuesta del servidor ["
+      //if (response.statusCode == HttpStatus.notFound) return [];
+      /*String msg = "\nRespuesta del servidor ["
           "StatusCode: ${response.statusCode}. Body: ${response.body}]\n";
       if (kDebugMode) print(msg);
-      throw Exception(msg);
+       */
+      generalException = false;
+      throw Exception(response.statusCode);
     }
   } catch (e) {
-    if (kDebugMode) print("$e");
-    throw Exception(e);
+    if (generalException) {
+      if (kDebugMode) print("$e");
+      throw Exception(e);
+    }
+    return Future.value([]);
   }
 
 }

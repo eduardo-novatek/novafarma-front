@@ -51,7 +51,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
         ? PresentationDTO().fromJson(json['presentation'])
         : null,
       name: json['name'],
-      lastAddDate: toDate(json['lastAddDate']),
+      lastAddDate: strToDate(json['lastAddDate']),
       lastCostPrice: json['lastCostPrice'],
       lastSalePrice: json['lastSalePrice'],
       currentStock: json['currentStock'],

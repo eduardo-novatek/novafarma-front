@@ -326,14 +326,16 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           if (_isSupplier() ||
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
-            var result = await _medicineControlledValidated();
+            (bool, DateTime?) result = (true, null);
+            if (_medicine.controlled!) result = await _medicineControlledValidated();
+            //var result = await _medicineControlledValidated();
             if (result.$1) {
               _updateVoucherItem();
             } else {
               await message(
                 context: context,
                 title: 'No autorizado',
-                message: 'Próxima fecha de retiro: ${toDateStr(result.$2!)}',
+                message: 'Próxima fecha de retiro: ${dateToStr(result.$2!)}',
               );
               _barCodeFocusNode.requestFocus();
             }
@@ -367,7 +369,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
   Future<(bool, DateTime?)> _medicineControlledValidated() async {
     bool validate = false;
-    if (_medicine.controlled != null  && ! _medicine.controlled!) validate = true;
+    //if (_medicine.controlled != null  && ! _medicine.controlled!) validate = true;
     DateTime? fetchDate = await fetchMedicineDateAuthorizationSale(
           customerId: widget.customerId,
           medicineId: _medicine.medicineId!

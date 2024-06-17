@@ -589,7 +589,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
     _dateFocusNode.addListener(() {
       // Perdida de foco
       if (! _dateFocusNode.hasFocus) {
-        if (toDate(_dateController.text) == null) {
+        if (strToDate(_dateController.text) == null) {
           _dateController.value = TextEditingValue(text: dateNow());
         }
       }
