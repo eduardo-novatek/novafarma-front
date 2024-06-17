@@ -1,8 +1,7 @@
-import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
-import '../globals/tools/parse_date.dart';
+import '../globals/tools/date_time.dart';
 
 class MedicineDTO extends Deserializable<MedicineDTO> {
   int? medicineId;
@@ -52,7 +51,7 @@ class MedicineDTO extends Deserializable<MedicineDTO> {
         ? PresentationDTO().fromJson(json['presentation'])
         : null,
       name: json['name'],
-      lastAddDate: parseDate(json['lastAddDate']),
+      lastAddDate: toDate(json['lastAddDate']),
       lastCostPrice: json['lastCostPrice'],
       lastSalePrice: json['lastSalePrice'],
       currentStock: json['currentStock'],

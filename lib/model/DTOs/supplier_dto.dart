@@ -1,5 +1,4 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
-import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
 class SupplierDTO extends Deserializable<SupplierDTO> {
   final int? supplierId;

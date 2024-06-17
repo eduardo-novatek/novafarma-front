@@ -1,7 +1,7 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
 class DateAuthorizationSaleDTO extends Deserializable<DateAuthorizationSaleDTO> {
-  String? dateAuthorization;
+  DateTime? dateAuthorization;
   //final bool? isFirst;
 
   DateAuthorizationSaleDTO.empty():

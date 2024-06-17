@@ -4,7 +4,7 @@ import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
-import 'package:novafarma_front/model/globals/tools/parse_date.dart';
+import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
 import '../../model/enums/data_type_enum.dart';
@@ -123,7 +123,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         children: [
           _buildMovementTypeBox(),
           _buildSupplierOrCustomerBox(),
-          IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
+          IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: const Icon(Icons.abc)),
         ],
       ),
     );
@@ -343,6 +343,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         return PopScope( //Evita salida con flecha atrás del navegador
                           canPop: false,
                           child: AddVoucherItemDialog(
+                            customerId: _selectedCustomerOrSupplierId,
                             movementType: toMovementTypeEnum(_selectedMovementType)!,
                             barCodeList: _barCodeList,
                             onAdd: (newVoucherItemDTO) {
@@ -480,6 +481,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         return PopScope( //Evita salida con flecha atras del navegador
           canPop: false,
           child: AddVoucherItemDialog(
+            customerId: _selectedCustomerOrSupplierId,
             movementType: toMovementTypeEnum(_selectedMovementType),
             modifyVoucherItem: modifyVoucherItem,
             onModify: (modifiedVoucher) {
@@ -587,7 +589,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
     _dateFocusNode.addListener(() {
       // Perdida de foco
       if (! _dateFocusNode.hasFocus) {
-        if (parseDate(_dateController.text) == null) {
+        if (toDate(_dateController.text) == null) {
           _dateController.value = TextEditingValue(text: dateNow());
         }
       }

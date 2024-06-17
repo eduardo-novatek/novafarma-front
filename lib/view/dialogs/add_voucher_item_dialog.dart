@@ -6,6 +6,7 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_date_authorization_sale.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
+import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
@@ -14,6 +15,7 @@ import '../../model/globals/tools/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class AddVoucherItemDialog extends StatefulWidget {
+  final int customerId;
   final MovementTypeEnum? movementType;
   final List<String>? barCodeList; // ID's de medicamentos agregados al voucher
   final VoucherItemDTO? modifyVoucherItem; //Si es una modificacion, el voucher viene cargado
@@ -22,6 +24,7 @@ class AddVoucherItemDialog extends StatefulWidget {
 
   const AddVoucherItemDialog({
     super.key,
+    required this.customerId,
     this.modifyVoucherItem,
     this.movementType,
     this.barCodeList,
@@ -323,13 +326,14 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
           if (_isSupplier() ||
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
-            if (await _medicineControlledValidated()) {
+            var result = await _medicineControlledValidated();
+            if (result.$1) {
               _updateVoucherItem();
             } else {
               await message(
                 context: context,
                 title: 'No autorizado',
-                message: 'Próxima fecha de retiro: '
+                message: 'Próxima fecha de retiro: ${toDateStr(result.$2!)}',
               );
               _barCodeFocusNode.requestFocus();
             }
@@ -363,11 +367,16 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
 
   Future<(bool, DateTime?)> _medicineControlledValidated() async {
     bool validate = false;
-    if (! _voucherItem.controlled!) validate = true;
-    DateTime? fetchDate =
-      await fetchMedicineDateAuthorizationSale(customerId: 1, medicineId: 1
+    if (_medicine.controlled != null  && ! _medicine.controlled!) validate = true;
+    DateTime? fetchDate = await fetchMedicineDateAuthorizationSale(
+          customerId: widget.customerId,
+          medicineId: _medicine.medicineId!
     );
-    validate = (fetchDate != null && fetchDate <= ):
+    DateTime now = DateTime.now();
+    //Si es la primera venta, fetchDate=null
+    validate = (fetchDate == null ||
+        (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now)) //fecha<=now
+    );
     return Future.value((validate, fetchDate));
   }
 

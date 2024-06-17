@@ -54,24 +54,32 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
         //Asume que el cuerpo de la respuesta está codificado en UTF-8 por defecto
         //dynamic decodedData = json.decode(response.body);
 
-        //Utiliza explícitamente un decodificador UTF-8 para manejar la codificación.
-        //La línea que usa utf8.decode podría ser ligeramente más segura si
-        // existe la posibilidad de que la respuesta no esté codificada en UTF-8,
-        // pero en la mayoría de los casos, ambos enfoques son intercambiables.
-        //dynamic decodedData = json.decode(utf8.decode(response.bodyBytes));
-        dynamic decodedData = json.decode(response.body);
+        // Intenta decodificar el Json
+        try {
+          //Utiliza explícitamente un decodificador UTF-8 para manejar la codificación.
+          //La línea que usa utf8.decode podría ser ligeramente más segura si
+          // existe la posibilidad de que la respuesta no esté codificada en UTF-8,
+          // pero en la mayoría de los casos, ambos enfoques son intercambiables.
+          //dynamic decodedData = json.decode(utf8.decode(response.bodyBytes));
+          dynamic decodedData = json.decode(response.body);
 
-        if (decodedData is List) {
-          return decodedData.map((item) => classObject.fromJson(item)).toList();
-        } else if (decodedData is Map<String, dynamic>) {
-          return [classObject.fromJson(decodedData)].toList();
-        } else if (decodedData is bool) {
-          return [decodedData].toList();
-        } else if (decodedData is int) {
-          return [decodedData].toList();
-        } else {
-          if (kDebugMode) print("Tipo de datos desconocido");
-          throw Exception('Tipo de datos desconocido');
+          if (decodedData is List) {
+            return decodedData.map((item) => classObject.fromJson(item))
+                .toList();
+          } else if (decodedData is Map<String, dynamic>) {
+            return [classObject.fromJson(decodedData)].toList();
+          } else if (decodedData is bool) {
+            return [decodedData].toList();
+          } else if (decodedData is int) {
+            return [decodedData].toList();
+          } else {
+            if (kDebugMode) print("Tipo de datos desconocido");
+            throw Exception('Tipo de datos desconocido');
+          }
+        } catch (e) {
+          //No pudo decodificar el Json, asume que es un String
+          return [response.body];
+
         }
       } catch (e) {
         if (kDebugMode) print("Error al decodificar la respuesta JSON $e");

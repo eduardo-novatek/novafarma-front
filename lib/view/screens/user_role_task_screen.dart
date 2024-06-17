@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';

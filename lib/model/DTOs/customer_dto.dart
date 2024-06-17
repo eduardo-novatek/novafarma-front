@@ -1,6 +1,5 @@
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
-import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
 class CustomerDTO extends Deserializable<CustomerDTO> {
   final int? customerId;
@@ -67,6 +66,7 @@ class CustomerDTO extends Deserializable<CustomerDTO> {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       'customerId': customerId,

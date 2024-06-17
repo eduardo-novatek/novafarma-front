@@ -1,6 +1,5 @@
 //const String socket = "192.168.1.8:8080";       //casa
 //const String socket = "192.168.43.203:8080";    //celu
-import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 
 const String socket = 'localhost:8080';           //server jorge
 
@@ -51,4 +50,4 @@ const String uriMedicineFindBarCode = "/medicine/findBarCode";
 const String uriVoucherAdd = "/voucher/add";
 
 //Controlled Medication
-const String uriDteAuthorizationSale = "7controlledMedication/dateAuthorizationSale";
+const String uriDteAuthorizationSale = "controlledMedication/dateAuthorizationSale";
