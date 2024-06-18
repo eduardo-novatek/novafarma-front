@@ -328,14 +328,17 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
               _medicine.currentStock! > 0) {
             (bool, DateTime?) result = (true, null);
             if (_medicine.controlled!) result = await _medicineControlledValidated();
-            //var result = await _medicineControlledValidated();
             if (result.$1) {
               _updateVoucherItem();
             } else {
               await message(
                 context: context,
                 title: 'No autorizado',
-                message: 'Próxima fecha de retiro: ${dateToStr(result.$2!)}',
+                message:'${_medicine.name} '
+                    '${_medicine.presentation!.name} '
+                    '${_medicine.presentation!.quantity} '
+                    '${_medicine.presentation!.unitName}'
+                    '\n\nPróxima fecha de retiro: ${dateToStr(result.$2!)}',
               );
               _barCodeFocusNode.requestFocus();
             }
@@ -377,7 +380,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     DateTime now = DateTime.now();
     //Si es la primera venta, fetchDate=null
     validate = (fetchDate == null ||
-        (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now)) //fecha<=now
+        (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now)) //fecha <= now
     );
     return Future.value((validate, fetchDate));
   }

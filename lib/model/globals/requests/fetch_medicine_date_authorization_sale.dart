@@ -11,6 +11,7 @@ Future<DateTime?> fetchMedicineDateAuthorizationSale({
 }) async {
 
   Future<DateTime?> date = Future.value();
+
   await fetchDataObject<DateAuthorizationSaleDTO>(
     uri: '$uriDteAuthorizationSale/$customerId/$medicineId',
     classObject: DateAuthorizationSaleDTO.empty(),
