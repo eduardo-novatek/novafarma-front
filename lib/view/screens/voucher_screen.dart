@@ -13,7 +13,7 @@ import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
     defaultTextFromDropdownMenu;
 
-import '../dialogs/add_voucher_item_dialog.dart';
+import '../dialogs/voucher_item_dialog.dart';
 
 class VoucherScreen extends StatefulWidget {
   const VoucherScreen({super.key});

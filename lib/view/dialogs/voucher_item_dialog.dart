@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -13,6 +14,7 @@ import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/message.dart';
 import '../../model/globals/tools/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
+import 'controlled_medication_dialog.dart';
 
 class AddVoucherItemDialog extends StatefulWidget {
   final int customerId;
@@ -33,7 +35,7 @@ class AddVoucherItemDialog extends StatefulWidget {
   });
 
   @override
-  _AddVoucherItemDialogState createState() => _AddVoucherItemDialogState();
+  State<AddVoucherItemDialog> createState() => _AddVoucherItemDialogState();
 }
 
 class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
@@ -51,6 +53,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
   bool _quantityValidated = true;
+
+  ControlledMedicationDTO _newControlledMedication = ControlledMedicationDTO.empty();
 
   @override
   void initState() {
@@ -379,10 +383,23 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     );
     DateTime now = DateTime.now();
     //Si es la primera venta, fetchDate=null
-    validate = (fetchDate == null ||
-        (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now)) //fecha <= now
-    );
+    if (fetchDate == null) {
+      _updateNewControlledMedication();
+      ControlledMedicationDialog(controlledMedication: _newControlledMedication,);
+
+    } else {
+      //validate = fecha <= now
+      validate = (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now));
+      /*validate = (fetchDate == null ||
+          (fetchDate.isBefore(now) ||
+              fetchDate.isAtSameMomentAs(now)) //fecha <= now
+      );*/
+    }
     return Future.value((validate, fetchDate));
+  }
+
+  void _updateNewControlledMedication() {
+    _newControlledMedication.customerId =   
   }
 
   void _updateVoucherItem() {

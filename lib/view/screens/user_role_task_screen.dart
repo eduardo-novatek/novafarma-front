@@ -9,7 +9,7 @@ import 'package:novafarma_front/model/globals/requests/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import '../dialogs/add_user_dialog.dart';
+import '../dialogs/user_dialog.dart';
 
 class UserRoleTaskScreen extends StatefulWidget {
 
