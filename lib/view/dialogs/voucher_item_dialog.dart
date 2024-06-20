@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
+import 'package:novafarma_front/model/DTOs/customer_dto.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
+import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
@@ -16,17 +18,22 @@ import '../../model/globals/tools/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'controlled_medication_dialog.dart';
 
-class AddVoucherItemDialog extends StatefulWidget {
-  final int customerId;
+class VoucherItemDialog extends StatefulWidget {
+  final int customerOrSupplierId;
+  //Se especifica customer o supplier, nunca ambos.
+  final CustomerDTO? customer;
+  final SupplierDTO? supplier;
   final MovementTypeEnum? movementType;
   final List<String>? barCodeList; // ID's de medicamentos agregados al voucher
   final VoucherItemDTO? modifyVoucherItem; //Si es una modificacion, el voucher viene cargado
   final Function(VoucherItemDTO)? onAdd;
   final Function(VoucherItemDTO)? onModify;
 
-  const AddVoucherItemDialog({
+  const VoucherItemDialog({
     super.key,
-    required this.customerId,
+    required this.customerOrSupplierId,
+    this.customer,
+    this.supplier,
     this.modifyVoucherItem,
     this.movementType,
     this.barCodeList,
@@ -35,10 +42,10 @@ class AddVoucherItemDialog extends StatefulWidget {
   });
 
   @override
-  State<AddVoucherItemDialog> createState() => _AddVoucherItemDialogState();
+  State<VoucherItemDialog> createState() => _VoucherItemDialogState();
 }
 
-class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
+class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   final _formKey = GlobalKey<FormState>();
 
@@ -63,7 +70,8 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     if (widget.modifyVoucherItem != null) {
       _updateVoucherItem();
       _quantityController.value = TextEditingValue(
-          text: '${_voucherItem.quantity}');
+          text: '${_voucherItem.quantity}'
+      );
     }
     _createListeners();
   }
@@ -378,7 +386,7 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
     bool validate = false;
     //if (_medicine.controlled != null  && ! _medicine.controlled!) validate = true;
     DateTime? fetchDate = await fetchMedicineDateAuthorizationSale(
-          customerId: widget.customerId,
+          customerId: widget.customerOrSupplierId,
           medicineId: _medicine.medicineId!
     );
     DateTime now = DateTime.now();
@@ -399,7 +407,12 @@ class _AddVoucherItemDialogState extends State<AddVoucherItemDialog> {
   }
 
   void _updateNewControlledMedication() {
-    _newControlledMedication.customerId =   
+    _newControlledMedication.customerId =  widget.customerOrSupplierId;
+    _newControlledMedication.medicineId = _medicine.medicineId;
+    _newControlledMedication.medicineName = _medicine.name;
+    _newControlledMedication.customerName =
+      '${widget.customer!.name} ${widget.customer!.lastname}';
+    _newControlledMedication.lastSaleDate = _medicine.lastAddDate;
   }
 
   void _updateVoucherItem() {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:novafarma_front/model/DTOs/customer_dto.dart';
+import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
@@ -34,6 +36,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
+  CustomerDTO? _customer = CustomerDTO.empty();
+  SupplierDTO? _supplier = SupplierDTO.empty();
   double _totalPriceVoucher = 0;
 
   final List<VoucherItemDTO> _voucherItemList = [];
@@ -342,8 +346,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
                       builder: (BuildContext context) {
                         return PopScope( //Evita salida con flecha atrás del navegador
                           canPop: false,
-                          child: AddVoucherItemDialog(
-                            customerId: _selectedCustomerOrSupplierId,
+                          child: VoucherItemDialog(
+                            customerOrSupplierId: _selectedCustomerOrSupplierId,
                             movementType: toMovementTypeEnum(_selectedMovementType)!,
                             barCodeList: _barCodeList,
                             onAdd: (newVoucherItemDTO) {
@@ -480,8 +484,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
       builder: (BuildContext context) {
         return PopScope( //Evita salida con flecha atras del navegador
           canPop: false,
-          child: AddVoucherItemDialog(
-            customerId: _selectedCustomerOrSupplierId,
+          child: VoucherItemDialog(
+            customerOrSupplierId: _selectedCustomerOrSupplierId,
             movementType: toMovementTypeEnum(_selectedMovementType),
             modifyVoucherItem: modifyVoucherItem,
             onModify: (modifiedVoucher) {
@@ -505,7 +509,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   Widget _buildSupplierOrCustomerBox() {
     if (_selectedMovementType != defaultTextFromDropdownMenu) {
-     //Es Proveedor?
+      //Es Proveedor?
       if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
           _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)){
         return Container(
@@ -522,9 +526,15 @@ class _VoucherScreenState extends State<VoucherScreen> {
             children: [
               _buildSectionTitleBar(sectionTitle: "Datos proveedor"),
               SupplierBox(
-                selectedId: _selectedCustomerOrSupplierId,
-                onSelectedIdChanged: (value) => setState(() {
-                  _selectedCustomerOrSupplierId = value;
+                //selectedId: _selectedCustomerOrSupplierId,
+                onSelectedChanged: (supplier) => setState(() {
+                  if (supplier == null) {
+                    _selectedCustomerOrSupplierId = 0;
+                    _supplier = null;
+                  } else {
+                    _selectedCustomerOrSupplierId = supplier.supplierId!;
+                    _supplier!.supplierId = supplier.supplierId;
+                  }
                 }),
               ),
             ],
@@ -546,9 +556,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
             children: [
               _buildSectionTitleBar(sectionTitle: "Datos cliente"),
               CustomerBox(
-                  selectedId: _selectedCustomerOrSupplierId,
-                  onSelectedIdChanged: (value) => setState(() {
-                    _selectedCustomerOrSupplierId = value;
+                  //selectedId: _selectedCustomerOrSupplierId,
+                  onSelectedChanged: (customer) => setState(() {
+                    //_selectedCustomerOrSupplierId = value;
+                    if (customer == null) {
+                      _selectedCustomerOrSupplierId = 0;
+                      _customer = null;
+                    } else {
+                      _selectedCustomerOrSupplierId = customer.customerId!;
+                      _updateCustomer(customer);
+                    }
                   })
               ),
             ],
@@ -557,6 +574,21 @@ class _VoucherScreenState extends State<VoucherScreen> {
       }
     }
     return const SizedBox.shrink();
+  }
+
+  void _updateCustomer(CustomerDTO c) {
+    _customer?.customerId = c.customerId;
+    _customer?.name = c.name;
+    _customer?.lastname = c.lastname;
+    _customer?.document = c.document;
+    _customer?.telephone = c.telephone;
+    _customer?.addDate = c.addDate;
+    _customer?.paymentNumber = c.paymentNumber;
+    _customer?.partner = c.partner;
+    _customer?.deleted = c.deleted;
+    _customer?.notes = c.notes;
+    _customer?.partnerId = c.partnerId;
+    _customer?.dependentId = c.dependentId;
   }
 
   Widget _buildDateTimeBox() {

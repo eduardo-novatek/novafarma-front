@@ -1,21 +1,20 @@
-import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
 class CustomerDTO extends Deserializable<CustomerDTO> {
-  final int? customerId;
-  final String name;
-  final String? lastname;
-  final int? document;
-  final String? telephone;
-  final DateTime? addDate;
-  final int? paymentNumber;
-  final bool? partner;
-  final bool? deleted;
-  final String? notes;
-  final int? partnerId;
-  final int? dependentId;
-  final bool? isFirst;
+  late final int? customerId;
+  late final String name;
+  late final String? lastname;
+  late final int? document;
+  late final String? telephone;
+  late final DateTime? addDate;
+  late final int? paymentNumber;
+  late final bool? partner;
+  late final bool? deleted;
+  late final String? notes;
+  late final int? partnerId;
+  late final int? dependentId;
+  late final bool? isFirst;
 
   CustomerDTO.empty():
       customerId = null,

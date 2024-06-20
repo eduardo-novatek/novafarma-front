@@ -11,15 +11,15 @@ import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/customer_selection_dialog.dart';
 
 class CustomerBox extends StatefulWidget {
-  int selectedId;
+  //int selectedId;
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
-  final ValueChanged<int> onSelectedIdChanged;
+  final ValueChanged<CustomerDTO?> onSelectedChanged;
 
   CustomerBox({
     super.key,
     this.nextFocusNode,
-    required this.selectedId,
-    required this.onSelectedIdChanged,
+    //required this.selectedId,
+    required this.onSelectedChanged,
   });
 
   @override
@@ -188,8 +188,9 @@ class CustomerBoxState extends State<CustomerBox> {
         if (_documentController.text.trim().isNotEmpty) {
           if (int.tryParse(_documentController.text.trim()) != null) {
             await _updateCustomerList(
-                isDocument: true, value: _documentController.text)
-                .then((value) {
+                isDocument: true,
+                value: _documentController.text
+            ).then((value) {
               if (_customerList.isNotEmpty) {
                 _updateSelectedClient(0);
               } else {
@@ -262,8 +263,24 @@ class CustomerBoxState extends State<CustomerBox> {
         '(${_customerList[selectedIndex].document})';
     
     //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
-    widget.selectedId = _customerList[selectedIndex].customerId!;
-    widget.onSelectedIdChanged(widget.selectedId);
+    //widget.selectedId = _customerList[selectedIndex].customerId!;
+    widget.onSelectedChanged(
+        CustomerDTO(
+          customerId: _customerList[selectedIndex].customerId!,
+          name: _customerList[selectedIndex].name,
+          lastname: _customerList[selectedIndex].lastname!,
+          document: _customerList[selectedIndex].document!,
+          telephone: _customerList[selectedIndex].telephone!,
+          addDate: _customerList[selectedIndex].addDate,
+          paymentNumber: _customerList[selectedIndex].paymentNumber,
+          partner: _customerList[selectedIndex].partner,
+          deleted: _customerList[selectedIndex].deleted,
+          notes: _customerList[selectedIndex].notes,
+          partnerId: _customerList[selectedIndex].partnerId,
+          dependentId: _customerList[selectedIndex].dependentId,
+        )
+    );
+
     _initializeTextFormFields();
     _nextFocus();
   }
@@ -280,16 +297,11 @@ class CustomerBoxState extends State<CustomerBox> {
 
   Future<void> _notFound({required bool viewMessage, required bool isDocument}) async {
     _customerFound = null;
-    widget.selectedId = 0;
-    widget.onSelectedIdChanged(widget.selectedId);
+    //widget.selectedId = 0;
+    widget.onSelectedChanged(null);
     //_initializeTextFormFields();
 
     if (viewMessage) {
-      /*await floatingMessage(
-          context: context,
-          text: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
-          messageTypeEnum: MessageTypeEnum.warning,
-      );*/
       await OpenDialog(
         context: context,
         title: 'Atención',

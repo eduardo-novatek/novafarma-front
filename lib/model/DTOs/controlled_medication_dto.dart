@@ -3,14 +3,14 @@ import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
 class ControlledMedicationDTO extends Deserializable<ControlledMedicationDTO> {
-  final int? controlledMedicationId;
-  final int? customerId;
-  final int? medicineId;
-  final String? medicineName;
-  final String? customerName;
-  final int? frequencyDays;
-  final int? toleranceDays;
-  final DateTime? lastSaleDate;
+  late final int? controlledMedicationId;
+  late final int? customerId;
+  late final int? medicineId;
+  late final String? medicineName;
+  late final String? customerName;
+  late final int? frequencyDays;
+  late final int? toleranceDays;
+  late final DateTime? lastSaleDate;
   //final bool? isFirst;
 
   ControlledMedicationDTO.empty():

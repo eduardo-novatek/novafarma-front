@@ -1,14 +1,14 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
 class SupplierDTO extends Deserializable<SupplierDTO> {
-  final int? supplierId;
-  final String name;
-  final String? telephone1;
-  final String? telephone2;
-  final String? address;
-  final String? email;
-  final String? notes;
-  final bool? isFirst;
+  late final int? supplierId;
+  late final String name;
+  late final String? telephone1;
+  late final String? telephone2;
+  late final String? address;
+  late final String? email;
+  late final String? notes;
+  late final bool? isFirst;
 
   SupplierDTO.empty():
         supplierId = null,

@@ -8,15 +8,15 @@ import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
 
 class SupplierBox extends StatefulWidget {
-  final int selectedId;
-  final ValueChanged<int> onSelectedIdChanged;
+  //final int selectedId;
+  final ValueChanged<SupplierDTO?> onSelectedChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
   const SupplierBox({
     super.key,
     this.onRefreshButtonChange,
-    required this.selectedId,
-    required this.onSelectedIdChanged,
+    //required this.selectedId,
+    required this.onSelectedChanged,
   });
 
   @override
@@ -90,7 +90,17 @@ class SupplierBoxState extends State<SupplierBox> {
           model: _supplierList.isNotEmpty ? _supplierList[0] : null,
           callback: (supplier) {
             setState(() {
-              widget.onSelectedIdChanged(supplier!.supplierId!);
+              widget.onSelectedChanged(
+                SupplierDTO(
+                  supplierId: supplier!.supplierId,
+                  name: supplier.name,
+                  telephone1: supplier.telephone1,
+                  telephone2: supplier.telephone2,
+                  email: supplier.email,
+                  address: supplier.address,
+                  notes: supplier.notes,
+                )
+              );
             });
           },
         ),
@@ -112,7 +122,7 @@ class SupplierBoxState extends State<SupplierBox> {
             supplierId: 0,
           ),
         );
-        widget.onSelectedIdChanged(0);
+        widget.onSelectedChanged(null);
       });
     } catch (error) {
       _showMessageConnectionError(context);
@@ -125,7 +135,7 @@ class SupplierBoxState extends State<SupplierBox> {
             supplierId: 0,
           ),
         );
-        widget.onSelectedIdChanged(0);
+        widget.onSelectedChanged(null);
       }
       setState(() {
         _isLoading = false;
