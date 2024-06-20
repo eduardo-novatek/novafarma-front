@@ -1,10 +1,10 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
 class PresentationDTO extends Deserializable<PresentationDTO> {
-  final int? presentationId;
-  final String? name;
-  final int? quantity;
-  final String? unitName;
+  int? presentationId;
+  String? name;
+  int? quantity;
+  String? unitName;
   //final bool? isFirst;
 
   PresentationDTO.empty():

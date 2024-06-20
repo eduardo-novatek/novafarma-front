@@ -2,13 +2,13 @@ import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
 class UserDTO extends Deserializable<UserDTO> {
-  final int? userId;
-  final String name;
-  final String lastname;
-  final String? userName;
-  final String? pass;
-  final bool? active;
-  final RoleDTO role;
+  int? userId;
+  String name;
+  String lastname;
+  String? userName;
+  String? pass;
+  bool? active;
+  RoleDTO role;
 
   UserDTO.empty():
         userId = null,

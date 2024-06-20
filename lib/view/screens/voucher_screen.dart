@@ -39,10 +39,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
   CustomerDTO? _customer = CustomerDTO.empty();
   SupplierDTO? _supplier = SupplierDTO.empty();
   double _totalPriceVoucher = 0;
+  late final bool _isCustomer, _isSupplier;
 
   final List<VoucherItemDTO> _voucherItemList = [];
   final List<String> _barCodeList = []; //Para control de medicamentos ingresados al voucher
-
 
   @override
   void initState() {
@@ -199,6 +199,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         if (_selectedMovementType != movementType!) {
                           setState(() {
                             _selectedMovementType = movementType;
+                            _isCustomer = (_selectedMovementType == nameMovementType(MovementTypeEnum.sale));
+                            _isSupplier = (
+                                _selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
+                                _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier));
                             _selectedCustomerOrSupplierId = 0;
                             _voucherItemList.clear();
                             _barCodeList.clear();
@@ -348,6 +352,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
                           canPop: false,
                           child: VoucherItemDialog(
                             customerOrSupplierId: _selectedCustomerOrSupplierId,
+                            customer: _isCustomer ? _customer : null,
+                            supplier: _isSupplier ? _supplier : null,
                             movementType: toMovementTypeEnum(_selectedMovementType)!,
                             barCodeList: _barCodeList,
                             onAdd: (newVoucherItemDTO) {
@@ -510,8 +516,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Widget _buildSupplierOrCustomerBox() {
     if (_selectedMovementType != defaultTextFromDropdownMenu) {
       //Es Proveedor?
-      if (_selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
-          _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier)){
+      if (_isSupplier){
         return Container(
           width: MediaQuery.of(context).size.width * 0.275,
           margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -542,7 +547,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         );
 
         //Es Cliente?
-      } else if (_selectedMovementType == nameMovementType(MovementTypeEnum.sale)) {
+      } else if (_isCustomer) {
         return Container(
           width: MediaQuery.of(context).size.width * 0.3,
           margin: const EdgeInsets.symmetric(horizontal: 16.0),

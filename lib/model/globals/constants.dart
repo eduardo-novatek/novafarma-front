@@ -50,4 +50,4 @@ const String uriMedicineFindBarCode = "/medicine/findBarCode";
 const String uriVoucherAdd = "/voucher/add";
 
 //Controlled Medication
-const String uriDteAuthorizationSale = "controlledMedication/dateAuthorizationSale";
+const String uriDateAuthorizationSale = "controlledMedication/dateAuthorizationSale";

@@ -29,16 +29,13 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
   final FocusNode _toleranceDaysFocusNode = FocusNode();
   final FocusNode _lastSaleDateFocusNode = FocusNode();
 
-  late final bool isUpdate;
-
+  late final bool isAdd;
 
   @override
   void initState() {
     super.initState();
-    isUpdate =
-        widget.controlledMedication.customerId != null &&
-        widget.controlledMedication.customerId! > 0;
-
+    isAdd = (widget.controlledMedication.lastSaleDate == null);
+    print(isAdd);
   }
 
   @override
@@ -68,7 +65,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [
-                Text(isUpdate
+                Text(isAdd
                     ? 'Agregar medicamento controlado'
                     : 'Modificar medicamento controlado',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -81,7 +78,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                         isUpdate
+                         isAdd
                               ? CreateTextFormField(
                                   controller: _frequencyDaysController,
                                   focusNode: _frequencyDaysFocusNode,
@@ -96,7 +93,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                                   '${widget.controlledMedication.frequencyDays}'),
 
                           const SizedBox(height: 20),
-                          _buildTable(),
+                          //_buildTable(),
                           const SizedBox(height: 5),
 
                           CreateTextFormField(
@@ -122,11 +119,11 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                         child: const Text("Aceptar"),
                         onPressed: () {
                             if (!_formKey.currentState!.validate()) return;
-                            if (_validate()) {
+                            //if (_validate()) {
                               Navigator.of(context).pop();
-                            } else {
+                            //} else {
 
-                            }
+                            //}
                         },
                       ),
                       const SizedBox(width: 8),

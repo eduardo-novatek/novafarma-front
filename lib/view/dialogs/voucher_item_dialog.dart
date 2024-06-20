@@ -383,7 +383,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   Future<(bool, DateTime?)> _medicineControlledValidated() async {
-    bool validate = false;
+    bool validate = true;
     //if (_medicine.controlled != null  && ! _medicine.controlled!) validate = true;
     DateTime? fetchDate = await fetchMedicineDateAuthorizationSale(
           customerId: widget.customerOrSupplierId,
