@@ -23,13 +23,21 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
 
   final TextEditingController _frequencyDaysController = TextEditingController();
   final TextEditingController _toleranceDaysController = TextEditingController();
+  final TextEditingController _lastSaleDateController = TextEditingController();
 
   final FocusNode _frequencyDaysFocusNode = FocusNode();
   final FocusNode _toleranceDaysFocusNode = FocusNode();
+  final FocusNode _lastSaleDateFocusNode = FocusNode();
+
+  late final bool isUpdate;
+
 
   @override
   void initState() {
     super.initState();
+    isUpdate =
+        widget.controlledMedication.customerId != null &&
+        widget.controlledMedication.customerId! > 0;
 
   }
 
@@ -38,9 +46,11 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
     super.dispose();
     _frequencyDaysController.dispose();
     _toleranceDaysController.dispose();
+    _lastSaleDateController.dispose();
 
     _frequencyDaysFocusNode.dispose();
     _toleranceDaysFocusNode.dispose();
+    _lastSaleDateFocusNode.dispose();
   }
 
 
@@ -58,7 +68,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [
-                Text(widget.modifyVoucherItem == null
+                Text(isUpdate
                     ? 'Agregar medicamento controlado'
                     : 'Modificar medicamento controlado',
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -71,18 +81,19 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          widget.modifyVoucherItem == null
+                         isUpdate
                               ? CreateTextFormField(
-                            controller: _frequencyDaysController,
-                            focusNode: _frequencyDaysFocusNode,
-                            label: 'Frecuencia de compra',
-                            dataType: DataTypeEnum.number,
-                            minValueForValidation: 0,
-                            maxValueForValidation: 365,
-                            textForValidation: 'Ingrese un valor entre 0 y 365',
-                            initialFocus: true,
-                          )
-                              : Text('Çódigo: ${widget.modifyVoucherItem?.barCode}'),
+                                  controller: _frequencyDaysController,
+                                  focusNode: _frequencyDaysFocusNode,
+                                  label: 'Frecuencia de compra',
+                                  dataType: DataTypeEnum.number,
+                                  minValueForValidation: 0,
+                                  maxValueForValidation: 365,
+                                  textForValidation: 'Ingrese un valor entre 0 y 365',
+                                  initialFocus: true,
+                                )
+                              : Text('Frecuencia de compra: '
+                                  '${widget.controlledMedication.frequencyDays}'),
 
                           const SizedBox(height: 20),
                           _buildTable(),
