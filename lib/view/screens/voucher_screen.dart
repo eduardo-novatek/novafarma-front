@@ -288,7 +288,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         1: FlexColumnWidth(2),
         2: FlexColumnWidth(1),
         3: FlexColumnWidth(1),
-        4: FlexColumnWidth(1),
+        4: FlexColumnWidth(0.6),
         5: FixedColumnWidth(96),
       },
       children: [
@@ -404,14 +404,109 @@ class _VoucherScreenState extends State<VoucherScreen> {
         1: FlexColumnWidth(2),
         2: FlexColumnWidth(1),
         3: FlexColumnWidth(1),
-        4: FlexColumnWidth(1),
+        4: FlexColumnWidth(0.6),
+        5: FixedColumnWidth(96),
+      },
+      children: [
+        TableRow(
+          children: [
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: item.controlled != null && item.controlled!
+                    ? const Tooltip(
+                  message: 'Medicamento controlado',
+                  child: Icon(Icons.copyright, color: Colors.red),
+                )
+                    : const SizedBox.shrink(),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(item.medicineName ?? '<sin especificar>'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(item.presentation ?? '<sin especificar>'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
+                      ? item.unitPrice != null
+                      ? NumberFormat('#,##0.00', 'es_ES').format(item.unitPrice)
+                      : '0,00'
+                      : item.currentStock != null
+                      ? NumberFormat('#,##0.00', 'es_ES').format(item.currentStock)
+                      : '0,00',
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  item.quantity != null
+                      ? NumberFormat('#,##0.00', 'es_ES').format(item.quantity)
+                      : '0,00',
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      tooltip: 'Editar item',
+                      onPressed: () => _editVoucherItem(index),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete),
+                      tooltip: 'Borrar item',
+                      onPressed: () => _deleteVoucherItem(index),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+
+  /*Widget _buildVoucherItem(VoucherItemDTO item, int index) {
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(0.2),
+        1: FlexColumnWidth(2),
+        2: FlexColumnWidth(1),
+        3: FlexColumnWidth(1),
+        4: FlexColumnWidth(0.6),
         5: FixedColumnWidth(96),
       },
       children: [
         TableRow(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left: 8.0),
               child: item.controlled != null &&  item.controlled!
                 ? const Tooltip(
                     message: 'Medicamento controlado',
@@ -420,15 +515,15 @@ class _VoucherScreenState extends State<VoucherScreen> {
                 : const SizedBox.shrink(),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left: 8.0),
               child: Text(item.medicineName ?? '<sin especificar>'),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left: 8.0),
               child: Text(item.presentation ?? '<sin especificar>'),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left: 8.0),
               child: Text(_selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
                         ? item.unitPrice != null
                           ? NumberFormat('#,##0.00', 'es_ES').format(item.unitPrice)
@@ -441,7 +536,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left: 8.0),
               child: Text(item.quantity != null
                   ? NumberFormat('#,##0.00', 'es_ES').format(item.quantity)
                   //? item.quantity.toString()
@@ -449,26 +544,29 @@ class _VoucherScreenState extends State<VoucherScreen> {
                   textAlign: TextAlign.right,
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  tooltip: 'Editar item',
-                  onPressed: () => _editVoucherItem(index),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  tooltip: 'Borrar item',
-                  onPressed: () => _deleteVoucherItem(index),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: 'Editar item',
+                    onPressed: () => _editVoucherItem(index),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    tooltip: 'Borrar item',
+                    onPressed: () => _deleteVoucherItem(index),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ],
     );
-  }
+  }*/
 
   void _editVoucherItem(int index) {
 

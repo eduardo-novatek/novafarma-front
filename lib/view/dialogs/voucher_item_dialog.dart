@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
@@ -14,7 +15,6 @@ import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/message.dart';
-import '../../model/globals/tools/create_key_pressed.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'controlled_medication_dialog.dart';
 
@@ -311,7 +311,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   void _barCodeListener() {
-    if (isEscape()) return;
+    if (_barCodeFocusNode.hasFocus) {
+      HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+    } else {
+      HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    }
+
     //Da tiempo a ejecutar evento onChange de los botones del Dialog
     Future.delayed(const Duration(milliseconds: 100), () async {
       if (!_focusEnabled || _barCodeFocusNode.hasFocus) {
@@ -380,6 +385,14 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
       });
     });
+  }
+
+  bool _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+      Navigator.of(context).pop();
+      return true;  // Evento manejado
+    }
+    return false;  // Evento no manejado
   }
 
   Future<(bool, DateTime?)> _medicineControlledValidated() async {
@@ -460,7 +473,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   void _quantityListener() {
-    if (isEscape()) return;
+    if (_quantityFocusNode.hasFocus) {
+      HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+    } else {
+      HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    }
+
     Future.delayed(const Duration(milliseconds: 100), () async {
       if (!_focusEnabled ||
           _quantityFocusNode.hasFocus ||
