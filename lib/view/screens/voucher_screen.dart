@@ -39,7 +39,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   CustomerDTO? _customer = CustomerDTO.empty();
   SupplierDTO? _supplier = SupplierDTO.empty();
   double _totalPriceVoucher = 0;
-  late final bool _isCustomer, _isSupplier;
+  late bool _isCustomer, _isSupplier;
 
   final List<VoucherItemDTO> _voucherItemList = [];
   final List<String> _barCodeList = []; //Para control de medicamentos ingresados al voucher
@@ -533,7 +533,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
               SupplierBox(
                 //selectedId: _selectedCustomerOrSupplierId,
                 onSelectedChanged: (supplier) => setState(() {
-                  if (supplier == null) {
+                  if (supplier == null || supplier.supplierId == 0) {
                     _selectedCustomerOrSupplierId = 0;
                     _supplier = null;
                   } else {

@@ -90,17 +90,21 @@ class SupplierBoxState extends State<SupplierBox> {
           model: _supplierList.isNotEmpty ? _supplierList[0] : null,
           callback: (supplier) {
             setState(() {
-              widget.onSelectedChanged(
-                SupplierDTO(
-                  supplierId: supplier!.supplierId,
-                  name: supplier.name,
-                  telephone1: supplier.telephone1,
-                  telephone2: supplier.telephone2,
-                  email: supplier.email,
-                  address: supplier.address,
-                  notes: supplier.notes,
-                )
-              );
+              if (supplier!.supplierId == 0) {
+                widget.onSelectedChanged(null);
+              } else {
+                widget.onSelectedChanged(
+                    SupplierDTO(
+                      supplierId: supplier.supplierId,
+                      name: supplier.name,
+                      telephone1: supplier.telephone1,
+                      telephone2: supplier.telephone2,
+                      email: supplier.email,
+                      address: supplier.address,
+                      notes: supplier.notes,
+                    )
+                );
+              }
             });
           },
         ),
