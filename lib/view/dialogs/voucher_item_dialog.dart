@@ -58,12 +58,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   final FocusNode _quantityFocusNode = FocusNode();
 
   VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
-  MedicineDTO _medicine = MedicineDTO();
+  MedicineDTO _medicine = MedicineDTO.empty();
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
   bool _quantityValidated = true;
 
-  ControlledMedicationDTO _newControlledMedication = ControlledMedicationDTO.empty();
+  ControlledMedicationDTO? _newControlledMedication = ControlledMedicationDTO.empty();
 
   @override
   void initState() {
@@ -399,7 +399,6 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   Future<(bool, DateTime?)> _medicineControlledValidated() async {
     bool validate = true;
-    //if (_medicine.controlled != null  && ! _medicine.controlled!) validate = true;
     DateTime? fetchDate = await fetchMedicineDateAuthorizationSale(
           customerId: widget.customerOrSupplierId,
           medicineId: _medicine.medicineId!
@@ -408,7 +407,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     //Si es la primera venta, fetchDate=null
     if (fetchDate == null) {
       _updateNewControlledMedication();
-      showDialog(
+      await showDialog(
         context: context,
         barrierDismissible: false, //lo hace modal
         builder: (BuildContext context) {
@@ -419,29 +418,15 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
               )
           );
         }
-      );
+      ).then((value) {
+        //si _newControlledMedication != null, agregarlo a lista...
+        if (value == true) {
+          //agregar a lista este medicamento controlado...
 
-      /*
-       showDialog(
-      context: context,
-      barrierDismissible: false, //lo hace modal
-      builder: (BuildContext context) {
-        return PopScope( //Evita salida con flecha atras del navegador
-          canPop: false,
-          child: VoucherItemDialog(
-            customerOrSupplierId: _selectedCustomerOrSupplierId,
-            voucherDate: strToDate(_dateController.text)!,
-            movementType: toMovementTypeEnum(_selectedMovementType),
-            modifyVoucherItem: modifyVoucherItem,
-            onModify: (modifiedVoucher) {
-              setState(() {
-                _voucherItemList[index].quantity = modifiedVoucher.quantity;
-              });
-            },
-          ),
-        );
-      },
-    );*/
+        } else {
+         _initialize(initializeCodeBar: true);
+        }
+      });
 
     } else {
       //validate = fecha <= now
@@ -455,17 +440,19 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   void _updateNewControlledMedication() {
-    _newControlledMedication.customerId =  widget.customerOrSupplierId;
-    _newControlledMedication.medicineId = _medicine.medicineId;
-    _newControlledMedication.medicineName = _medicine.name;
-    _newControlledMedication.customerName =
+    _newControlledMedication?.customerId =  widget.customerOrSupplierId;
+    _newControlledMedication?.medicineId = _medicine.medicineId!;
+    _newControlledMedication?.medicineName = _medicine.name!;
+    _newControlledMedication?.customerName =
       '${widget.customer!.name} ${widget.customer!.lastname}';
-    _newControlledMedication.lastSaleDate = null; //widget.voucherDate;
+    _newControlledMedication?.lastSaleDate = null; //widget.voucherDate;
   }
 
   void _updateVoucherItem() {
     setState(() {
-      if (widget.modifyVoucherItem == null) {
+      if (widget.modifyVoucherItem == null) { //Alta?
+        if (_medicine.medicineId == null) return;
+
         _voucherItem.medicineId = _medicine.medicineId;
         _voucherItem.barCode = _medicine.barCode;
         _voucherItem.medicineName = _medicine.name;
@@ -480,7 +467,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         //
         _barCodeValidated = true;
 
-      } else {
+      } else { //Modificacion
         _voucherItem.medicineId = widget.modifyVoucherItem?.medicineId;
         _voucherItem.barCode = widget.modifyVoucherItem?.barCode;
         _voucherItem.medicineName = widget.modifyVoucherItem?.medicineName;
@@ -495,9 +482,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   double? _unitPrice() {
     if (widget.movementType == MovementTypeEnum.sale) {
-      return _medicine.lastSalePrice;
+      return _medicine.lastSalePrice!;
     } else if (_isSupplier()) {
-      return _medicine.lastCostPrice;
+      return _medicine.lastCostPrice!;
     }
     return null;
   }
@@ -602,6 +589,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   void _initialize({required bool initializeCodeBar}) {
     setState(() {
       _quantityController.value = TextEditingValue.empty;
+      _medicine = MedicineDTO.empty();
       _voucherItem = VoucherItemDTO.empty();
       if (initializeCodeBar) {
         _barCodeController.value = TextEditingValue.empty;

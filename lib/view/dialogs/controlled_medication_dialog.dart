@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
 
-import '../../model/DTOs/customer_dto.dart';
 import '../../model/enums/data_type_enum.dart';
 import '../../model/globals/message.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class ControlledMedicationDialog extends StatefulWidget {
-  final ControlledMedicationDTO controlledMedication;  //Se actualiza con los datos seleccionados
+  //Se actualiza con los datos ingresados de Frecuencia y Tolernacia.
+  //Si cancela, controlledMedication se reasigna a null.
+  ControlledMedicationDTO? controlledMedication;
   //final CustomerDTO customer;
 
-  const ControlledMedicationDialog({
+  ControlledMedicationDialog({
     super.key,
-    required this.controlledMedication,
+    this.controlledMedication,
     //required this.customer,
   });
 
@@ -37,7 +38,8 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
   @override
   void initState() {
     super.initState();
-    isAdd = (widget.controlledMedication.customerId == null || widget.controlledMedication.customerId! == 0);
+    isAdd = (widget.controlledMedication?.customerId == null
+        || widget.controlledMedication?.customerId! == 0);
 
     if (isAdd) {
       _frequencyDaysController.value = TextEditingValue(text: '0');
@@ -45,10 +47,10 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
       // Es modificacion
     } else {
       _frequencyDaysController.value = TextEditingValue(
-        text: widget.controlledMedication.frequencyDays.toString()
+        text: widget.controlledMedication!.frequencyDays.toString()
       );
       _toleranceDaysController.value = TextEditingValue(
-          text: widget.controlledMedication.toleranceDays.toString()
+          text: widget.controlledMedication!.toleranceDays.toString()
       );
     }
   }
@@ -87,7 +89,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-                widget.controlledMedication.lastSaleDate == null
+                widget.controlledMedication!.lastSaleDate == null
                   ? const Padding(
                     padding: EdgeInsets.only(bottom: 20.0),
                     child: Text(
@@ -102,10 +104,10 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                   )
                   : const SizedBox.shrink(),
                 //Text('Paciente: ${widget.customer.name} ${widget.customer.lastname}'),
-                Text('Paciente: ${widget.controlledMedication.customerName}'),
-                Text('Medicamento: ${widget.controlledMedication.medicineName}'),
-                widget.controlledMedication.lastSaleDate != null
-                  ? Text('Ultima venta: ${widget.controlledMedication.lastSaleDate}')
+                Text('Paciente: ${widget.controlledMedication!.customerName}'),
+                Text('Medicamento: ${widget.controlledMedication!.medicineName}'),
+                widget.controlledMedication!.lastSaleDate != null
+                  ? Text('Ultima venta: ${widget.controlledMedication!.lastSaleDate}')
                   : const SizedBox.shrink(),
                 Flexible(
                   child: SingleChildScrollView(
@@ -151,20 +153,24 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                             if (int.parse(_frequencyDaysController.text) <
                                 int.parse(_toleranceDaysController.text)) {
                               await message(
-                                  message: 'La frecuencia debe ser mayor o igual a los días de tolerancia',
-                                  context: context,
+                                message: 'La frecuencia de compra debe ser mayor o igual a los días de tolerancia',
+                                context: context,
                               );
-                              _frequencyDaysFocusNode.hasFocus;
+                              _frequencyDaysFocusNode.requestFocus();
                               return;
                             }
-                            Navigator.of(context).pop();
+                            _updateControlledMedication();
+                            //Devuelve true, con lo cual el objeto controlledMedication está actualizado
+                            Navigator.of(context).pop(true);
                         },
                       ),
                       const SizedBox(width: 8),
                       TextButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
-                          Navigator.of(context).pop();
+                          widget.controlledMedication = ControlledMedicationDTO.empty();
+                          //Devuelve false, con lo cual el objeto controlledMedication está inicializado
+                          Navigator.of(context).pop(false);
                         },
                       ),
                     ],
@@ -176,7 +182,11 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
         },
       ),
     );
+  }
 
+  void _updateControlledMedication() {
+    widget.controlledMedication!.frequencyDays = int.parse(_frequencyDaysController.text);
+    widget.controlledMedication!.toleranceDays = int.parse(_toleranceDaysController.text);
   }
 
 }
