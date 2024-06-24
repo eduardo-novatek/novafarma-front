@@ -15,7 +15,7 @@ class CustomerBox extends StatefulWidget {
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
   final ValueChanged<CustomerDTO?> onSelectedChanged;
 
-  CustomerBox({
+  const CustomerBox({
     super.key,
     this.nextFocusNode,
     //required this.selectedId,

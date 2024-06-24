@@ -20,6 +20,7 @@ import 'controlled_medication_dialog.dart';
 
 class VoucherItemDialog extends StatefulWidget {
   final int customerOrSupplierId;
+  final DateTime voucherDate;
   //Se especifica customer o supplier, nunca ambos.
   final CustomerDTO? customer;
   final SupplierDTO? supplier;
@@ -32,6 +33,7 @@ class VoucherItemDialog extends StatefulWidget {
   const VoucherItemDialog({
     super.key,
     required this.customerOrSupplierId,
+    required this.voucherDate,
     this.customer,
     this.supplier,
     this.modifyVoucherItem,
@@ -96,7 +98,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         builder: (context, constraints) {
           return Container(
             width: constraints.maxWidth * 0.4, // 40% del ancho disponible
-            height: constraints.maxHeight * 0.55, // 60% del alto disponible
+            height: constraints.maxHeight * 0.70, // 60% del alto disponible
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [
@@ -406,7 +408,40 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     //Si es la primera venta, fetchDate=null
     if (fetchDate == null) {
       _updateNewControlledMedication();
-      ControlledMedicationDialog(controlledMedication: _newControlledMedication,);
+      showDialog(
+        context: context,
+        barrierDismissible: false, //lo hace modal
+        builder: (BuildContext context) {
+          return PopScope( //Evita salida con flecha atras del navegador
+              canPop: false,
+              child: ControlledMedicationDialog(
+                controlledMedication: _newControlledMedication,
+              )
+          );
+        }
+      );
+
+      /*
+       showDialog(
+      context: context,
+      barrierDismissible: false, //lo hace modal
+      builder: (BuildContext context) {
+        return PopScope( //Evita salida con flecha atras del navegador
+          canPop: false,
+          child: VoucherItemDialog(
+            customerOrSupplierId: _selectedCustomerOrSupplierId,
+            voucherDate: strToDate(_dateController.text)!,
+            movementType: toMovementTypeEnum(_selectedMovementType),
+            modifyVoucherItem: modifyVoucherItem,
+            onModify: (modifiedVoucher) {
+              setState(() {
+                _voucherItemList[index].quantity = modifiedVoucher.quantity;
+              });
+            },
+          ),
+        );
+      },
+    );*/
 
     } else {
       //validate = fecha <= now
@@ -425,7 +460,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     _newControlledMedication.medicineName = _medicine.name;
     _newControlledMedication.customerName =
       '${widget.customer!.name} ${widget.customer!.lastname}';
-    _newControlledMedication.lastSaleDate = _medicine.lastAddDate;
+    _newControlledMedication.lastSaleDate = widget.voucherDate;
   }
 
   void _updateVoucherItem() {

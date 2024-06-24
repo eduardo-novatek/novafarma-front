@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 ///Dada una fecha en formato String (dateStr), devuelve la fecha en formato
 ///DateTime. Si el argumento dateStr es "yyyy-MM-dd", devuelve un objeto
-///DateTime con igual formato. Idem para dateStr="dd-MM-yyyy". Si falla la
+///DateTime con igual formato. Idem para dateStr="dd/MM/yyyy". Si falla la
 ///conversión devuelve null.
 DateTime? strToDate(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return null;

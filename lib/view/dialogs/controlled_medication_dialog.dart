@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
 
@@ -60,8 +59,8 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
-            width: constraints.maxWidth * 0.15, // 15% del ancho disponible
-            height: constraints.maxHeight * 0.2, // 20% del alto disponible
+            width: constraints.maxWidth * 0.30, // 15% del ancho disponible
+            height: constraints.maxHeight * 0.50, // 20% del alto disponible
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [

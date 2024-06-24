@@ -352,6 +352,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                           canPop: false,
                           child: VoucherItemDialog(
                             customerOrSupplierId: _selectedCustomerOrSupplierId,
+                            voucherDate: strToDate(_dateController.text)!,
                             customer: _isCustomer ? _customer : null,
                             supplier: _isSupplier ? _supplier : null,
                             movementType: toMovementTypeEnum(_selectedMovementType)!,
@@ -491,83 +492,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
-
-  /*Widget _buildVoucherItem(VoucherItemDTO item, int index) {
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(0.2),
-        1: FlexColumnWidth(2),
-        2: FlexColumnWidth(1),
-        3: FlexColumnWidth(1),
-        4: FlexColumnWidth(0.6),
-        5: FixedColumnWidth(96),
-      },
-      children: [
-        TableRow(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: item.controlled != null &&  item.controlled!
-                ? const Tooltip(
-                    message: 'Medicamento controlado',
-                    child: Icon(Icons.copyright, color: Colors.red,)
-                  )
-                : const SizedBox.shrink(),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(item.medicineName ?? '<sin especificar>'),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(item.presentation ?? '<sin especificar>'),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(_selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
-                        ? item.unitPrice != null
-                          ? NumberFormat('#,##0.00', 'es_ES').format(item.unitPrice)
-                          : '0,00'
-                        : item.currentStock != null
-                          ? NumberFormat('#,##0.00', 'es_ES').format(item.currentStock)
-                          //? item.currentStock.toString()
-                          : '0,00',
-                      textAlign: TextAlign.right
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(item.quantity != null
-                  ? NumberFormat('#,##0.00', 'es_ES').format(item.quantity)
-                  //? item.quantity.toString()
-                  : '0,00',
-                  textAlign: TextAlign.right,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    tooltip: 'Editar item',
-                    onPressed: () => _editVoucherItem(index),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    tooltip: 'Borrar item',
-                    onPressed: () => _deleteVoucherItem(index),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }*/
-
   void _editVoucherItem(int index) {
 
     VoucherItemDTO modifyVoucherItem = VoucherItemDTO(
@@ -590,6 +514,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
           canPop: false,
           child: VoucherItemDialog(
             customerOrSupplierId: _selectedCustomerOrSupplierId,
+            voucherDate: strToDate(_dateController.text)!,
             movementType: toMovementTypeEnum(_selectedMovementType),
             modifyVoucherItem: modifyVoucherItem,
             onModify: (modifiedVoucher) {
@@ -636,7 +561,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                     _supplier = null;
                   } else {
                     _selectedCustomerOrSupplierId = supplier.supplierId!;
-                    _supplier!.supplierId = supplier.supplierId;
+                    _updateSupplier(supplier);
                   }
                 }),
               ),
@@ -677,6 +602,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
       }
     }
     return const SizedBox.shrink();
+  }
+
+  void _updateSupplier(SupplierDTO s) {
+    _supplier?.supplierId = s.supplierId;
+    _supplier?.name = s.name;
+    _supplier?.address = s.address;
+    _supplier?.email = s.email;
+    _supplier?.telephone1 = s.telephone1;
+    _supplier?.telephone2 = s.telephone2;
+    _supplier?.notes = s.notes;
   }
 
   void _updateCustomer(CustomerDTO c) {
