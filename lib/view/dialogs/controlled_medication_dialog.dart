@@ -3,6 +3,7 @@ import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
 
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/enums/data_type_enum.dart';
+import '../../model/globals/message.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class ControlledMedicationDialog extends StatefulWidget {
@@ -36,7 +37,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
   @override
   void initState() {
     super.initState();
-    isAdd = (widget.controlledMedication.lastSaleDate == null);
+    isAdd = (widget.controlledMedication.customerId == null || widget.controlledMedication.customerId! == 0);
 
     if (isAdd) {
       _frequencyDaysController.value = TextEditingValue(text: '0');
@@ -78,6 +79,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
             height: constraints.maxHeight * 0.50, // 20% del alto disponible
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(isAdd
                     ? 'Agregar medicamento controlado'
@@ -86,16 +88,24 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                 ),
                 const SizedBox(height: 20),
                 widget.controlledMedication.lastSaleDate == null
-                  ? const Text(
-                      'Primera venta',
-                      style: TextStyle(fontStyle: FontStyle.italic, fontSize: 14,),
-                    )
+                  ? const Padding(
+                    padding: EdgeInsets.only(bottom: 20.0),
+                    child: Text(
+                      '* Primera venta *',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  )
                   : const SizedBox.shrink(),
                 //Text('Paciente: ${widget.customer.name} ${widget.customer.lastname}'),
                 Text('Paciente: ${widget.controlledMedication.customerName}'),
                 Text('Medicamento: ${widget.controlledMedication.medicineName}'),
                 widget.controlledMedication.lastSaleDate != null
-                  ? Text('Ultima venta ${widget.controlledMedication.lastSaleDate}')
+                  ? Text('Ultima venta: ${widget.controlledMedication.lastSaleDate}')
                   : const SizedBox.shrink(),
                 Flexible(
                   child: SingleChildScrollView(
@@ -136,13 +146,18 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                     children: [
                       TextButton(
                         child: const Text("Aceptar"),
-                        onPressed: () {
+                        onPressed: () async {
                             if (!_formKey.currentState!.validate()) return;
-                            //if (_validate()) {
-                              Navigator.of(context).pop();
-                            //} else {
-
-                            //}
+                            if (int.parse(_frequencyDaysController.text) <
+                                int.parse(_toleranceDaysController.text)) {
+                              await message(
+                                  message: 'La frecuencia debe ser mayor o igual a los días de tolerancia',
+                                  context: context,
+                              );
+                              _frequencyDaysFocusNode.hasFocus;
+                              return;
+                            }
+                            Navigator.of(context).pop();
                         },
                       ),
                       const SizedBox(width: 8),

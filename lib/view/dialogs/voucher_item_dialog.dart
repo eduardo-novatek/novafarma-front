@@ -460,7 +460,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     _newControlledMedication.medicineName = _medicine.name;
     _newControlledMedication.customerName =
       '${widget.customer!.name} ${widget.customer!.lastname}';
-    _newControlledMedication.lastSaleDate = widget.voucherDate;
+    _newControlledMedication.lastSaleDate = null; //widget.voucherDate;
   }
 
   void _updateVoucherItem() {
