@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -347,7 +349,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
               widget.movementType == MovementTypeEnum.adjustmentStock ||
               _medicine.currentStock! > 0) {
             (bool, DateTime?) result = (true, null);
-            if (_medicine.controlled!) result = await _medicineControlledValidated();
+            if (! _isSupplier()) {
+              if (_medicine.controlled!) result = await _medicineControlledValidated();
+            }
             if (result.$1) {
               _updateVoucherItem();
             } else {
@@ -434,6 +438,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   void _updateNewControlledMedication() {
+    //Si _controlledMedication es null, crea el objeto vacío
+    _controlledMedication ??= ControlledMedicationDTO.empty();
     _controlledMedication?.customerId =  widget.customerOrSupplierId;
     _controlledMedication?.medicineId = _medicine.medicineId!;
     _controlledMedication?.medicineName = _medicine.name!;

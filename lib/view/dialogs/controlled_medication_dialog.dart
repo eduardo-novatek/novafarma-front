@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
 

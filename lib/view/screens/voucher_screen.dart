@@ -129,6 +129,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         children: [
           _buildMovementTypeBox(),
           _buildSupplierOrCustomerBox(),
+          // ignore: avoid_print
           IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: const Icon(Icons.abc)),
         ],
       ),
