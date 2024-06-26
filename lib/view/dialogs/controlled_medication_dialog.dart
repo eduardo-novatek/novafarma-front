@@ -168,7 +168,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                       TextButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
-                          widget.controlledMedication = ControlledMedicationDTO.empty();
+                          widget.controlledMedication = null;
                           //Devuelve false, con lo cual el objeto controlledMedication está inicializado
                           Navigator.of(context).pop(false);
                         },

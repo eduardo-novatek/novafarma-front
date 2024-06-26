@@ -429,10 +429,6 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     } else {
       //validate = fecha <= now
       validate = (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now));
-      /*validate = (fetchDate == null ||
-          (fetchDate.isBefore(now) ||
-              fetchDate.isAtSameMomentAs(now)) //fecha <= now
-      );*/
     }
     return Future.value((validate, fetchDate));
   }
@@ -592,6 +588,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     setState(() {
       _quantityController.value = TextEditingValue.empty;
       _medicine = MedicineDTO.empty();
+      _controlledMedication = null;
       _voucherItem = VoucherItemDTO.empty();
       if (initializeCodeBar) {
         _barCodeController.value = TextEditingValue.empty;

@@ -11,7 +11,6 @@ import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
-import '../../model/DTOs/controlled_medication_dto.dart';
 import '../../model/enums/data_type_enum.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
