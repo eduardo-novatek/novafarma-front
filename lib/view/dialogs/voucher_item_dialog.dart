@@ -26,7 +26,7 @@ class VoucherItemDialog extends StatefulWidget {
   final SupplierDTO? supplier;
   final MovementTypeEnum? movementType;
   final List<String>? barCodeList; // ID's de medicamentos agregados al voucher
-  final VoucherItemDTO? modifyVoucherItem; //Si es una modificacion, el voucher viene cargado
+  final VoucherItemDTO? modifyVoucherItem; //Si es una modificacion, el voucherItem viene cargado
   final Function(VoucherItemDTO)? onAdd;
   final Function(VoucherItemDTO)? onModify;
 
@@ -63,7 +63,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   bool _barCodeValidated = true;
   bool _quantityValidated = true;
 
-  ControlledMedicationDTO? _newControlledMedication = ControlledMedicationDTO.empty();
+  ControlledMedicationDTO? _controlledMedication = ControlledMedicationDTO.empty();
 
   @override
   void initState() {
@@ -201,6 +201,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         quantity: _voucherItem.quantity,
         currentStock: _voucherItem.currentStock,
         controlled: _voucherItem.controlled,
+        controlledMedication: _controlledMedication,
       ),
     );
     _initialize(initializeCodeBar: true);
@@ -414,16 +415,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           return PopScope( //Evita salida con flecha atras del navegador
               canPop: false,
               child: ControlledMedicationDialog(
-                controlledMedication: _newControlledMedication,
+                controlledMedication: _controlledMedication,
               )
           );
         }
       ).then((value) {
-        //si _newControlledMedication != null, agregarlo a lista...
-        if (value == true) {
-          //agregar a lista este medicamento controlado...
-
-        } else {
+        //si canceló...
+        if (! value) {
          _initialize(initializeCodeBar: true);
         }
       });
@@ -440,12 +438,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   void _updateNewControlledMedication() {
-    _newControlledMedication?.customerId =  widget.customerOrSupplierId;
-    _newControlledMedication?.medicineId = _medicine.medicineId!;
-    _newControlledMedication?.medicineName = _medicine.name!;
-    _newControlledMedication?.customerName =
+    _controlledMedication?.customerId =  widget.customerOrSupplierId;
+    _controlledMedication?.medicineId = _medicine.medicineId!;
+    _controlledMedication?.medicineName = _medicine.name!;
+    _controlledMedication?.customerName =
       '${widget.customer!.name} ${widget.customer!.lastname}';
-    _newControlledMedication?.lastSaleDate = null; //widget.voucherDate;
+    _controlledMedication?.lastSaleDate = null; //widget.voucherDate;
   }
 
   void _updateVoucherItem() {
@@ -464,6 +462,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         _voucherItem.currentStock = _medicine.currentStock;
         _voucherItem.quantity = 0;
         _voucherItem.controlled = _medicine.controlled;
+        _voucherItem.controlledMedication =
+            _medicine.controlled! ? _controlledMedication : null;
         //
         _barCodeValidated = true;
 
@@ -476,6 +476,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         _voucherItem.currentStock = widget.modifyVoucherItem?.currentStock;
         _voucherItem.quantity = widget.modifyVoucherItem?.quantity;
         _voucherItem.controlled = widget.modifyVoucherItem?.controlled;
+        _voucherItem.controlledMedication =
+            _voucherItem.controlled! ? _controlledMedication : null;
       }
     });
   }

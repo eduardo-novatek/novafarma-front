@@ -1,5 +1,7 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
+import 'controlled_medication_dto.dart';
+
 class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   int? voucherItemId;
   int? medicineId;
@@ -10,6 +12,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
   double? quantity;
   double? unitPrice;
   bool? controlled;
+  ControlledMedicationDTO? controlledMedication;
   //final bool? isFirst;
 
   VoucherItemDTO.empty():
@@ -21,7 +24,8 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     quantity = null,
     unitPrice = null,
     currentStock = null,
-    controlled = null
+    controlled = null,
+    controlledMedication = null
     //isFirst = null
   ;
 
@@ -35,6 +39,7 @@ class VoucherItemDTO extends Deserializable<VoucherItemDTO> {
     this.unitPrice,
     this.currentStock,
     this.controlled,
+    this.controlledMedication,
     //this.isFirst,
   });
 
