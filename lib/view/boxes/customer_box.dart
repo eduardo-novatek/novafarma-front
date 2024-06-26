@@ -66,7 +66,10 @@ class CustomerBoxState extends State<CustomerBox> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _isLoading
-              ? buildCircularProgress()
+              ? Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: buildCircularProgress(),
+                )
               : _buildSearchBox(),
           _customerFound != null
               ? Text(_customerFound!,
