@@ -1,21 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 
-import '../../DTOs/medicine_dto.dart';
+import '../../DTOs/medicine_dto1.dart';
 import '../constants.dart' show uriMedicineFindBarCode;
 import 'fetch_data_object.dart';
 
 Future<void> fetchMedicineBarCode({
   required String barCode,
-  required MedicineDTO medicine,
+  required MedicineDTO1 medicine,
 }) async {
 
-  await fetchDataObject<MedicineDTO>(
+  await fetchDataObject<MedicineDTO1>(
     uri: '$uriMedicineFindBarCode/$barCode',
-    classObject: MedicineDTO.empty(),
+    classObject: MedicineDTO1.empty(),
   ).then((data) {
     if (data.isNotEmpty) {
-      final MedicineDTO fetchedMedicine = data.first as MedicineDTO;
+      final MedicineDTO1 fetchedMedicine = data.first as MedicineDTO1;
       medicine.medicineId = fetchedMedicine.medicineId;
       medicine.barCode = fetchedMedicine.barCode;
       medicine.name = fetchedMedicine.name;

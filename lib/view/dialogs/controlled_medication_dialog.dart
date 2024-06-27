@@ -1,7 +1,7 @@
 // ignore_for_file: must_be_immutable, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
+import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 
 import '../../model/enums/data_type_enum.dart';
 import '../../model/globals/message.dart';
@@ -10,7 +10,7 @@ import '../../model/globals/tools/create_text_form_field.dart';
 class ControlledMedicationDialog extends StatefulWidget {
   //Se actualiza con los datos ingresados de Frecuencia y Tolernacia.
   //Si cancela, controlledMedication se reasigna a null.
-  ControlledMedicationDTO? controlledMedication;
+  ControlledMedicationDTO1? controlledMedication;
   //final CustomerDTO customer;
 
   ControlledMedicationDialog({

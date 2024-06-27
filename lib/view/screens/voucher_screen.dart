@@ -1,22 +1,31 @@
 import 'dart:core';
+import 'dart:html';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:novafarma_front/model/DTOs/customer_dto.dart';
+import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
+import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
+import '../../model/DTOs/controlled_medication_dto.dart';
+import '../../model/DTOs/customer_dto.dart';
 import '../../model/enums/data_type_enum.dart';
+import '../../model/enums/message_type_enum.dart';
+import '../../model/enums/request_type_enum.dart';
 import '../../model/globals/publics.dart';
+import '../../model/globals/requests/fetch_data_object.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-    defaultTextFromDropdownMenu;
+    defaultTextFromDropdownMenu, uriControlledMedicationAdd, uriVoucherAdd;
 
+import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/voucher_item_dialog.dart';
 
 class VoucherScreen extends StatefulWidget {
@@ -38,7 +47,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
-  CustomerDTO? _customer = CustomerDTO.empty();
+  CustomerDTO1? _customer = CustomerDTO1.empty();
   SupplierDTO? _supplier = SupplierDTO.empty();
   double _totalPriceVoucher = 0;
   late bool _isCustomer, _isSupplier;
@@ -383,7 +392,21 @@ class _VoucherScreenState extends State<VoucherScreen> {
             TextButton(
               child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
               onPressed: () {
-
+                bool controlledMedicationOk = false;
+                bool voucherOk = false;
+                try {
+                  _addControlledMedication();
+                  controlledMedicationOk = true;
+                  _addVoucher();
+                  voucherOk = true;
+                } catch(e) {
+                  if (kDebugMode) print(e);
+                  floatingMessage(
+                      context: context,
+                      text: _messageSaveError(controlledMedicationOk, voucherOk),
+                      messageTypeEnum: MessageTypeEnum.error
+                  );
+                }
               },
             ),
 
@@ -400,6 +423,80 @@ class _VoucherScreenState extends State<VoucherScreen> {
         )
       ],
     );
+  }
+
+  String _messageSaveError(bool controlledMedicationOk, bool voucherOk) {
+    if (! controlledMedicationOk) {
+      return 'Error guardando medicamento controlado.\nEl voucher no se guardó.';
+    } else if (! voucherOk) {
+      return 'Error guardando voucher';
+    }
+    return 'Error desconocido';
+  }
+
+  void _addControlledMedication() {
+    ControlledMedicationDTO controlledMedication = ControlledMedicationDTO.empty();
+
+    for (var voucherItem in _voucherItemList) {
+
+      if (voucherItem.controlledMedication == null) continue;
+
+      //Creo el json
+      controlledMedication.customer = CustomerDTO(
+          customerId: voucherItem.controlledMedication!.customerId);
+      controlledMedication.medicine = MedicineDTO(
+          medicineId: voucherItem.controlledMedication!.medicineId);
+      controlledMedication.frequencyDays =
+          voucherItem.controlledMedication!.frequencyDays;
+      controlledMedication.toleranceDays =
+          voucherItem.controlledMedication!.toleranceDays;
+
+      try {
+        fetchDataObject(
+            uri: uriControlledMedicationAdd,
+            classObject: controlledMedication,
+            requestType: RequestTypeEnum.post,
+            body: controlledMedication
+
+        ).then((newControlledMedicationId) {
+          if (newControlledMedicationId.isEmpty) {
+            print("Error agregando medicamento controlado");
+          } else {
+            print(
+                'Medicamento controlado agregado con éxito (id: $newControlledMedicationId)');
+          }
+        }).onError((error, stackTrace) {
+          if (error.toString().contains('302')) {
+            print('El cliente ya posee un registro del medicamento controlado');
+          }
+        });
+
+      } catch (e) {
+        throw Exception(e);
+      }
+    }
+
+  }
+
+
+  void _addVoucher() {
+
+    /*try {
+      fetchDataObject(
+          uri: uriVoucherAdd,
+          classObject: _newVoucher,
+          requestType: RequestTypeEnum.post,
+          body: _newVoucher
+      ).then((newUserId) {
+        floatingMessage(
+            context: context,
+            text: "Comprobante agregado con éxito",
+            messageTypeEnum: MessageTypeEnum.info
+        );
+      });
+    } catch (e) {
+      throw Exception(e);
+    }*/
   }
 
   Widget _buildVoucherItem(VoucherItemDTO item, int index) {
@@ -619,7 +716,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
     _supplier?.notes = s.notes;
   }
 
-  void _updateCustomer(CustomerDTO c) {
+  void _updateCustomer(CustomerDTO1 c) {
     _customer?.customerId = c.customerId;
     _customer?.name = c.name;
     _customer?.lastname = c.lastname;

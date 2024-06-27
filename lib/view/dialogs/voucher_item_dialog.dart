@@ -3,9 +3,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:novafarma_front/model/DTOs/controlled_medication_dto.dart';
-import 'package:novafarma_front/model/DTOs/customer_dto.dart';
-import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
+import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
+import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -24,7 +24,7 @@ class VoucherItemDialog extends StatefulWidget {
   final int customerOrSupplierId;
   final DateTime voucherDate;
   //Se especifica customer o supplier, nunca ambos.
-  final CustomerDTO? customer;
+  final CustomerDTO1? customer;
   final SupplierDTO? supplier;
   final MovementTypeEnum? movementType;
   final List<String>? barCodeList; // ID's de medicamentos agregados al voucher
@@ -60,12 +60,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   final FocusNode _quantityFocusNode = FocusNode();
 
   VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
-  MedicineDTO _medicine = MedicineDTO.empty();
+  MedicineDTO1 _medicine = MedicineDTO1.empty();
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
   bool _quantityValidated = true;
 
-  ControlledMedicationDTO? _controlledMedication = ControlledMedicationDTO.empty();
+  ControlledMedicationDTO1? _controlledMedication = ControlledMedicationDTO1.empty();
 
   @override
   void initState() {
@@ -339,7 +339,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         _barCodeFocusNode.requestFocus();
         return;
       }
-      _medicine = MedicineDTO.empty();
+      _medicine = MedicineDTO1.empty();
       await fetchMedicineBarCode(
           barCode: _barCodeController.text,
           medicine: _medicine,
@@ -439,7 +439,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   void _updateNewControlledMedication() {
     //Si _controlledMedication es null, crea el objeto vacío
-    _controlledMedication ??= ControlledMedicationDTO.empty();
+    _controlledMedication ??= ControlledMedicationDTO1.empty();
     _controlledMedication?.customerId =  widget.customerOrSupplierId;
     _controlledMedication?.medicineId = _medicine.medicineId!;
     _controlledMedication?.medicineName = _medicine.name!;
@@ -593,7 +593,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   void _initialize({required bool initializeCodeBar}) {
     setState(() {
       _quantityController.value = TextEditingValue.empty;
-      _medicine = MedicineDTO.empty();
+      _medicine = MedicineDTO1.empty();
       _controlledMedication = null;
       _voucherItem = VoucherItemDTO.empty();
       if (initializeCodeBar) {

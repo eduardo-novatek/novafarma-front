@@ -1,41 +1,48 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
-import 'customer_dto.dart';
-import 'medicine_dto.dart';
-
-class ControlledMedicationDTO extends Deserializable<ControlledMedicationDTO> {
+class ControlledMedicationDTO1 extends Deserializable<ControlledMedicationDTO1> {
   int? controlledMedicationId;
-  CustomerDTO? customer;
-  MedicineDTO? medicine;
+  int? customerId;
+  int? medicineId;
+  String? medicineName;
+  String? customerName;
   int? frequencyDays;
   int? toleranceDays;
   DateTime? lastSaleDate;
+  //final bool? isFirst;
 
-  ControlledMedicationDTO.empty():
+  ControlledMedicationDTO1.empty():
     controlledMedicationId = 0,
-    customer = null,
-    medicine = null,
+    customerId = 0,
+    medicineId = 0,
+    medicineName = null,
+    customerName = null,
     frequencyDays = 0,
     toleranceDays = 0,
     lastSaleDate = null
+    //isFirst = null,
   ;
 
-    ControlledMedicationDTO({
+    ControlledMedicationDTO1({
       required this.controlledMedicationId,
-      required this.customer,
-      required this.medicine,
+      required this.customerId,
+      required this.medicineId,
+      required this.medicineName,
+      this.customerName,
       required this.frequencyDays,
       required this.toleranceDays,
       required this.lastSaleDate,
+      //this.isFirst,
     });
 
     @override
-    ControlledMedicationDTO fromJson(Map<String, dynamic> json) {
-    return ControlledMedicationDTO(
+    ControlledMedicationDTO1 fromJson(Map<String, dynamic> json) {
+    return ControlledMedicationDTO1(
       controlledMedicationId: json['controlledMedicationId'],
-      customer: json['customer']['customerId'],
-      medicine: json['medicine']['medicineId'],
+      customerId: json['customerId'],
+      medicineId: json['medicine']['medicineId'],
+      medicineName: json['medicine']['name'],
       frequencyDays: json['frequencyDays'],
       toleranceDays: json['toleranceDays'],
       lastSaleDate: strToDate(json['lastSaleDate']),
@@ -46,8 +53,10 @@ class ControlledMedicationDTO extends Deserializable<ControlledMedicationDTO> {
   Map<String, dynamic> toJson() {
     return {
       'controlledMedicationId': controlledMedicationId,
-      'customer': customer,
-      'medicine': medicine,
+      'customerId': customerId,
+      'medicineId': medicineId,
+      'medicineName': medicineName,
+      'customerName': customerName,
       'frequencyDays': frequencyDays,
       'toleranceDays': toleranceDays,
       'lastSaleDate': lastSaleDate,

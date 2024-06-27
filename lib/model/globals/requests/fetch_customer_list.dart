@@ -1,24 +1,24 @@
 import 'package:flutter/foundation.dart';
 
-import '../../DTOs/customer_dto.dart';
+import '../../DTOs/customer_dto1.dart';
 import '../constants.dart' show uriCustomerFindDocument, uriCustomerFindLastnameName;
 import 'fetch_data_object.dart';
 
 Future<void> fetchCustomerList({
-  required List<CustomerDTO> customerList,
+  required List<CustomerDTO1> customerList,
   required bool searchByDocument, //true=buscar por documento. false=buscar por apellido
   required String value
 }) async {
 
-  await fetchDataObject<CustomerDTO>(
+  await fetchDataObject<CustomerDTO1>(
     uri: searchByDocument
         ? '$uriCustomerFindDocument/$value'
         : '$uriCustomerFindLastnameName/$value',
-    classObject: CustomerDTO.empty(),
+    classObject: CustomerDTO1.empty(),
   ).then((data) {
       customerList.clear();
-      customerList.addAll(data.cast<CustomerDTO>().map((e) =>
-          CustomerDTO(
+      customerList.addAll(data.cast<CustomerDTO1>().map((e) =>
+          CustomerDTO1(
             customerId: e.customerId,
             name: e.name,
             lastname: e.lastname,

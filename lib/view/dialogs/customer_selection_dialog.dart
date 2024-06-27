@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../model/DTOs/customer_dto.dart';
+import '../../model/DTOs/customer_dto1.dart';
 
 class CustomerSelectionDialog extends StatelessWidget {
-  final List<CustomerDTO> customers;
+  final List<CustomerDTO1> customers;
   final Function(int) onSelect;
 
   const CustomerSelectionDialog({

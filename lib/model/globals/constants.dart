@@ -51,3 +51,4 @@ const String uriVoucherAdd = "/voucher/add";
 
 //Controlled Medication
 const String uriDateAuthorizationSale = "controlledMedication/dateAuthorizationSale";
+const String uriControlledMedicationAdd = "/controlledMedication/add";

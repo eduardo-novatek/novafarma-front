@@ -6,7 +6,7 @@ import 'package:novafarma_front/model/globals/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
-import '../../model/DTOs/customer_dto.dart';
+import '../../model/DTOs/customer_dto1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
 import '../../model/globals/tools/floating_message.dart';
@@ -15,7 +15,7 @@ import '../dialogs/customer_selection_dialog.dart';
 class CustomerBox extends StatefulWidget {
   //int selectedId;
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
-  final ValueChanged<CustomerDTO?> onSelectedChanged;
+  final ValueChanged<CustomerDTO1?> onSelectedChanged;
 
   const CustomerBox({
     super.key,
@@ -30,7 +30,7 @@ class CustomerBox extends StatefulWidget {
 
 class CustomerBoxState extends State<CustomerBox> {
 
-  final List<CustomerDTO> _customerList = [];
+  final List<CustomerDTO1> _customerList = [];
 
   final TextEditingController _documentController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
@@ -270,7 +270,7 @@ class CustomerBoxState extends State<CustomerBox> {
     //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
     //widget.selectedId = _customerList[selectedIndex].customerId!;
     widget.onSelectedChanged(
-        CustomerDTO(
+        CustomerDTO1(
           customerId: _customerList[selectedIndex].customerId!,
           name: _customerList[selectedIndex].name,
           lastname: _customerList[selectedIndex].lastname!,

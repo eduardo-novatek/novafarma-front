@@ -100,7 +100,10 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
       if (kDebugMode) print("$e");
       throw Exception(e);
     }
-    return Future.value([]);
+    //return Future.value([]);
+    //Debe implementarse este return. Para ello hay que modificar todas las
+    //llamadas a fetchDataObject de modo que manejen correctamente el error.
+    return Future.error(e);
   }
 
 }
