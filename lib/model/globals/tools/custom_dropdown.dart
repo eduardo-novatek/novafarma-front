@@ -45,6 +45,7 @@ class CustomDropdown<T extends Object> extends StatefulWidget {
   final ThemeData themeData;
   final List<T?> modelList;
   final T? model;
+  final bool modelSelected; //true: el item 'model' queda seleccionado. false: el primer item queda seleccionado
   final Function(T?) callback;
   final FocusNode? focusNode;
 
@@ -54,6 +55,7 @@ class CustomDropdown<T extends Object> extends StatefulWidget {
         required this.themeData,
         required this.modelList,
         required this.model,
+        required this.modelSelected,
         required this.callback,
   });
 
@@ -85,7 +87,7 @@ class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
             fontSize: widget.themeData.textTheme.bodyMedium?.fontSize,
           ),
           isDense: true,
-          value: object,
+          value: widget.modelSelected ? object : widget.modelList[0],
           items: widget.modelList.map((T? value) {
             return DropdownMenuItem<T>(
               value: value,

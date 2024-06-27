@@ -197,6 +197,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                       themeData: _themeData,
                       modelList: movementTypes,
                       model: movementTypes[0],
+                      modelSelected: true,
                       callback: (movementType) {
                         //Si cambió el tipo de comprobante
                         if (_selectedMovementType != movementType!) {
@@ -558,6 +559,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
               _buildSectionTitleBar(sectionTitle: "Datos proveedor"),
               SupplierBox(
                 //selectedId: _selectedCustomerOrSupplierId,
+                selectFist: _selectedCustomerOrSupplierId == 0,
                 onSelectedChanged: (supplier) => setState(() {
                   if (supplier == null || supplier.supplierId == 0) {
                     _selectedCustomerOrSupplierId = 0;

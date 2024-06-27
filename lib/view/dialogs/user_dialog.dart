@@ -131,6 +131,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                         themeData: themeData,
                         modelList: widget.roleList,
                         model: widget.roleList[0],
+                        modelSelected: true,
                         callback: (role) {
                           selectedRole = role!.name;
                         },

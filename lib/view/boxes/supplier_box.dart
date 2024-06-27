@@ -11,11 +11,13 @@ import '../../model/globals/tools/floating_message.dart';
 
 class SupplierBox extends StatefulWidget {
   //final int selectedId;
+  final bool selectFist;
   final ValueChanged<SupplierDTO?> onSelectedChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
   const SupplierBox({
     super.key,
+    required this.selectFist,
     this.onRefreshButtonChange,
     //required this.selectedId,
     required this.onSelectedChanged,
@@ -34,6 +36,11 @@ class SupplierBoxState extends State<SupplierBox> {
   void initState() {
     super.initState();
     _updateSupplierList();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -90,6 +97,7 @@ class SupplierBoxState extends State<SupplierBox> {
           themeData: ThemeData(),
           modelList: _supplierList,
           model: _supplierList.isNotEmpty ? _supplierList[0] : null,
+          modelSelected: ! widget.selectFist,
           callback: (supplier) {
             setState(() {
               if (supplier!.supplierId == 0) {
