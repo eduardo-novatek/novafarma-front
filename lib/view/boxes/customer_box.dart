@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/build_circular_progress.dart';
@@ -29,6 +30,8 @@ class CustomerBox extends StatefulWidget {
 }
 
 class CustomerBoxState extends State<CustomerBox> {
+
+  final _formKey = GlobalKey<FormState>();
 
   final List<CustomerDTO1> _customerList = [];
 
@@ -82,27 +85,30 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   Widget _buildSearchBox() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        CreateTextFormField(
-          controller: _documentController,
-          focusNode: _documentFocusNode,
-          label: 'Documento',
-          dataType: DataTypeEnum.identificationDocument,
-          acceptEmpty: true,
-          viewCharactersCount: false,
-        ),
-        CreateTextFormField(
-          controller: _lastnameController,
-          focusNode: _lastnameFocusNode,
-          label: 'Apellido',
-          dataType: DataTypeEnum.text,
-          maxValueForValidation: 25,
-          acceptEmpty: true,
-          viewCharactersCount: false,
-        ),
-      ],
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          CreateTextFormField(
+            controller: _documentController,
+            focusNode: _documentFocusNode,
+            label: 'Documento',
+            dataType: DataTypeEnum.identificationDocument,
+            acceptEmpty: true,
+            viewCharactersCount: false,
+          ),
+          CreateTextFormField(
+            controller: _lastnameController,
+            focusNode: _lastnameFocusNode,
+            label: 'Apellido',
+            dataType: DataTypeEnum.text,
+            maxValueForValidation: 25,
+            acceptEmpty: true,
+            viewCharactersCount: false,
+          ),
+        ],
+      ),
     );
   }
 
@@ -191,6 +197,7 @@ class CustomerBoxState extends State<CustomerBox> {
       // perdida de foco;
       if (!_documentFocusNode.hasFocus) {
         if (_documentController.text.trim().isNotEmpty) {
+          if (!_formKey.currentState!.validate()) return;
           if (int.tryParse(_documentController.text.trim()) != null) {
             await _updateCustomerList(
                 isDocument: true,
@@ -198,12 +205,17 @@ class CustomerBoxState extends State<CustomerBox> {
             ).then((value) {
               if (_customerList.isNotEmpty) {
                 _updateSelectedClient(0);
-              } else {
-                _notFound(viewMessage: true, isDocument: true);
+              //} else {
+              //  _notFound(viewMessage: true, isDocument: true);
               }
-            }).onError((error, stackTrace) =>
-                _showMessageConnectionError(context: context, isDocument: true)
-            );
+            }).onError((error, stackTrace) {
+              if (error.toString().contains(HttpStatus.notFound.toString())) {
+                _notFound(viewMessage: true, isDocument: true);
+              } else { //InternalServerError
+                _showMessageConnectionError(context: context, isDocument: true);
+              }
+            });
+
           } else {
             await OpenDialog(
               context: context,
