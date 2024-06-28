@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:html';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -381,17 +383,33 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           }
 
         } else {
-          _setBarCodeValidated(false);
+         /* _setBarCodeValidated(false);
           _initialize(initializeCodeBar: false);
           await message(context: context, message: 'Artículo no encontrado');
           _barCodeFocusNode.requestFocus();
+
+          */
         }
       }).onError((error, stackTrace) {
-        if (kDebugMode) print('Error!!: $error');
-        _setBarCodeValidated(false);
-        if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
+        _barCodeFindError(error);
       });
     });
+  }
+
+  Future<void> _barCodeFindError(Object? error) async {
+    if (kDebugMode) print(error.toString());
+
+    if (error.toString().contains(HttpStatus.notFound.toString())) {
+      _setBarCodeValidated(false);
+      _initialize(initializeCodeBar: false);
+      await message(context: context, message: 'Artículo no encontrado');
+      _barCodeFocusNode.requestFocus();
+
+    } else {
+      _setBarCodeValidated(false);
+      if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
+    }
+
   }
 
   bool _handleKeyEvent(KeyEvent event) {

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:html';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/build_circular_progress.dart';
@@ -176,8 +177,10 @@ class CustomerBoxState extends State<CustomerBox> {
 
   Future<Null> _showMessageConnectionError({
     required BuildContext context,
+    required Object? error,
     required bool isDocument
   }) async {
+    if (kDebugMode) print('_showMessageConnectionError: $error');
     await floatingMessage(
       context: context,
       text: "Error de conexión",
@@ -212,7 +215,8 @@ class CustomerBoxState extends State<CustomerBox> {
               if (error.toString().contains(HttpStatus.notFound.toString())) {
                 _notFound(viewMessage: true, isDocument: true);
               } else { //InternalServerError
-                _showMessageConnectionError(context: context, isDocument: true);
+                _showMessageConnectionError(
+                    context: context, error: error, isDocument: true);
               }
             });
 
@@ -246,7 +250,8 @@ class CustomerBoxState extends State<CustomerBox> {
                 _notFound(viewMessage: true, isDocument: false);
               }
             }).onError((error, stackTrace) =>
-              _showMessageConnectionError(context: context, isDocument: false)
+              _showMessageConnectionError(
+                  context: context, error: error, isDocument: false)
             );
 
 

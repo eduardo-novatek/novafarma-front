@@ -97,7 +97,6 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
     }
   } catch (e) {
     if (generalException) {
-      if (kDebugMode) print("$e");
       throw Exception(e);
     }
     //return Future.value([]);

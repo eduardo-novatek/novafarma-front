@@ -4,7 +4,6 @@ import 'dart:html';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
@@ -459,16 +458,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
             body: controlledMedication
 
         ).then((newControlledMedicationId) {
-          if (newControlledMedicationId.isEmpty) {
-            print("Error agregando medicamento controlado");
-          } else {
-            print(
-                'Medicamento controlado agregado con éxito (id: $newControlledMedicationId)');
+          if (kDebugMode) {
+            print('Medicamento controlado agregado con éxito (id: '
+                '$newControlledMedicationId)');
           }
         }).onError((error, stackTrace) {
-          if (error.toString().contains('302')) {
-            print('El cliente ya posee un registro del medicamento controlado');
-          }
+          _controlledMedicationServerError(error);
         });
 
       } catch (e) {
@@ -478,6 +473,28 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   }
 
+  void _controlledMedicationServerError(Object? error) {
+    String? msg;
+
+    if (error.toString().contains(HttpStatus.found.toString())) {
+      msg = 'El cliente ya posee un registro del medicamento controlado';
+    } else if (error.toString().contains(HttpStatus.notFound.toString())) {
+      msg = 'El cliente o medicamento no existe';
+    } else if (error.toString().contains(HttpStatus.conflict.toString())) {
+      msg = 'El medicamento no es controlado';
+    } else if (error.toString().contains(HttpStatus.partialContent.toString())) {
+      msg = 'Dato/s incorrecto: verifique los datos enviados al servidor';
+    } else { //InternalServerError
+      msg = 'InternalServerError: $error';
+    }
+
+    floatingMessage(
+        context: context,
+        text: msg,
+        messageTypeEnum: MessageTypeEnum.warning
+    );
+    if (kDebugMode) print(msg);
+  }
 
   void _addVoucher() {
 
