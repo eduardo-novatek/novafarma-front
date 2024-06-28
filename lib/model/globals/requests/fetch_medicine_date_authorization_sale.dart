@@ -22,7 +22,7 @@ Future<DateTime?> fetchMedicineDateAuthorizationSale({
 
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
-    throw Exception(error);
+    return Future.error(error!);
   });
   return date;
 }

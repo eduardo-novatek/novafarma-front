@@ -449,8 +449,33 @@ class _VoucherScreenState extends State<VoucherScreen> {
           voucherItem.controlledMedication!.frequencyDays;
       controlledMedication.toleranceDays =
           voucherItem.controlledMedication!.toleranceDays;
+      controlledMedication.lastSaleDate =
+          voucherItem.controlledMedication!.lastSaleDate;
 
-      try {
+      //Si es 1a venta, el registro ya está persistido en bbdd, solo resta actualizar la fecha
+      if (controlledMedication.lastSaleDate == null) {
+        try {
+          fetchDataObject(
+              uri: uriControlledMedicationAdd,
+              classObject: controlledMedication,
+              requestType: RequestTypeEnum.post,
+              body: controlledMedication
+
+          ).then((newControlledMedicationId) {
+            if (kDebugMode) {
+              print('Medicamento controlado agregado con éxito (id: '
+                  '$newControlledMedicationId)');
+            }
+          }).onError((error, stackTrace) {
+            _controlledMedicationServerError(error);
+          });
+        } catch (e) {
+          throw Exception(e);
+        }
+      }
+
+      //Habilitar en caso de dar de alta un nuevo ControlledMedication...
+      /*try {
         fetchDataObject(
             uri: uriControlledMedicationAdd,
             classObject: controlledMedication,
@@ -468,7 +493,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
       } catch (e) {
         throw Exception(e);
-      }
+      }*/
     }
 
   }
@@ -632,6 +657,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
           canPop: false,
           child: VoucherItemDialog(
             customerOrSupplierId: _selectedCustomerOrSupplierId,
+            customer: _isCustomer ? _customer : null,
+            supplier: _isSupplier ? _supplier : null,
             voucherDate: strToDate(_dateController.text)!,
             movementType: toMovementTypeEnum(_selectedMovementType),
             modifyVoucherItem: modifyVoucherItem,
