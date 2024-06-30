@@ -40,6 +40,7 @@ class OpenDialog {
         actions: [
 
           TextButton.icon(
+            autofocus: true ,
             onPressed: () {
               completer.complete(1);
               Navigator.of(context).pop();

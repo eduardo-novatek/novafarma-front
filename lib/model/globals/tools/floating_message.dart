@@ -3,11 +3,94 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 
+class FloatingMessage {
+  static OverlayEntry? _overlayEntry;
+  static bool _isShowing = false;
 
-Future<void> floatingMessage({
+  static void show({
+    required BuildContext context,
+    required String text,
+    required MessageTypeEnum messageTypeEnum,
+    int secondsDelay = 3,
+    bool allowFlow = false,
+  }) async {
+    if (_isShowing) return;
+
+    final overlay = Overlay.of(context);
+
+    void removeOverlay() {
+      if (_overlayEntry != null) {
+        _overlayEntry!.remove();
+        _overlayEntry = null;
+        _isShowing = false;
+      }
+    }
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        bottom: MediaQuery.of(context).size.height * 0.02,
+        left: MediaQuery.of(context).size.width * 0.3,
+        right: MediaQuery.of(context).size.width * 0.3,
+        child: GestureDetector(
+          onTap: () {
+            if (!allowFlow) removeOverlay();
+          },
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: getColorMessage(messageTypeEnum),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  getIconMessage(messageTypeEnum),
+                  const SizedBox(width: 8.0),
+                  Expanded(
+                    child: Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 17.0, color: Colors.black),
+                    ),
+                  ),
+                  !allowFlow
+                      ? IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black),
+                    onPressed: removeOverlay,
+                  )
+                      : const SizedBox.shrink(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(_overlayEntry!);
+    _isShowing = true;
+
+    await Future.delayed(Duration(seconds: secondsDelay));
+
+    if (_overlayEntry != null) {
+      removeOverlay();
+    }
+  }
+}
+
+
+
+
+//
+// Impementarion 2
+//
+/*Future<void> floatingMessage({
   required BuildContext context,
   required String text,
   required MessageTypeEnum messageTypeEnum,
+  int? secondsDelay = 3,
   bool? allowFlow = false, // Si debe "permitir el flujo" de la app mientras se muestra el mensaje (por defecto, espera)
 }) async {
 
@@ -63,11 +146,15 @@ Future<void> floatingMessage({
   );
 
   overlay.insert(overlayEntry);
-  Future.delayed(const Duration(seconds: 3), removeOverlay);
-
+  Future.delayed(Duration(seconds: secondsDelay!), removeOverlay);
   if (! allowFlow!) return completer.future; // Espera antes de continuar
 }
+*/
 
+
+//
+// Impementarion 1
+//
   /*ScaffoldMessenger.of(context).clearSnackBars();
 
   ScaffoldMessenger.of(context).showSnackBar(

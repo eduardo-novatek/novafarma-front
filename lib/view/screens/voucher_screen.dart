@@ -15,6 +15,9 @@ import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
 import '../../model/DTOs/controlled_medication_dto.dart';
 import '../../model/DTOs/customer_dto.dart';
+import '../../model/DTOs/supplier_dto_1.dart';
+import '../../model/DTOs/voucher_dto.dart';
+import '../../model/DTOs/voucher_item_dto_1.dart';
 import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
@@ -391,20 +394,26 @@ class _VoucherScreenState extends State<VoucherScreen> {
             TextButton(
               child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
               onPressed: () {
-                bool controlledMedicationOk = false;
+                //bool controlledMedicationOk = false;
                 bool voucherOk = false;
                 try {
-                  _addControlledMedication();
-                  controlledMedicationOk = true;
+                  //_addControlledMedication();
+                  //controlledMedicationOk = true;
                   _addVoucher();
                   voucherOk = true;
                 } catch(e) {
                   if (kDebugMode) print(e);
-                  floatingMessage(
+                  FloatingMessage.show(
+                      context: context,
+                      //text: _messageSaveError(controlledMedicationOk, voucherOk),
+                      text: _messageSaveError(voucherOk),
+                      messageTypeEnum: MessageTypeEnum.error
+                  );
+                  /*floatingMessage(
                       context: context,
                       text: _messageSaveError(controlledMedicationOk, voucherOk),
                       messageTypeEnum: MessageTypeEnum.error
-                  );
+                  );*/
                 }
               },
             ),
@@ -424,14 +433,20 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
-  String _messageSaveError(bool controlledMedicationOk, bool voucherOk) {
+  String _messageSaveError(bool voucherOk) {
+    if (! voucherOk) {
+      return 'Error guardando voucher';
+    }
+    return 'Error desconocido';
+  }
+  /*String _messageSaveError(bool controlledMedicationOk, bool voucherOk) {
     if (! controlledMedicationOk) {
       return 'Error guardando medicamento controlado.\nEl voucher no se guardó.';
     } else if (! voucherOk) {
       return 'Error guardando voucher';
     }
     return 'Error desconocido';
-  }
+  }*/
 
   void _addControlledMedication() {
     ControlledMedicationDTO controlledMedication = ControlledMedicationDTO.empty();
@@ -513,24 +528,31 @@ class _VoucherScreenState extends State<VoucherScreen> {
       msg = 'InternalServerError: $error';
     }
 
-    floatingMessage(
+    FloatingMessage.show(
         context: context,
         text: msg,
         messageTypeEnum: MessageTypeEnum.warning
     );
+    /*floatingMessage(
+        context: context,
+        text: msg,
+        messageTypeEnum: MessageTypeEnum.warning
+    );*/
     if (kDebugMode) print(msg);
   }
 
   void _addVoucher() {
+    List<VoucherDTO>? voucher;
+    _createVoucher(voucher);
 
-    /*try {
+    try {
       fetchDataObject(
           uri: uriVoucherAdd,
-          classObject: _newVoucher,
+          classObject: VoucherDTO(),
           requestType: RequestTypeEnum.post,
-          body: _newVoucher
+          body: voucher,
       ).then((newUserId) {
-        floatingMessage(
+        FloatingMessage.show(
             context: context,
             text: "Comprobante agregado con éxito",
             messageTypeEnum: MessageTypeEnum.info
@@ -538,7 +560,36 @@ class _VoucherScreenState extends State<VoucherScreen> {
       });
     } catch (e) {
       throw Exception(e);
-    }*/
+    }
+  }
+
+  void _createVoucher(List<VoucherDTO>? voucher) {
+    voucher!.clear();
+    DateTime? dt = dateToStr(_dateController.text as DateTime?) as DateTime?;
+
+    voucher.add(
+      VoucherDTO(
+        movementType: toMovementTypeEnum(_selectedMovementType),
+        user: userLogged['userId'],
+        customer: _customer != null
+          ? CustomerDTO(customerId: _customer!.customerId)
+          : null,
+        supplier: _supplier != null
+          ? SupplierDTO1(supplierId: _supplier!.supplierId)
+          : null,
+        dateTime: dt,
+        total: _totalPriceVoucher,
+        voucherItemList: _getVoucherItems(voucherItem)
+      )
+    );
+
+
+  }
+
+  List<VoucherItemDTO1> _getVoucherItems(VoucherItemDTO voucherItem) {
+    for(VoucherItemDTO voucherItem in _voucherItemList) {
+      voucherItem.
+    }
   }
 
   Widget _buildVoucherItem(VoucherItemDTO item, int index) {

@@ -29,6 +29,7 @@ Future<void> fetchMedicineBarCode({
     }
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
-    throw Exception(error);
+    //Future.error(error!);
+    throw error!;
   });
 }

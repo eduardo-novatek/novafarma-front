@@ -185,11 +185,16 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       setState(() {
         _loadingRoles = false;
       });
-      floatingMessage(
+      FloatingMessage.show(
           context: context,
           text: "Error de conexión",
           messageTypeEnum: MessageTypeEnum.error
       );
+      /*floatingMessage(
+          context: context,
+          text: "Error de conexión",
+          messageTypeEnum: MessageTypeEnum.error
+      );*/
     }
   }
 
@@ -220,11 +225,16 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
           _loadingUsers = false;
         })
       }).onError((error, stackTrace) {
-        floatingMessage(
+        FloatingMessage.show(
             context: context,
             text: "Error de conexión",
             messageTypeEnum: MessageTypeEnum.error
         );
+        /*floatingMessage(
+            context: context,
+            text: "Error de conexión",
+            messageTypeEnum: MessageTypeEnum.error
+        );*/
         setState(() {
           _loadingUsers = false;
         });
@@ -235,10 +245,16 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       setState(() {
         _loadingUsers = false;
       });
-      floatingMessage(
+      FloatingMessage.show(
           context: context,
           text: "Error: $e",
-          messageTypeEnum: MessageTypeEnum.error);
+          messageTypeEnum: MessageTypeEnum.error
+      );
+      /*floatingMessage(
+          context: context,
+          text: "Error: $e",
+          messageTypeEnum: MessageTypeEnum.error
+      );*/
     }
   }
 
@@ -262,22 +278,32 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                 requestType: RequestTypeEnum.post,
                 body: newUser
             ).then((newUserId) {
-              floatingMessage(
+              FloatingMessage.show(
                   context: context,
                   text: "Usuario agregado con éxito",
                   messageTypeEnum: MessageTypeEnum.info
               );
+              /*floatingMessage(
+                  context: context,
+                  text: "Usuario agregado con éxito",
+                  messageTypeEnum: MessageTypeEnum.info
+              );*/
               // Si está la opcion "Seleccione...", la elimina de la lista
               if (_roleList[0].isFirst! == true) _roleList.removeAt(0);
               // Actualiza la lista de usuarios
               _fetchUsers();
             });
           } catch (e) {
-            floatingMessage(
+            FloatingMessage.show(
                 context: context,
                 text: 'Error: $e',
                 messageTypeEnum: MessageTypeEnum.error
             );
+            /*floatingMessage(
+                context: context,
+                text: 'Error: $e',
+                messageTypeEnum: MessageTypeEnum.error
+            );*/
           }
         }
     } while (newUser != null);
@@ -293,11 +319,16 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       //@2
 
     } catch(e) {
-      floatingMessage(
+      FloatingMessage.show(
           context: context,
           text: 'Error: $e',
           messageTypeEnum: MessageTypeEnum.error
       );
+      /*floatingMessage(
+          context: context,
+          text: 'Error: $e',
+          messageTypeEnum: MessageTypeEnum.error
+      );*/
     }
 
   }

@@ -184,11 +184,16 @@ class _AddUserDialogState extends State<AddUserDialog> {
     try {
       if (await existUserName(userName: userName)) {
         if (context.mounted) {
-          floatingMessage(
+          FloatingMessage.show(
               context: context,
               text: 'Usuario ya registrado: $userName',
               messageTypeEnum: MessageTypeEnum.warning
           );
+          /*floatingMessage(
+              context: context,
+              text: 'Usuario ya registrado: $userName',
+              messageTypeEnum: MessageTypeEnum.warning
+          );*/
           _userNameFocusNode.requestFocus();
         }
         return false;
@@ -196,22 +201,32 @@ class _AddUserDialogState extends State<AddUserDialog> {
 
       if (selectedRole == defaultTextFromDropdownMenu) {
         if (context.mounted) {
-          floatingMessage(
+          FloatingMessage.show(
               context: context,
               text: 'Por favor, seleccione el rol',
               messageTypeEnum: MessageTypeEnum.warning
           );
+          /*floatingMessage(
+              context: context,
+              text: 'Por favor, seleccione el rol',
+              messageTypeEnum: MessageTypeEnum.warning
+          );*/
         }
         return false;
       }
 
 
     } catch (e) {
-      floatingMessage(
+      FloatingMessage.show(
+          context: context,
+          text: "Error de conexión",
+          messageTypeEnum: MessageTypeEnum.error
+      );
+      /*floatingMessage(
           context: context,
           text: "Error de conexión",
         messageTypeEnum: MessageTypeEnum.error
-      );
+      );*/
       return false;
     }
 

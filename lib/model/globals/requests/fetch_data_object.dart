@@ -6,6 +6,7 @@ import 'package:http/http.dart';
 import 'package:novafarma_front/model/globals/constants.dart'
     show socket, timeOutSecondsResponse;
 import 'package:novafarma_front/model/globals/deserializable.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/request_type_enum.dart';
 
@@ -73,7 +74,10 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
             return [decodedData].toList();
           } else {
             if (kDebugMode) print("Tipo de datos desconocido");
-            throw Exception('Tipo de datos desconocido');
+            throw ErrorObject(
+              statusCode: 0,
+              message: 'Tipo de datos desconocido'
+            );
           }
         } catch (e) {
           //No pudo decodificar el Json, asume que es un String
@@ -83,25 +87,27 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
       } catch (e) {
         generalException = false;
         if (kDebugMode) print("Error al decodificar la respuesta JSON $e");
-        throw Exception('Error al decodificar la respuesta JSON $e');
+        //throw Exception((0, 'Error al decodificar la respuesta JSON $e'));
+        throw ErrorObject(
+          statusCode: 0,
+          message: 'Error al decodificar la respuesta JSON $e'
+        );
       }
 
     } else {
-      //if (response.statusCode == HttpStatus.notFound) return [];
-      /*String msg = "\nRespuesta del servidor ["
-          "StatusCode: ${response.statusCode}. Body: ${response.body}]\n";
-      if (kDebugMode) print(msg);
-       */
       generalException = false;
-      throw Exception(response.statusCode);
+      throw ErrorObject(
+        statusCode: response.statusCode,
+        message: response.body.isNotEmpty
+            ? jsonDecode(response.body)['message']
+            : null
+      );
+
     }
   } catch (e) {
     if (generalException) {
-      throw Exception(e);
+      rethrow;
     }
-    //return Future.value([]);
-    //Debe implementarse este return. Para ello hay que modificar todas las
-    //llamadas a fetchDataObject de modo que manejen correctamente el error.
     return Future.error(e);
   }
 

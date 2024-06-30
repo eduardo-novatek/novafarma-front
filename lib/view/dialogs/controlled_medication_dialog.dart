@@ -11,12 +11,12 @@ class ControlledMedicationDialog extends StatefulWidget {
   //Se actualiza con los datos ingresados de Frecuencia y Tolernacia.
   //Si cancela, controlledMedication se reasigna a null.
   ControlledMedicationDTO1? controlledMedication;
-  //final CustomerDTO customer;
+  final bool isAdd; //alta=true, si es un update=false
 
   ControlledMedicationDialog({
     super.key,
     this.controlledMedication,
-    //required this.customer,
+    required this.isAdd,
   });
 
   @override
@@ -35,15 +35,11 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
   final FocusNode _toleranceDaysFocusNode = FocusNode();
   final FocusNode _lastSaleDateFocusNode = FocusNode();
 
-  late final bool isAdd;
-
   @override
   void initState() {
     super.initState();
-    isAdd = (widget.controlledMedication?.customerId == null
-        || widget.controlledMedication?.customerId! == 0);
 
-    if (isAdd) {
+    if (widget.isAdd) {
       _frequencyDaysController.value = TextEditingValue(text: '0');
       _toleranceDaysController.value = TextEditingValue(text: '0');
       // Es modificacion
@@ -85,13 +81,13 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(isAdd
-                    ? 'Agregar medicamento controlado'
-                    : 'Actualizar medicamento controlado',
+                Text(widget.isAdd
+                    ? 'Vincular medicamento controlado'
+                    : 'Actualizar vínculo de medicamento controlado',
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-                widget.controlledMedication!.lastSaleDate == null
+                /*widget.controlledMedication!.lastSaleDate == null
                   ? const Padding(
                     padding: EdgeInsets.only(bottom: 20.0),
                     child: Text(
@@ -105,6 +101,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                     ),
                   )
                   : const SizedBox.shrink(),
+                 */
                 //Text('Paciente: ${widget.customer.name} ${widget.customer.lastname}'),
                 Text('Paciente: ${widget.controlledMedication!.customerName}'),
                 Text('Medicamento: ${widget.controlledMedication!.medicineName}'),

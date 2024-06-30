@@ -11,11 +11,16 @@ import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
+import 'package:novafarma_front/model/globals/requests/add_controlled_medication.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_date_authorization_sale.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
 
+import '../../model/DTOs/controlled_medication_dto.dart';
+import '../../model/DTOs/customer_dto.dart';
+import '../../model/DTOs/medicine_dto.dart';
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/message.dart';
@@ -357,15 +362,17 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
             if (result.$1) {
               _updateVoucherItem();
             } else {
-              await message(
-                context: context,
-                title: 'No autorizado',
-                message:'${_medicine.name} '
-                    '${_medicine.presentation!.name} '
-                    '${_medicine.presentation!.quantity} '
-                    '${_medicine.presentation!.unitName}'
-                    '\n\nPróxima fecha de retiro: ${dateToStr(result.$2!)}',
-              );
+              if (result.$2 != null) {
+                await message(
+                  context: context,
+                  title: 'No autorizado',
+                  message: '${_medicine.name} '
+                      '${_medicine.presentation!.name} '
+                      '${_medicine.presentation!.quantity} '
+                      '${_medicine.presentation!.unitName}'
+                      '\n\nPróxima fecha de retiro: ${dateToStr(result.$2!)}',
+                );
+              }
               _barCodeFocusNode.requestFocus();
             }
 
@@ -383,6 +390,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           }
 
         } else {
+          print("no encontrado");
          /* _setBarCodeValidated(false);
           _initialize(initializeCodeBar: false);
           await message(context: context, message: 'Artículo no encontrado');
@@ -399,7 +407,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   Future<void> _barCodeFindError(Object? error) async {
     if (kDebugMode) print(error.toString());
 
-    if (error.toString().contains(HttpStatus.notFound.toString())) {
+    if (error is ErrorObject) {
+    if (error.statusCode == HttpStatus.notFound) {
       _setBarCodeValidated(false);
       _initialize(initializeCodeBar: false);
       await message(context: context, message: 'Artículo no encontrado');
@@ -409,6 +418,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       _setBarCodeValidated(false);
       if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
     }
+  }
 
   }
 
@@ -425,12 +435,40 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     DateTime? fetchDate = await fetchMedicineDateAuthorizationSale(
           customerId: widget.customerOrSupplierId,
           medicineId: _medicine.medicineId!
-    );
+    ).onError((error, stackTrace) async {
+      String msg = 'Error desconocido: $error';
+      if (error is ErrorObject) {
+        msg = _obtainMessageError(error) ?? msg;
+        if (error.statusCode == HttpStatus.notFound && error.message!.contains(
+            'NO POSEE UN REGISTRO DEL MEDICAMENTO CONTROLADO')) {
+          //Agrega el nuevo medicamento controlado
+          await _newControlledMedicationBox();
+        } else {
+          if (kDebugMode) print(msg);
+          await message(message: msg, context: context);
+        }
+        validate = false;
+      }
+      return null;
+    });
+
+    //Si se produjo un error en fetchMedicineDateAuthorizationSale, salgo sin validar
+    if (! validate) return Future.value((false, null));
+
     DateTime now = DateTime.now();
-    //Si es la primera venta, fetchDate=null
-    if (fetchDate == null) {
-      _updateNewControlledMedication();
-      await showDialog(
+
+    //validate = primera venta || fecha <= now
+    validate = true;
+    if (fetchDate != null) {
+      validate = (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now));
+    }
+
+    return Future.value((validate, fetchDate));
+  }
+
+  Future<void> _newControlledMedicationBox() async {
+    _updateNewControlledMedication();
+    await showDialog(
         context: context,
         barrierDismissible: false, //lo hace modal
         builder: (BuildContext context) {
@@ -438,21 +476,55 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
               canPop: false,
               child: ControlledMedicationDialog(
                 controlledMedication: _controlledMedication,
+                isAdd: true,
               )
           );
         }
-      ).then((value) {
-        //si canceló...
-        if (! value) {
-         _initialize(initializeCodeBar: true);
-        }
-      });
+    ).then((value) {
+      if (! value) {  //si canceló...
+        _initialize(initializeCodeBar: true);
+      } else {
+        ControlledMedicationDTO controlledMedication = ControlledMedicationDTO.empty();
+        //Arma el json
+        controlledMedication.customer = CustomerDTO(
+            customerId: _controlledMedication!.customerId);
+        controlledMedication.medicine = MedicineDTO(
+            medicineId: _controlledMedication!.medicineId);
+        controlledMedication.frequencyDays =
+            _controlledMedication!.frequencyDays;
+        controlledMedication.toleranceDays =
+            _controlledMedication!.toleranceDays;
+        controlledMedication.lastSaleDate =
+            _controlledMedication!.lastSaleDate;
 
-    } else {
-      //validate = fecha <= now
-      validate = (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now));
+        addControlledMedication(
+            controlledMedication: controlledMedication,
+            context: context
+        );
+      }
+    });
+  }
+
+  String? _obtainMessageError(ErrorObject error) {
+    String? msg;
+
+    if (error.statusCode == HttpStatus.partialContent) {
+      msg = 'El medicamento no es controlado';
+
+    } else if (error.statusCode == HttpStatus.notFound) {
+      if (error.message!.contains(
+          'NO POSEE UN REGISTRO DEL MEDICAMENTO CONTROLADO')) {
+        msg = 'El cliente no posee un registro del medicamento controlado';
+      } else if (error.message!.contains('EL CLIENTE CON ID')) {
+        msg = 'El cliente no existe';
+      } else if (error.message!.contains('EL MEDICAMENTO CON ID')) {
+        msg = 'El medicamento no existe';
+      }
+
+    } else if (error.statusCode == HttpStatus.internalServerError) {
+      msg = error.message;
     }
-    return Future.value((validate, fetchDate));
+    return msg;
   }
 
   void _updateNewControlledMedication() {
@@ -590,12 +662,18 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     required BuildContext context,
     required bool isBarCode,
   }) async {
-    await floatingMessage(
+    FloatingMessage.show(
       context: context,
       text: "Error de conexión",
       messageTypeEnum: MessageTypeEnum.error,
       allowFlow: true,
     );
+    /*await floatingMessage(
+      context: context,
+      text: "Error de conexión",
+      messageTypeEnum: MessageTypeEnum.error,
+      allowFlow: true,
+    );*/
     if (context.mounted) _pushFocus(context: context, isBarCode: isBarCode);
   }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart' show strToDate;
 
 import '../../DTOs/date_authorization_sale_dto.dart';
@@ -17,11 +16,12 @@ Future<DateTime?> fetchMedicineDateAuthorizationSale({
     classObject: DateAuthorizationSaleDTO.empty(),
 
   ).then((data) {
+    //Si data es vacio, implica que es la primera venta (el medicamento
+    // controlado esta registrado para el cliente)
     if (data.isEmpty) return Future.value(null);
     date = Future.value(strToDate(data.first as String));
 
   }).onError((error, stackTrace) {
-    if (kDebugMode) print(error);
     return Future.error(error!);
   });
   return date;

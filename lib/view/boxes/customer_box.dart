@@ -181,12 +181,18 @@ class CustomerBoxState extends State<CustomerBox> {
     required bool isDocument
   }) async {
     if (kDebugMode) print('_showMessageConnectionError: $error');
-    await floatingMessage(
+    FloatingMessage.show(
       context: context,
       text: "Error de conexión",
       messageTypeEnum: MessageTypeEnum.error,
       allowFlow: true,
     );
+    /*await floatingMessage(
+      context: context,
+      text: "Error de conexión",
+      messageTypeEnum: MessageTypeEnum.error,
+      allowFlow: true,
+    );*/
     _pushFocus(context: context, isDocument: isDocument);
   }
 

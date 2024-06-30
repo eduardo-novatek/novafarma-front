@@ -158,11 +158,16 @@ class SupplierBoxState extends State<SupplierBox> {
   }
 
   void _showMessageConnectionError(BuildContext context) {
-    floatingMessage(
+    FloatingMessage.show(
       context: context,
       text: "Error de conexión",
       messageTypeEnum: MessageTypeEnum.error,
     );
+    /*floatingMessage(
+      context: context,
+      text: "Error de conexión",
+      messageTypeEnum: MessageTypeEnum.error,
+    );*/
   }
 }
 
