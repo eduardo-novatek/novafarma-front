@@ -32,7 +32,7 @@ class VoucherItemDTO1 extends Deserializable<VoucherItemDTO1> {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'medicine': medicine,
+      'medicine': medicine?.toJson(),
       'quantity': quantity,
       'unitPrice': unitPrice,
     };

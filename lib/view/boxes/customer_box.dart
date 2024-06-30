@@ -15,14 +15,12 @@ import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/customer_selection_dialog.dart';
 
 class CustomerBox extends StatefulWidget {
-  //int selectedId;
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
   final ValueChanged<CustomerDTO1?> onSelectedChanged;
 
   const CustomerBox({
     super.key,
     this.nextFocusNode,
-    //required this.selectedId,
     required this.onSelectedChanged,
   });
 
@@ -162,19 +160,6 @@ class CustomerBoxState extends State<CustomerBox> {
     }
   }
 
-  /*CustomDropdown<CustomerDTO> _buildCustomDropdown() {
-    return CustomDropdown<CustomerDTO>(
-      themeData: ThemeData(),
-      modelList: _customerList,
-      model: _customerList.isNotEmpty ? _customerList[0] : null,
-      callback: (customer) {
-        setState(() {
-          widget.onSelectedIdChanged(customer!.customerId!);
-        });
-      },
-    );
-  }*/
-
   Future<Null> _showMessageConnectionError({
     required BuildContext context,
     required Object? error,
@@ -187,12 +172,6 @@ class CustomerBoxState extends State<CustomerBox> {
       messageTypeEnum: MessageTypeEnum.error,
       allowFlow: true,
     );
-    /*await floatingMessage(
-      context: context,
-      text: "Error de conexión",
-      messageTypeEnum: MessageTypeEnum.error,
-      allowFlow: true,
-    );*/
     _pushFocus(context: context, isDocument: isDocument);
   }
 
@@ -212,11 +191,7 @@ class CustomerBoxState extends State<CustomerBox> {
                 isDocument: true,
                 value: _documentController.text
             ).then((value) {
-              if (_customerList.isNotEmpty) {
-                _updateSelectedClient(0);
-              //} else {
-              //  _notFound(viewMessage: true, isDocument: true);
-              }
+              if (_customerList.isNotEmpty) _updateSelectedClient(0);
             }).onError((error, stackTrace) {
               if (error.toString().contains(HttpStatus.notFound.toString())) {
                 _notFound(viewMessage: true, isDocument: true);
@@ -244,23 +219,23 @@ class CustomerBoxState extends State<CustomerBox> {
       // perdida de foco
       if (!_lastnameFocusNode.hasFocus) {
         if (_lastnameController.text.trim().isNotEmpty) {
-          await _updateCustomerList(isDocument: false, value: _lastnameController.text)
-            .then((value) {
-              if (_customerList.isNotEmpty) {
-                if (_customerList.length == 1) {
-                  _updateSelectedClient(0);
-                } else {
-                  _clientSelection();
-                }
+          await _updateCustomerList(
+            isDocument: false,
+            value: _lastnameController.text
+          ).then((value) {
+            if (_customerList.isNotEmpty) {
+              if (_customerList.length == 1) {
+                _updateSelectedClient(0);
               } else {
-                _notFound(viewMessage: true, isDocument: false);
+                _clientSelection();
               }
-            }).onError((error, stackTrace) =>
-              _showMessageConnectionError(
-                  context: context, error: error, isDocument: false)
-            );
-
-
+            } else {
+              _notFound(viewMessage: true, isDocument: false);
+            }
+          }).onError((error, stackTrace) =>
+            _showMessageConnectionError(
+                context: context, error: error, isDocument: false)
+          );
         }
       }
     });
@@ -285,10 +260,9 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   void _updateSelectedClient(int selectedIndex) {
-     _customerFound =
-    '${_customerList[selectedIndex].name} '
-        '${_customerList[selectedIndex].lastname} '
-        '(${_customerList[selectedIndex].document})';
+     _customerFound = '${_customerList[selectedIndex].name} '
+                      '${_customerList[selectedIndex].lastname} '
+                      '(${_customerList[selectedIndex].document})';
     
     //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
     //widget.selectedId = _customerList[selectedIndex].customerId!;
@@ -325,9 +299,7 @@ class CustomerBoxState extends State<CustomerBox> {
 
   Future<void> _notFound({required bool viewMessage, required bool isDocument}) async {
     _customerFound = null;
-    //widget.selectedId = 0;
     widget.onSelectedChanged(null);
-    //_initializeTextFormFields();
 
     if (viewMessage) {
       await OpenDialog(

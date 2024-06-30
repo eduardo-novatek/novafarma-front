@@ -16,11 +16,13 @@ import 'package:novafarma_front/view/boxes/supplier_box.dart';
 import '../../model/DTOs/controlled_medication_dto.dart';
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/supplier_dto_1.dart';
+import '../../model/DTOs/user_dto_1.dart';
 import '../../model/DTOs/voucher_dto.dart';
 import '../../model/DTOs/voucher_item_dto_1.dart';
 import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
+import '../../model/globals/message.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/requests/fetch_data_object.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
@@ -41,16 +43,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   final ThemeData _themeData = ThemeData();
 
-  final TextEditingController _documentController = TextEditingController();
+  //final TextEditingController _documentController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
   final FocusNode _dateFocusNode = FocusNode();
-  final FocusNode _documentFocusNode = FocusNode();
+  //final FocusNode _documentFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0;
-  CustomerDTO1? _customer = CustomerDTO1.empty();
-  SupplierDTO? _supplier = SupplierDTO.empty();
+  CustomerDTO1? _customer;// = CustomerDTO1.empty();
+  SupplierDTO? _supplier;// = SupplierDTO.empty();
   double _totalPriceVoucher = 0;
   late bool _isCustomer, _isSupplier;
 
@@ -67,9 +69,9 @@ class _VoucherScreenState extends State<VoucherScreen> {
   @override
   void dispose() {
     super.dispose();
-    _documentController.dispose();
+    //_documentController.dispose();
     _dateController.dispose();
-    _documentFocusNode.dispose();
+    //_documentFocusNode.dispose();
     _dateFocusNode.dispose();
   }
 
@@ -218,6 +220,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
                             _isSupplier = (
                                 _selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
                                 _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier));
+                            if (_isSupplier) {
+                              _customer = null;
+                            } else {
+                              _supplier = null;
+                            }
                             _selectedCustomerOrSupplierId = 0;
                             _voucherItemList.clear();
                             _barCodeList.clear();
@@ -394,26 +401,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
             TextButton(
               child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
               onPressed: () {
-                //bool controlledMedicationOk = false;
-                bool voucherOk = false;
                 try {
-                  //_addControlledMedication();
-                  //controlledMedicationOk = true;
-                  _addVoucher();
-                  voucherOk = true;
+                  _saveVoucher();
+                  _initializeVoucher();
                 } catch(e) {
                   if (kDebugMode) print(e);
                   FloatingMessage.show(
                       context: context,
-                      //text: _messageSaveError(controlledMedicationOk, voucherOk),
-                      text: _messageSaveError(voucherOk),
+                      text: 'Error guardando comprobante',
                       messageTypeEnum: MessageTypeEnum.error
                   );
-                  /*floatingMessage(
-                      context: context,
-                      text: _messageSaveError(controlledMedicationOk, voucherOk),
-                      messageTypeEnum: MessageTypeEnum.error
-                  );*/
                 }
               },
             ),
@@ -432,21 +429,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
       ],
     );
   }
-
-  String _messageSaveError(bool voucherOk) {
-    if (! voucherOk) {
-      return 'Error guardando voucher';
-    }
-    return 'Error desconocido';
-  }
-  /*String _messageSaveError(bool controlledMedicationOk, bool voucherOk) {
-    if (! controlledMedicationOk) {
-      return 'Error guardando medicamento controlado.\nEl voucher no se guardó.';
-    } else if (! voucherOk) {
-      return 'Error guardando voucher';
-    }
-    return 'Error desconocido';
-  }*/
 
   void _addControlledMedication() {
     ControlledMedicationDTO controlledMedication = ControlledMedicationDTO.empty();
@@ -541,21 +523,19 @@ class _VoucherScreenState extends State<VoucherScreen> {
     if (kDebugMode) print(msg);
   }
 
-  void _addVoucher() {
-    List<VoucherDTO>? voucher;
-    _createVoucher(voucher);
-
+  void _saveVoucher() {
     try {
-      fetchDataObject(
+      fetchDataObject<VoucherDTO>(
           uri: uriVoucherAdd,
-          classObject: VoucherDTO(),
+          classObject: VoucherDTO.empty(),
           requestType: RequestTypeEnum.post,
-          body: voucher,
-      ).then((newUserId) {
-        FloatingMessage.show(
-            context: context,
-            text: "Comprobante agregado con éxito",
-            messageTypeEnum: MessageTypeEnum.info
+          body: _createVoucher(),
+      ).then((newVoucherId) async {
+        if (kDebugMode) print('Comprobante agregado con éxito (id=${newVoucherId[0]})');
+        await message(
+          title: 'Operación correcta',
+          message: 'Comprobante agregado con éxito',
+          context: context
         );
       });
     } catch (e) {
@@ -563,33 +543,32 @@ class _VoucherScreenState extends State<VoucherScreen> {
     }
   }
 
-  void _createVoucher(List<VoucherDTO>? voucher) {
-    voucher!.clear();
-    DateTime? dt = dateToStr(_dateController.text as DateTime?) as DateTime?;
-
-    voucher.add(
-      VoucherDTO(
-        movementType: toMovementTypeEnum(_selectedMovementType),
-        user: userLogged['userId'],
-        customer: _customer != null
-          ? CustomerDTO(customerId: _customer!.customerId)
-          : null,
-        supplier: _supplier != null
-          ? SupplierDTO1(supplierId: _supplier!.supplierId)
-          : null,
-        dateTime: dt,
-        total: _totalPriceVoucher,
-        voucherItemList: _getVoucherItems(voucherItem)
-      )
+  VoucherDTO _createVoucher() {
+    return VoucherDTO(
+      movementType: toMovementTypeEnum(_selectedMovementType)?.index,
+      user: UserDTO1(userId: userLogged['userId']),
+      customer: _customer != null
+        ? CustomerDTO(customerId: _customer!.customerId)
+        : null,
+      supplier: _supplier != null
+        ? SupplierDTO1(supplierId: _supplier!.supplierId)
+        : null,
+      dateTime:  strToDate(_dateController.text),
+      total:_totalPriceVoucher,
+      voucherItemList: _getVoucherItems()
     );
-
-
   }
 
-  List<VoucherItemDTO1> _getVoucherItems(VoucherItemDTO voucherItem) {
+  List<VoucherItemDTO1> _getVoucherItems() {
+    List<VoucherItemDTO1> voucherItems = [];
     for(VoucherItemDTO voucherItem in _voucherItemList) {
-      voucherItem.
+      voucherItems.add(VoucherItemDTO1(
+        medicine: MedicineDTO(medicineId: voucherItem.medicineId),
+        quantity: voucherItem.quantity,
+        unitPrice: voucherItem.unitPrice
+      ));
     }
+    return voucherItems;
   }
 
   Widget _buildVoucherItem(VoucherItemDTO item, int index) {
@@ -750,7 +729,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
             children: [
               _buildSectionTitleBar(sectionTitle: "Datos proveedor"),
               SupplierBox(
-                //selectedId: _selectedCustomerOrSupplierId,
                 selectFist: _selectedCustomerOrSupplierId == 0,
                 onSelectedChanged: (supplier) => setState(() {
                   if (supplier == null || supplier.supplierId == 0) {
@@ -781,17 +759,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
             children: [
               _buildSectionTitleBar(sectionTitle: "Datos cliente"),
               CustomerBox(
-                  //selectedId: _selectedCustomerOrSupplierId,
-                  onSelectedChanged: (customer) => setState(() {
-                    //_selectedCustomerOrSupplierId = value;
-                    if (customer == null) {
-                      _selectedCustomerOrSupplierId = 0;
-                      _customer = null;
-                    } else {
-                      _selectedCustomerOrSupplierId = customer.customerId!;
-                      _updateCustomer(customer);
-                    }
-                  })
+                initialize: _selectedCustomerOrSupplierId == 0,
+                onSelectedChanged: (customer) => setState(() {
+                  if (customer == null) {
+                    _selectedCustomerOrSupplierId = 0;
+                    _customer = null;
+                  } else {
+                    _selectedCustomerOrSupplierId = customer.customerId!;
+                    _updateCustomer(customer);
+                  }
+                })
               ),
             ],
           ),
@@ -802,6 +779,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   void _updateSupplier(SupplierDTO s) {
+    _supplier = SupplierDTO.empty();
     _supplier?.supplierId = s.supplierId;
     _supplier?.name = s.name;
     _supplier?.address = s.address;
@@ -812,6 +790,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   void _updateCustomer(CustomerDTO1 c) {
+    _customer = CustomerDTO1.empty();
     _customer?.customerId = c.customerId;
     _customer?.name = c.name;
     _customer?.lastname = c.lastname;
@@ -862,6 +841,14 @@ class _VoucherScreenState extends State<VoucherScreen> {
       }
     });
 
+  }
+
+  void _initializeVoucher() {
+    _selectedCustomerOrSupplierId = 0;
+    _buildSupplierOrCustomerBox();
+    _voucherItemList.clear();
+    _barCodeList.clear();
+    _totalPriceVoucher = 0;
   }
 }
 

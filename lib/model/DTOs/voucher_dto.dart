@@ -2,7 +2,6 @@
 import 'package:novafarma_front/model/DTOs/supplier_dto_1.dart';
 import 'package:novafarma_front/model/DTOs/user_dto_1.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto_1.dart';
-import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
 import '../globals/tools/date_time.dart';
@@ -10,7 +9,7 @@ import 'customer_dto.dart';
 
 class VoucherDTO extends Deserializable<VoucherDTO> {
   int? voucherId;
-  MovementTypeEnum? movementType;
+  int? movementType;
   String? voucherNumber; //En caso de numeracion manual
   UserDTO1? user;
   CustomerDTO? customer;
@@ -64,12 +63,12 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
       'voucherId': voucherId,
       'movementType': movementType,
       'voucherNumber': voucherNumber,
-      'user': user,
-      'customer': customer,
-      'supplier': supplier,
-      'dateTime': dateTime,
+      'user': user?.toJson(),
+      'customer': customer?.toJson(),
+      'supplier': supplier?.toJson(),
+      'dateTime': dateTime?.toIso8601String(),
       'total': total,
-      'voucherItemList': voucherItemList,
+      'voucherItemList': voucherItemList?.map((item) => item.toJson()).toList(),
     };
   }
 }
