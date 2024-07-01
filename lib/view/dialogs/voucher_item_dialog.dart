@@ -325,6 +325,10 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   void _barCodeListener() {
     if (_barCodeFocusNode.hasFocus) {
       HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+      _barCodeController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _barCodeController.text.length
+      );
     } else {
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     }
@@ -590,6 +594,10 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   void _quantityListener() {
     if (_quantityFocusNode.hasFocus) {
       HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+      _quantityController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _quantityController.text.length
+      );
     } else {
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     }

@@ -21,7 +21,6 @@ import '../../model/DTOs/voucher_item_dto_1.dart';
 import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
-import '../../model/globals/message.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/requests/fetch_data_object.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
@@ -42,11 +41,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   final ThemeData _themeData = ThemeData();
 
-  //final TextEditingController _documentController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   final FocusNode _dateFocusNode = FocusNode();
-  //final FocusNode _documentFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
   int _selectedCustomerOrSupplierId = 0; //id del Customer o Supplier seleccionado
@@ -70,6 +68,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   void dispose() {
     super.dispose();
     _dateController.dispose();
+    _notesController.dispose();
     _dateFocusNode.dispose();
   }
 
@@ -140,8 +139,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         children: [
           _buildMovementTypeBox(),
           _buildSupplierOrCustomerBox(),
-          // ignore: avoid_print
-          IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: const Icon(Icons.abc)),
+          //IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: const Icon(Icons.abc)),
         ],
       ),
     );
@@ -254,7 +252,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                 _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
                     ? _boxTotalVoucher()
                     : const SizedBox.shrink(),
-
+                //_notesBody(),
                 const Divider(),
                 _footerBody(),
               ],
@@ -297,6 +295,23 @@ class _VoucherScreenState extends State<VoucherScreen> {
       _totalPriceVoucher += voucherItemDTO.unitPrice! * voucherItemDTO.quantity!;
     }
   }
+
+  /*Widget _notesBody() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 100.0, top: 8.0, right: 100.0, bottom: 8.0),
+      child: CreateTextFormField(
+        controller: _notesController,
+        label: 'Notas',
+        dataType: DataTypeEnum.text,
+        acceptEmpty: true,
+        validate: true,
+        viewCharactersCount: true,
+        isUnderline: false,
+        maxLines: 2,
+        maxValueForValidation: 100,
+      ),
+    );
+  }*/
 
   Table _columnsBody() {
     return Table(
@@ -385,6 +400,20 @@ class _VoucherScreenState extends State<VoucherScreen> {
                       },
                     );
                   },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: IconButton(
+                    icon: const Icon(Icons.note_add),
+                    tooltip: _notesController.text.trim().isEmpty
+                      ? 'Agregar notas' : 'Modificar notas',
+                    style: const ButtonStyle(
+                      iconSize: MaterialStatePropertyAll(20.0),
+                      iconColor: MaterialStatePropertyAll(Colors.blue),
+                    ),
+                    onPressed: () {
+                    }
                 ),
               ),
             ],
@@ -756,14 +785,19 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
   void _dateListener() {
     _dateFocusNode.addListener(() {
-      // Perdida de foco
-      if (! _dateFocusNode.hasFocus) {
+      //Recibe foco
+      if (_dateFocusNode.hasFocus) {
+        _dateController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _dateController.text.length,
+        );
+        // Pierde foco
+      } else if (! _dateFocusNode.hasFocus) {
         if (strToDate(_dateController.text) == null) {
           _dateController.value = TextEditingValue(text: dateNow());
         }
       }
     });
-
   }
 
   void _initializeVoucher() {

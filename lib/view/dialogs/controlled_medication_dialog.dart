@@ -29,16 +29,14 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
 
   final TextEditingController _frequencyDaysController = TextEditingController();
   final TextEditingController _toleranceDaysController = TextEditingController();
-  final TextEditingController _lastSaleDateController = TextEditingController();
 
   final FocusNode _frequencyDaysFocusNode = FocusNode();
   final FocusNode _toleranceDaysFocusNode = FocusNode();
-  final FocusNode _lastSaleDateFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-
+    _addListeners();
     if (widget.isAdd) {
       _frequencyDaysController.value = TextEditingValue(text: '0');
       _toleranceDaysController.value = TextEditingValue(text: '0');
@@ -51,6 +49,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
           text: widget.controlledMedication!.toleranceDays.toString()
       );
     }
+
   }
 
   @override
@@ -58,11 +57,9 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
     super.dispose();
     _frequencyDaysController.dispose();
     _toleranceDaysController.dispose();
-    _lastSaleDateController.dispose();
 
     _frequencyDaysFocusNode.dispose();
     _toleranceDaysFocusNode.dispose();
-    _lastSaleDateFocusNode.dispose();
   }
 
 
@@ -186,6 +183,33 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
   void _updateControlledMedication() {
     widget.controlledMedication!.frequencyDays = int.parse(_frequencyDaysController.text);
     widget.controlledMedication!.toleranceDays = int.parse(_toleranceDaysController.text);
+  }
+
+  _addListeners() {
+    _frequenceDaysListener();
+    _toleranceDaysListener();
+  }
+
+  void _toleranceDaysListener() {
+    _toleranceDaysFocusNode.addListener(() {
+      if (_toleranceDaysFocusNode.hasFocus) {
+        _toleranceDaysController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _toleranceDaysController.text.length
+        );
+      }
+    });
+  }
+
+  void _frequenceDaysListener() {
+    _frequencyDaysFocusNode.addListener(() {
+      if (_frequencyDaysFocusNode.hasFocus) {
+        _frequencyDaysController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _frequencyDaysController.text.length
+        );
+      }
+    });
   }
 
 }

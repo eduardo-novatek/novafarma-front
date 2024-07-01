@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 
 ///Dada una fecha en formato String (dateStr), devuelve la fecha en formato
 ///DateTime. Si el argumento dateStr es "yyyy-MM-dd", devuelve un objeto
-///DateTime con igual formato. Idem para dateStr="dd/MM/yyyy". Si falla la
-///conversión devuelve null.
+///DateTime con igual formato. Idem para dateStr="dd/MM/yyyy".
+///Si falla la conversión o el año < 1900, retorna null.
 DateTime? strToDate(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return null;
   DateTime? date;
@@ -14,19 +14,14 @@ DateTime? strToDate(String? dateStr) {
   } catch (_) {
     // Si falla, intentar parsear en formato dd/MM/yyyy
     try {
-      date = DateFormat('dd/MM/yyyy').parse(dateStr);
+      date = DateFormat('dd/MM/yyyy').parseStrict(dateStr);
     } catch (e) {
       if (kDebugMode) print('Error parseando la fecha: $e');
       return null;
     }
   }
+  if (date.year < 1900) return null;
   return date;
-  /*if (dateString!.isEmpty) return null;
-  try {
-    return DateFormat('dd/MM/yyyy').parse(dateString);
-  } catch (e) {
-    return null;
-  }*/
 }
 
 ///Dada una fecha en formato DateTime: yyyy-MM-dd, la devuelve en formato String
