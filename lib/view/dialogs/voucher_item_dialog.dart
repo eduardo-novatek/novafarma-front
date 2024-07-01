@@ -480,7 +480,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
               )
           );
         }
-    ).then((value) {
+    ).then((value) async {
       if (! value) {  //si canceló...
         _initialize(initializeCodeBar: true);
       } else {
@@ -497,7 +497,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         controlledMedication.lastSaleDate =
             _controlledMedication!.lastSaleDate;
 
-        addControlledMedication(
+        await addControlledMedication(
             controlledMedication: controlledMedication,
             context: context
         );

@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
-import '../../model/DTOs/controlled_medication_dto.dart';
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/supplier_dto_1.dart';
 import '../../model/DTOs/user_dto_1.dart';
@@ -27,7 +25,7 @@ import '../../model/globals/publics.dart';
 import '../../model/globals/requests/fetch_data_object.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-    defaultTextFromDropdownMenu, uriControlledMedicationAdd, uriVoucherAdd;
+    defaultTextFromDropdownMenu, uriVoucherAdd;
 
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/voucher_item_dialog.dart';
@@ -50,11 +48,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
   //final FocusNode _documentFocusNode = FocusNode();
 
   String _selectedMovementType = defaultTextFromDropdownMenu;
-  int _selectedCustomerOrSupplierId = 0;
-  CustomerDTO1? _customer;// = CustomerDTO1.empty();
-  SupplierDTO? _supplier;// = SupplierDTO.empty();
-  double _totalPriceVoucher = 0;
+  int _selectedCustomerOrSupplierId = 0; //id del Customer o Supplier seleccionado
+  String? _customerSelected; //'Nombre Apellido (documento)' del Customer seleccionado
+  CustomerDTO1? _customer;
+  SupplierDTO? _supplier;
   late bool _isCustomer, _isSupplier;
+  double _totalPriceVoucher = 0;
 
   final List<VoucherItemDTO> _voucherItemList = [];
   final List<String> _barCodeList = []; //Para control de medicamentos ingresados al voucher
@@ -69,9 +68,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   @override
   void dispose() {
     super.dispose();
-    //_documentController.dispose();
     _dateController.dispose();
-    //_documentFocusNode.dispose();
     _dateFocusNode.dispose();
   }
 
@@ -400,17 +397,19 @@ class _VoucherScreenState extends State<VoucherScreen> {
           children: [
             TextButton(
               child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
-              onPressed: () {
+              onPressed: () async {
                 try {
-                  _saveVoucher();
+                  await _saveVoucher();
                   _initializeVoucher();
                 } catch(e) {
                   if (kDebugMode) print(e);
-                  FloatingMessage.show(
-                      context: context,
-                      text: 'Error guardando comprobante',
-                      messageTypeEnum: MessageTypeEnum.error
-                  );
+                  if (mounted) {
+                    FloatingMessage.show(
+                        context: context,
+                        text: 'Error guardando comprobante',
+                        messageTypeEnum: MessageTypeEnum.error
+                    );
+                  }
                 }
               },
             ),
@@ -430,102 +429,9 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
-  void _addControlledMedication() {
-    ControlledMedicationDTO controlledMedication = ControlledMedicationDTO.empty();
-
-    for (var voucherItem in _voucherItemList) {
-
-      if (voucherItem.controlledMedication == null) continue;
-
-      //Creo el json
-      controlledMedication.customer = CustomerDTO(
-          customerId: voucherItem.controlledMedication!.customerId);
-      controlledMedication.medicine = MedicineDTO(
-          medicineId: voucherItem.controlledMedication!.medicineId);
-      controlledMedication.frequencyDays =
-          voucherItem.controlledMedication!.frequencyDays;
-      controlledMedication.toleranceDays =
-          voucherItem.controlledMedication!.toleranceDays;
-      controlledMedication.lastSaleDate =
-          voucherItem.controlledMedication!.lastSaleDate;
-
-      //Si es 1a venta, el registro ya está persistido en bbdd, solo resta actualizar la fecha
-      if (controlledMedication.lastSaleDate == null) {
-        try {
-          fetchDataObject(
-              uri: uriControlledMedicationAdd,
-              classObject: controlledMedication,
-              requestType: RequestTypeEnum.post,
-              body: controlledMedication
-
-          ).then((newControlledMedicationId) {
-            if (kDebugMode) {
-              print('Medicamento controlado agregado con éxito (id: '
-                  '$newControlledMedicationId)');
-            }
-          }).onError((error, stackTrace) {
-            _controlledMedicationServerError(error);
-          });
-        } catch (e) {
-          throw Exception(e);
-        }
-      }
-
-      //Habilitar en caso de dar de alta un nuevo ControlledMedication...
-      /*try {
-        fetchDataObject(
-            uri: uriControlledMedicationAdd,
-            classObject: controlledMedication,
-            requestType: RequestTypeEnum.post,
-            body: controlledMedication
-
-        ).then((newControlledMedicationId) {
-          if (kDebugMode) {
-            print('Medicamento controlado agregado con éxito (id: '
-                '$newControlledMedicationId)');
-          }
-        }).onError((error, stackTrace) {
-          _controlledMedicationServerError(error);
-        });
-
-      } catch (e) {
-        throw Exception(e);
-      }*/
-    }
-
-  }
-
-  void _controlledMedicationServerError(Object? error) {
-    String? msg;
-
-    if (error.toString().contains(HttpStatus.found.toString())) {
-      msg = 'El cliente ya posee un registro del medicamento controlado';
-    } else if (error.toString().contains(HttpStatus.notFound.toString())) {
-      msg = 'El cliente o medicamento no existe';
-    } else if (error.toString().contains(HttpStatus.conflict.toString())) {
-      msg = 'El medicamento no es controlado';
-    } else if (error.toString().contains(HttpStatus.partialContent.toString())) {
-      msg = 'Dato/s incorrecto: verifique los datos enviados al servidor';
-    } else { //InternalServerError
-      msg = 'InternalServerError: $error';
-    }
-
-    FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
-    );
-    /*floatingMessage(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
-    );*/
-    if (kDebugMode) print(msg);
-  }
-
-  void _saveVoucher() {
+  Future<void> _saveVoucher() async {
     try {
-      fetchDataObject<VoucherDTO>(
+      await fetchDataObject<VoucherDTO>(
           uri: uriVoucherAdd,
           classObject: VoucherDTO.empty(),
           requestType: RequestTypeEnum.post,
@@ -759,13 +665,16 @@ class _VoucherScreenState extends State<VoucherScreen> {
             children: [
               _buildSectionTitleBar(sectionTitle: "Datos cliente"),
               CustomerBox(
-                initialize: _selectedCustomerOrSupplierId == 0,
+                customerSelected: _customerSelected,
                 onSelectedChanged: (customer) => setState(() {
                   if (customer == null) {
                     _selectedCustomerOrSupplierId = 0;
+                    _customerSelected = null;
                     _customer = null;
                   } else {
                     _selectedCustomerOrSupplierId = customer.customerId!;
+                    _customerSelected =
+                      '${customer.name} ${customer.lastname} (${customer.document})';
                     _updateCustomer(customer);
                   }
                 })
@@ -844,11 +753,13 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   void _initializeVoucher() {
-    _selectedCustomerOrSupplierId = 0;
-    _buildSupplierOrCustomerBox();
-    _voucherItemList.clear();
-    _barCodeList.clear();
-    _totalPriceVoucher = 0;
+    setState(() {
+      _selectedCustomerOrSupplierId = 0;
+      _customerSelected = null;
+      _voucherItemList.clear();
+      _barCodeList.clear();
+      _totalPriceVoucher = 0;
+    });
   }
 }
 

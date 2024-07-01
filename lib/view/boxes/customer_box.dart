@@ -15,13 +15,15 @@ import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/customer_selection_dialog.dart';
 
 class CustomerBox extends StatefulWidget {
+  String? customerSelected; //Nombre+Apellido+Documento del cliente seleccionado
   final FocusNode? nextFocusNode; // Proximo textFormField para dar el foco
   final ValueChanged<CustomerDTO1?> onSelectedChanged;
 
-  const CustomerBox({
+  CustomerBox({
     super.key,
-    this.nextFocusNode,
+    required this.customerSelected,
     required this.onSelectedChanged,
+    this.nextFocusNode,
   });
 
   @override
@@ -43,7 +45,7 @@ class CustomerBoxState extends State<CustomerBox> {
   bool _isLoading = false;
 
   //guarda los datos del cliente encontrado ("JUAN PEREZ (12345678)")
-  String? _customerFound;
+  //String? _customerFound;
 
   @override
   void initState() {
@@ -73,8 +75,9 @@ class CustomerBoxState extends State<CustomerBox> {
                   child: buildCircularProgress(),
                 )
               : _buildSearchBox(),
-          _customerFound != null
-              ? Text(_customerFound!,
+          //_customerFound != null
+          widget.customerSelected != null
+              ? Text(widget.customerSelected!, //_customerFound!
                   style: const TextStyle(fontSize: 14.0)
                 )
               : const SizedBox.shrink(),
@@ -124,36 +127,10 @@ class CustomerBoxState extends State<CustomerBox> {
         customerList: _customerList,
         searchByDocument: isDocument,
         value: value,
-        // Se comentó porque no se incluye "Seleccione...". Se deja por si se debe incluir luego.
-      );/*.then((value) {
-          if (! isDocument) {
-            _customerList.insert(
-              0,
-              CustomerDTO(
-                isFirst: true,
-                name: defaultTextFromDropdownMenu,
-                customerId: 0,
-              ),
-            );
-          }
-          widget.onSelectedIdChanged(0);
-        });*/
+      );
     } catch (error) {
-      //_showMessageConnectionError(context);
-      //throw Exception(error);
       return Future.error(error);
-
     } finally {
-      /*if (_customerList.isEmpty && !isDocument) {
-        _customerList.add(
-          CustomerDTO(
-            isFirst: true,
-            name: defaultTextFromDropdownMenu,
-            customerId: 0,
-          ),
-        );
-        widget.onSelectedIdChanged(0);
-      }*/
       setState(() {
         _isLoading = false;
       });
@@ -260,12 +237,12 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   void _updateSelectedClient(int selectedIndex) {
-     _customerFound = '${_customerList[selectedIndex].name} '
+     /*_customerFound = '${_customerList[selectedIndex].name} '
                       '${_customerList[selectedIndex].lastname} '
                       '(${_customerList[selectedIndex].document})';
-    
-    //Actualiza el id seleccionado y la funcion de usuario actualiza el valor
-    //widget.selectedId = _customerList[selectedIndex].customerId!;
+      */
+
+    //Llama a la funcion de usuario y pasa el Customer seleccionado
     widget.onSelectedChanged(
         CustomerDTO1(
           customerId: _customerList[selectedIndex].customerId!,
@@ -298,7 +275,7 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   Future<void> _notFound({required bool viewMessage, required bool isDocument}) async {
-    _customerFound = null;
+    //_customerFound = null;
     widget.onSelectedChanged(null);
 
     if (viewMessage) {

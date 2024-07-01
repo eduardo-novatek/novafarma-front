@@ -12,11 +12,11 @@ import '../constants.dart' show uriControlledMedicationAdd;
 import '../tools/floating_message.dart';
 import 'fetch_data_object.dart';
 
-void addControlledMedication({
+Future<void> addControlledMedication({
   required ControlledMedicationDTO controlledMedication,
-  required BuildContext context}) {
+  required BuildContext context}) async {
 
-  fetchDataObject(
+  await fetchDataObject(
       uri: uriControlledMedicationAdd,
       classObject: controlledMedication,
       requestType: RequestTypeEnum.post,

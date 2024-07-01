@@ -1,6 +1,5 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
-import 'controlled_medication_dto1.dart';
 import 'medicine_dto.dart';
 
 class VoucherItemDTO1 extends Deserializable<VoucherItemDTO1> {
