@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_web_libraries_in_flutter
 
 import 'dart:html';
 
@@ -352,11 +352,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           medicine: _medicine,
       ).then((value) async {
         if (_medicine.medicineId != null) {
-          if (_isSupplier() ||
-              widget.movementType == MovementTypeEnum.adjustmentStock ||
-              _medicine.currentStock! > 0) {
+          if (_isSupplier() || _isAdjustmentStock() ||_medicine.currentStock! > 0) {
             (bool, DateTime?) result = (true, null);
-            if (! _isSupplier()) {
+            if (! _isSupplier() && ! _isAdjustmentStock()) {
               if (_medicine.controlled!) result = await _medicineControlledValidated();
             }
             if (result.$1) {
@@ -389,9 +387,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
             _barCodeFocusNode.requestFocus();
           }
 
-        } else {
-          print("no encontrado");
-         /* _setBarCodeValidated(false);
+        /*} else {
+          _setBarCodeValidated(false);
           _initialize(initializeCodeBar: false);
           await message(context: context, message: 'Artículo no encontrado');
           _barCodeFocusNode.requestFocus();
@@ -583,10 +580,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     return null;
   }
 
-  bool _isSupplier() {
-    return widget.movementType == MovementTypeEnum.purchase ||
-      widget.movementType == MovementTypeEnum.returnToSupplier;
-  }
+  bool _isSupplier()  =>
+    widget.movementType == MovementTypeEnum.purchase ||
+    widget.movementType == MovementTypeEnum.returnToSupplier;
+
+  bool _isAdjustmentStock() =>
+    widget.movementType == MovementTypeEnum.adjustmentStock;
 
   void _quantityListener() {
     if (_quantityFocusNode.hasFocus) {

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, must_be_immutable, avoid_web_libraries_in_flutter
 
 import 'dart:html';
 import 'package:flutter/foundation.dart';

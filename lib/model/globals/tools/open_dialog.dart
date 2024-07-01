@@ -10,17 +10,18 @@ class OpenDialog {
   final String textButton1;
   final String textButton2;
   final String textButton3;
+  //final String focus; //texto del boton que recibe el foco (por defecto es textButton1)
 
   OpenDialog({
     required this.context,
-    this.title = "¿Confirma?",
-    this.content = "",
+    this.title = '¿Confirma?',
+    this.content = '',
     this.smallFont = false,
-    this.textButton1 = "Ok",
-    this.textButton2 = "",
-    this.textButton3 = ""
+    this.textButton1 = 'Ok',
+    this.textButton2 = '',
+    this.textButton3 = '',
+    //this.focus = 'Ok',
   });
-
 
   Future<int> view() async {
     Completer<int> completer = Completer<int>();
@@ -38,9 +39,8 @@ class OpenDialog {
         ),
 
         actions: [
-
           TextButton.icon(
-            autofocus: true ,
+            autofocus: textButton2.isEmpty ,
             onPressed: () {
               completer.complete(1);
               Navigator.of(context).pop();
@@ -51,23 +51,24 @@ class OpenDialog {
 
           textButton2.isNotEmpty
               ? TextButton.icon(
-                    onPressed: () {
-                      completer.complete(2);
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.cancel, color: Colors.red),
-                    label: Text(textButton2, style: const TextStyle(fontSize: 22)),
+                  autofocus: textButton2.isNotEmpty,
+                  onPressed: () {
+                    completer.complete(2);
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.cancel, color: Colors.red),
+                  label: Text(textButton2, style: const TextStyle(fontSize: 22)),
                 )
               : const SizedBox.shrink(),
 
           textButton3.isNotEmpty
               ? TextButton.icon(
-                    onPressed: () {
-                      completer.complete(3);
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.info),
-                    label: Text(textButton3, style: const TextStyle(fontSize: 22)),
+                  onPressed: () {
+                    completer.complete(3);
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.info),
+                  label: Text(textButton3, style: const TextStyle(fontSize: 22)),
                 )
               : const SizedBox.shrink(),
         ],

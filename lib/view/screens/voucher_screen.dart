@@ -10,6 +10,7 @@ import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
+import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
 import '../../model/DTOs/customer_dto.dart';
@@ -213,16 +214,13 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         if (_selectedMovementType != movementType!) {
                           setState(() {
                             _selectedMovementType = movementType;
+                            _customer = null;
+                            _supplier = null;
+                            _selectedCustomerOrSupplierId = 0;
                             _isCustomer = (_selectedMovementType == nameMovementType(MovementTypeEnum.sale));
                             _isSupplier = (
                                 _selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
                                 _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier));
-                            if (_isSupplier) {
-                              _customer = null;
-                            } else {
-                              _supplier = null;
-                            }
-                            _selectedCustomerOrSupplierId = 0;
                             _voucherItemList.clear();
                             _barCodeList.clear();
                           });
@@ -396,11 +394,18 @@ class _VoucherScreenState extends State<VoucherScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
-              child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
-              onPressed: () async {
+              onPressed: _voucherItemList.isEmpty ? null : () async {
                 try {
-                  await _saveVoucher();
-                  _initializeVoucher();
+                  int option = await OpenDialog(
+                      context: context,
+                      title: 'Confirmar',
+                      content: '¿Confirma el comprobante?',
+                      textButton1: 'Si',
+                      textButton2: 'No'
+                  ).view();
+                  if (option == 1) {
+                    await _saveVoucher();
+                  }
                 } catch(e) {
                   if (kDebugMode) print(e);
                   if (mounted) {
@@ -412,15 +417,23 @@ class _VoucherScreenState extends State<VoucherScreen> {
                   }
                 }
               },
+              child: const Text('Aceptar', style: TextStyle(fontSize: 17.0),),
             ),
 
             Padding(
               padding: const EdgeInsets.only(left: 25.0, right: 8.0),
               child: TextButton(
                 child: const Text('Cancelar', style: TextStyle(fontSize: 17.0),),
-                onPressed: () {
-
-                },
+                onPressed: () async {
+                  int option = await OpenDialog(
+                    title: 'Cancelar',
+                    content: '¿Cancelar el comprobante?',
+                    textButton1: 'Si',
+                    textButton2: 'No',
+                    context: context
+                  ).view();
+                  if (option == 1) _initializeVoucher();
+                }
               ),
             ),
           ],
@@ -438,11 +451,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
           body: _createVoucher(),
       ).then((newVoucherId) async {
         if (kDebugMode) print('Comprobante agregado con éxito (id=${newVoucherId[0]})');
-        await message(
-          title: 'Operación correcta',
-          message: 'Comprobante agregado con éxito',
-          context: context
+        FloatingMessage.show(
+            context: context,
+            text: 'Comprobante guardado con éxito',
+            messageTypeEnum: MessageTypeEnum.info
         );
+        _initializeVoucher();
       });
     } catch (e) {
       throw Exception(e);
@@ -756,6 +770,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
     setState(() {
       _selectedCustomerOrSupplierId = 0;
       _customerSelected = null;
+      _customer = null;
+      _supplier = null;
       _voucherItemList.clear();
       _barCodeList.clear();
       _totalPriceVoucher = 0;

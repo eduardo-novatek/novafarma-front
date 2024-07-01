@@ -2,7 +2,7 @@ import '../enums/movement_type_enum.dart';
 import 'constants.dart';
 
 Map<String, dynamic> userLogged = {
-  'userId': 40,
+  'userId': 1,
   'name': 'JUAN',
   'surname': 'PEREZ',
   'role': {
