@@ -23,7 +23,7 @@ import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/medicine_dto.dart';
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
-import '../../model/globals/message.dart';
+import '../../model/globals/tools/message.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'controlled_medication_dialog.dart';
 
@@ -107,7 +107,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         builder: (context, constraints) {
           return Container(
             width: constraints.maxWidth * 0.4, // 40% del ancho disponible
-            height: constraints.maxHeight * 0.70, // 60% del alto disponible
+            height: constraints.maxHeight * 0.54, // 60% del alto disponible
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [
@@ -138,11 +138,18 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                           _buildTable(),
                           const SizedBox(height: 5),
 
-                          CreateTextFormField(
-                            controller: _quantityController,
-                            focusNode: _quantityFocusNode,
-                            label: 'Cantidad',
-                            dataType: DataTypeEnum.number,
+                          Form(
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.05,
+                              child: CreateTextFormField(
+                                controller: _quantityController,
+                                focusNode: _quantityFocusNode,
+                                label: 'Cantidad',
+                                dataType: DataTypeEnum.number,
+                                maxValueForValidation: 100000,
+                                textForValidation: 'Ingrese una cantidad entre 0 y 100000',
+                              ),
+                            ),
                           )
                         ],
                       ),
@@ -154,7 +161,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
+                      ElevatedButton(
                         child: const Text("Aceptar"),
                         onPressed: () {
                           Future.delayed(const Duration(milliseconds: 150), () {
@@ -169,7 +176,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      TextButton(
+                      ElevatedButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
                           setState(() {

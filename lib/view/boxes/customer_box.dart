@@ -4,7 +4,7 @@ import 'dart:html';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/globals/build_circular_progress.dart';
+import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 

@@ -105,7 +105,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
       color: Colors.blue,
       padding: const EdgeInsets.all(8.0),
       child: const Text(
-        'Comprobantes',
+        'Emisión de comprobantes',
         style: TextStyle(
           color: Colors.white,
           fontSize: 19.0,
@@ -413,6 +413,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                       iconColor: MaterialStatePropertyAll(Colors.blue),
                     ),
                     onPressed: () {
+                      _showNotes();
                     }
                 ),
               ),
@@ -422,7 +423,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            TextButton(
+            ElevatedButton(
               onPressed: _voucherItemList.isEmpty ? null : () async {
                 try {
                   int option = await OpenDialog(
@@ -451,7 +452,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
             Padding(
               padding: const EdgeInsets.only(left: 25.0, right: 8.0),
-              child: TextButton(
+              child: ElevatedButton(
                 child: const Text('Cancelar', style: TextStyle(fontSize: 17.0),),
                 onPressed: () async {
                   int option = await OpenDialog(
@@ -503,6 +504,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
         ? SupplierDTO1(supplierId: _supplier!.supplierId)
         : null,
       dateTime:  strToDate(_dateController.text),
+      notes: _notesController.text,
       total:_totalPriceVoucher,
       voucherItemList: _getVoucherItems()
     );
@@ -687,6 +689,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                     _selectedCustomerOrSupplierId = supplier.supplierId!;
                     _updateSupplier(supplier);
                   }
+                  _notesController.clear();
                 }),
               ),
             ],
@@ -720,6 +723,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                       '${customer.name} ${customer.lastname} (${customer.document})';
                     _updateCustomer(customer);
                   }
+                  _notesController.clear();
                 })
               ),
             ],
@@ -803,14 +807,78 @@ class _VoucherScreenState extends State<VoucherScreen> {
   void _initializeVoucher() {
     setState(() {
       _selectedCustomerOrSupplierId = 0;
+      _totalPriceVoucher = 0;
       _customerSelected = null;
       _customer = null;
       _supplier = null;
       _voucherItemList.clear();
       _barCodeList.clear();
-      _totalPriceVoucher = 0;
+      _notesController.clear();
     });
   }
+
+  void _showNotes() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Notas'),
+          content: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.2,
+            child: CreateTextFormField(
+              controller: _notesController,
+              label: '',
+              dataType: DataTypeEnum.text,
+              acceptEmpty: true ,
+              maxValueForValidation: 100,
+              maxLines: 4,
+              viewCharactersCount: true,
+              initialFocus: true,
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: const Text('Aceptar'),
+              onPressed: () {
+                setState(() {
+                  _notesController.value = TextEditingValue(
+                      text: _notesController.text.trim()
+                  );
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Eliminar'),
+              onPressed: () async {
+                setState(() {
+                  _notesController.value = TextEditingValue(
+                      text: _notesController.text.trim()
+                  );
+                });
+                if (_notesController.text.isNotEmpty) {
+                  int option = await OpenDialog(
+                      context: context,
+                      title: 'Confirmar',
+                      content: '¿Eliminar la nota?',
+                      textButton1: 'Si',
+                      textButton2: 'No'
+                  ).view();
+                  if (option == 1) {
+                    setState(() {
+                      _notesController.clear();
+                    });
+                  }
+                }
+                if (context.mounted) {Navigator.of(context).pop();}
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
 
 

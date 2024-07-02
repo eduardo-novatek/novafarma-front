@@ -15,6 +15,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
   CustomerDTO? customer;
   SupplierDTO1? supplier;
   DateTime? dateTime;
+  String? notes;
   double? total;
   List<VoucherItemDTO1>? voucherItemList;
 
@@ -26,6 +27,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
     customer = null,
     supplier = null,
     dateTime = null,
+    notes = null,
     total = null,
     voucherItemList = null
   ;
@@ -38,6 +40,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
     this.customer,
     this.supplier,
     this.dateTime,
+    this.notes,
     this.total,
     this.voucherItemList,
   });
@@ -52,6 +55,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
       customer: json['customer']['customerId'],
       supplier: json['supplier']['supplierId'],
       dateTime: strToDate(json['dateTime']),
+      notes: json['notes'],
       total: json['total'],
       voucherItemList: json['voucherItemList'],
     );
@@ -67,6 +71,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
       'customer': customer?.toJson(),
       'supplier': supplier?.toJson(),
       'dateTime': dateTime?.toIso8601String(),
+      'notes': notes,
       'total': total,
       'voucherItemList': voucherItemList?.map((item) => item.toJson()).toList(),
     };

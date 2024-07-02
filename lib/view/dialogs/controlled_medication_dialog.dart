@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 
 import '../../model/enums/data_type_enum.dart';
-import '../../model/globals/message.dart';
+import '../../model/globals/tools/message.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 
 class ControlledMedicationDialog extends StatefulWidget {
@@ -142,7 +142,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
+                      ElevatedButton(
                         child: const Text("Aceptar"),
                         onPressed: () async {
                             if (!_formKey.currentState!.validate()) return;
@@ -161,7 +161,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                         },
                       ),
                       const SizedBox(width: 8),
-                      TextButton(
+                      ElevatedButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
                           widget.controlledMedication = null;

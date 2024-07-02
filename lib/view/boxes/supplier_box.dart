@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/globals/build_circular_progress.dart';
+import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
 import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_supplier_list.dart';
