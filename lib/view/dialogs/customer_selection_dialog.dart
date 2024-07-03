@@ -47,7 +47,7 @@ class CustomerSelectionDialog extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: ElevatedButton(
                 onPressed: () {
-                  onSelect(-1); // Se retorna -1 en caso de cancelación
+                  onSelect(-1); // Se retorna -1 si pulsa Cancelar
                   Navigator.of(context).pop();
                 },
                 child: const Text('Cancelar'),

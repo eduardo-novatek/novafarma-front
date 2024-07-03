@@ -48,22 +48,28 @@ class SupplierBoxState extends State<SupplierBox> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildRefreshButton(),
-              const Text('Proveedor:',
-                   style: TextStyle(fontSize: 16.0)
+        _isLoading
+            ? Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: buildCircularProgress(),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildRefreshButton(),
+                    const Text('Proveedor:',
+                         style: TextStyle(fontSize: 16.0)
+                    ),
+                    //_isLoading
+                    //    ? buildCircularProgress()
+                    //    : _buildCustomDropdown(),
+                    _buildCustomDropdown(),
+                  ],
+                ),
               ),
-              _isLoading
-                  ? buildCircularProgress()
-                  : _buildCustomDropdown(),
-            ],
-          ),
-        ),
       ],
     );
   }

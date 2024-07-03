@@ -31,7 +31,9 @@ import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/voucher_item_dialog.dart';
 
 class VoucherScreen extends StatefulWidget {
-  const VoucherScreen({super.key});
+  final ValueChanged<bool>? onBlockedStateChange;
+
+  const VoucherScreen({super.key, this.onBlockedStateChange});
 
   @override
   State<VoucherScreen> createState() => _VoucherScreenState();
@@ -463,7 +465,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   Future<void> _saveVoucher() async {
     setState(() {
-      _isSaving = true;
+      _changeStateSaved(true);
     });
     try {
       await fetchDataObject<VoucherDTO>(
@@ -472,9 +474,8 @@ class _VoucherScreenState extends State<VoucherScreen> {
           requestType: RequestTypeEnum.post,
           body: _createVoucher(),
       ).then((newVoucherId) async {
-        await Future.delayed(Duration(seconds: 10));
         setState(() {
-          _isSaving = false;
+          _changeStateSaved(false);
         });
         if (kDebugMode) print('Comprobante agregado con éxito (id=${newVoucherId[0]})');
         FloatingMessage.show(
@@ -486,10 +487,15 @@ class _VoucherScreenState extends State<VoucherScreen> {
       });
     } catch (e) {
       setState(() {
-        _isSaving = false;
+        _changeStateSaved(false);
       });
       throw Exception(e);
     }
+  }
+
+  void _changeStateSaved(bool isSaving) {
+    _isSaving = isSaving;
+    widget.onBlockedStateChange!(isSaving);
   }
 
   VoucherDTO _createVoucher() {
@@ -502,7 +508,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
       supplier: _supplier != null
         ? SupplierDTO1(supplierId: _supplier!.supplierId)
         : null,
-      dateTime:  strToDate(_dateController.text),
+      dateTime:  strToDateTime(_dateController.text),
       notes: _notesController.text,
       total:_totalPriceVoucher,
       voucherItemList: _getVoucherItems()
@@ -713,16 +719,19 @@ class _VoucherScreenState extends State<VoucherScreen> {
                 customerSelected: _customerSelected,
                 onSelectedChanged: (customer) => setState(() {
                   if (customer == null) {
-                    _selectedCustomerOrSupplierId = 0;
+                    /*_selectedCustomerOrSupplierId = 0;
                     _customerSelected = null;
                     _customer = null;
+                     */
+                    //_initializeVoucher();
                   } else {
+                    _initializeVoucher();
                     _selectedCustomerOrSupplierId = customer.customerId!;
                     _customerSelected =
                       '${customer.name} ${customer.lastname} (${customer.document})';
                     _updateCustomer(customer);
+                    //_notesController.clear();
                   }
-                  _notesController.clear();
                 })
               ),
             ],

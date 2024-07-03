@@ -229,6 +229,7 @@ class CustomerBoxState extends State<CustomerBox> {
             if (selectedIndex > -1) {
               _updateSelectedClient(selectedIndex);
             } else {
+              _lastnameController.clear();
               _notFound(viewMessage: false, isDocument: false);
             }
           },
