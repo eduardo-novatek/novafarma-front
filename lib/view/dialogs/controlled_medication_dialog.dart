@@ -72,8 +72,8 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
-            width: constraints.maxWidth * 0.30, // 15% del ancho disponible
-            height: constraints.maxHeight * 0.50, // 20% del alto disponible
+            width: constraints.maxWidth * 0.30, // % del ancho disponible
+            height: constraints.maxHeight * 0.49,
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,22 +84,6 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
-                /*widget.controlledMedication!.lastSaleDate == null
-                  ? const Padding(
-                    padding: EdgeInsets.only(bottom: 20.0),
-                    child: Text(
-                      '* Primera venta *',
-                      style: TextStyle(
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  )
-                  : const SizedBox.shrink(),
-                 */
-                //Text('Paciente: ${widget.customer.name} ${widget.customer.lastname}'),
                 Text('Paciente: ${widget.controlledMedication!.customerName}'),
                 Text('Medicamento: ${widget.controlledMedication!.medicineName}'),
                 widget.controlledMedication!.lastSaleDate != null
@@ -138,7 +122,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
+                  padding: const EdgeInsets.only(top: 27.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

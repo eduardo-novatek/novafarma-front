@@ -52,6 +52,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
   CustomerDTO1? _customer;
   SupplierDTO? _supplier;
   late bool _isCustomer, _isSupplier;
+  bool _isSaving = false;
   double _totalPriceVoucher = 0;
 
   final List<VoucherItemDTO> _voucherItemList = [];
@@ -74,29 +75,45 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.6,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black,
-            width: 1.0,
+    return Stack(
+      children: [
+        AbsorbPointer(
+          absorbing: _isSaving,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.6,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1.0,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildTitleBar(),
+                  _buildHead(),
+                  const Divider(),
+                  _selectedCustomerOrSupplierId  > 0
+                      || toMovementTypeEnum(_selectedMovementType) == MovementTypeEnum.adjustmentStock
+                      ? _buildBody()
+                      : const SizedBox.shrink(),
+                ],
+              ),
+            ),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTitleBar(),
-            _buildHead(),
-            const Divider(),
-            _selectedCustomerOrSupplierId  > 0
-                || toMovementTypeEnum(_selectedMovementType) == MovementTypeEnum.adjustmentStock
-              ? _buildBody()
-              : const SizedBox.shrink(),
-          ],
-        ),
-      ),
+        if (_isSaving)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black54,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ),
+      ]
     );
   }
 
@@ -145,36 +162,6 @@ class _VoucherScreenState extends State<VoucherScreen> {
     );
   }
 
-  /*Widget _buildHead() {
-    return FocusTraversalGroup(
-      policy:  CustomOrderedTraversalPolicy(),
-        child: Shortcuts(shortcuts: <LogicalKeySet, Intent> {
-            LogicalKeySet(LogicalKeyboardKey.enter): const NextFocusIntent(),
-        },
-        child: Actions(
-          actions: <Type, Action<Intent>> {
-            NextFocusIntent: CallbackAction<NextFocusIntent> (
-              onInvoke: (NextFocusIntent intent) {
-                FocusScope.of(context).nextFocus();
-                return null;
-              },
-            ),
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildMovementTypeBox(),
-                _buildSupplierOrCustomerBox(),
-                IconButton(onPressed: () => print(_selectedCustomerOrSupplierId), icon: Icon(Icons.abc)),
-              ],
-          ),
-        ),
-      ),
-    ));
-  }*/
-
   Widget _buildMovementTypeBox() {
     return Container(
       width: MediaQuery.of(context).size.width * 0.17,
@@ -212,15 +199,17 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         if (_selectedMovementType != movementType!) {
                           setState(() {
                             _selectedMovementType = movementType;
-                            _customer = null;
-                            _supplier = null;
-                            _selectedCustomerOrSupplierId = 0;
                             _isCustomer = (_selectedMovementType == nameMovementType(MovementTypeEnum.sale));
                             _isSupplier = (
                                 _selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
-                                _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier));
-                            _voucherItemList.clear();
-                            _barCodeList.clear();
+                                    _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier));
+                            _initializeVoucher();
+                            //_customer = null;
+                            //_supplier = null;
+                            //_selectedCustomerOrSupplierId = 0;
+
+                            //_voucherItemList.clear();
+                            //_barCodeList.clear();
                           });
                         }
                       },
@@ -473,6 +462,9 @@ class _VoucherScreenState extends State<VoucherScreen> {
   }
 
   Future<void> _saveVoucher() async {
+    setState(() {
+      _isSaving = true;
+    });
     try {
       await fetchDataObject<VoucherDTO>(
           uri: uriVoucherAdd,
@@ -480,6 +472,10 @@ class _VoucherScreenState extends State<VoucherScreen> {
           requestType: RequestTypeEnum.post,
           body: _createVoucher(),
       ).then((newVoucherId) async {
+        await Future.delayed(Duration(seconds: 10));
+        setState(() {
+          _isSaving = false;
+        });
         if (kDebugMode) print('Comprobante agregado con éxito (id=${newVoucherId[0]})');
         FloatingMessage.show(
             context: context,
@@ -489,6 +485,9 @@ class _VoucherScreenState extends State<VoucherScreen> {
         _initializeVoucher();
       });
     } catch (e) {
+      setState(() {
+        _isSaving = false;
+      });
       throw Exception(e);
     }
   }
@@ -819,81 +818,68 @@ class _VoucherScreenState extends State<VoucherScreen> {
 
   void _showNotes() {
     showDialog(
+      barrierDismissible: false, //lo hace modal
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Notas'),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.2,
-            child: CreateTextFormField(
-              controller: _notesController,
-              label: '',
-              dataType: DataTypeEnum.text,
-              acceptEmpty: true ,
-              maxValueForValidation: 100,
-              maxLines: 4,
-              viewCharactersCount: true,
-              initialFocus: true,
+        return PopScope(
+          canPop: false, //evita salida con flecha atras del navegador
+          child: AlertDialog(
+            title: const Text('Notas'),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.2,
+              child: CreateTextFormField(
+                controller: _notesController,
+                label: '',
+                dataType: DataTypeEnum.text,
+                acceptEmpty: true ,
+                maxValueForValidation: 100,
+                maxLines: 4,
+                viewCharactersCount: true,
+                initialFocus: true,
+              ),
             ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: const Text('Aceptar'),
-              onPressed: () {
-                setState(() {
-                  _notesController.value = TextEditingValue(
-                      text: _notesController.text.trim()
-                  );
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Eliminar'),
-              onPressed: () async {
-                setState(() {
-                  _notesController.value = TextEditingValue(
-                      text: _notesController.text.trim()
-                  );
-                });
-                if (_notesController.text.isNotEmpty) {
-                  int option = await OpenDialog(
-                      context: context,
-                      title: 'Confirmar',
-                      content: '¿Eliminar la nota?',
-                      textButton1: 'Si',
-                      textButton2: 'No'
-                  ).view();
-                  if (option == 1) {
-                    setState(() {
-                      _notesController.clear();
-                    });
+            actions: <Widget>[
+              ElevatedButton(
+                child: const Text('Aceptar'),
+                onPressed: () {
+                  setState(() {
+                    _notesController.value = TextEditingValue(
+                        text: _notesController.text.trim()
+                    );
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              ElevatedButton(
+                child: const Text('Eliminar'),
+                onPressed: () async {
+                  setState(() {
+                    _notesController.value = TextEditingValue(
+                        text: _notesController.text.trim()
+                    );
+                  });
+                  if (_notesController.text.isNotEmpty) {
+                    int option = await OpenDialog(
+                        context: context,
+                        title: 'Confirmar',
+                        content: '¿Eliminar la nota?',
+                        textButton1: 'Si',
+                        textButton2: 'No'
+                    ).view();
+                    if (option == 1) {
+                      setState(() {
+                        _notesController.clear();
+                      });
+                    }
                   }
-                }
-                if (context.mounted) {Navigator.of(context).pop();}
-              },
-            ),
-          ],
+                  if (context.mounted) {Navigator.of(context).pop();}
+                },
+              ),
+            ],
+          ),
         );
       },
     );
   }
 
 }
-
-
-/*class NextFocusIntent extends Intent {
-  const NextFocusIntent();
-}
-
-class CustomOrderedTraversalPolicy extends OrderedTraversalPolicy {
-  @override
-  bool inDirection(FocusNode currentNode, TraversalDirection direction) {
-    if (direction == TraversalDirection.right) {
-      return true;
-    }
-    return super.inDirection(currentNode, direction);
-  }
-}*/
-
-

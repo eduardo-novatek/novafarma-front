@@ -107,7 +107,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         builder: (context, constraints) {
           return Container(
             width: constraints.maxWidth * 0.4, // 40% del ancho disponible
-            height: constraints.maxHeight * 0.54, // 60% del alto disponible
+            height: constraints.maxHeight * 0.61,
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
               children: [
@@ -138,17 +138,15 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                           _buildTable(),
                           const SizedBox(height: 5),
 
-                          Form(
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.05,
-                              child: CreateTextFormField(
-                                controller: _quantityController,
-                                focusNode: _quantityFocusNode,
-                                label: 'Cantidad',
-                                dataType: DataTypeEnum.number,
-                                maxValueForValidation: 100000,
-                                textForValidation: 'Ingrese una cantidad entre 0 y 100000',
-                              ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.15,
+                            child: CreateTextFormField(
+                              controller: _quantityController,
+                              focusNode: _quantityFocusNode,
+                              label: 'Cantidad',
+                              dataType: DataTypeEnum.number,
+                              maxValueForValidation: 9999,
+                              textForValidation: 'Ingrese una cantidad entre 0 y 9999',
                             ),
                           )
                         ],
@@ -619,15 +617,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
       double? quantity = double.tryParse(_quantityController.text);
       if (_validQuantity(quantity)) {
-        //if (widget.movementType == MovementTypeEnum.sale
-        //    && quantity! > _voucherItem.currentStock!) {
-        quantity = _negativeQuantity(quantity);
+        quantity = _oppositeQuantity(quantity);
         if (quantity! + _voucherItem.currentStock! < 0) {
           _setQuantityValidated(false);
           await message(message: 'No hay stock suficiente', context: context);
           _quantityFocusNode.requestFocus();
         } else {
-          quantity = _negativeQuantity(quantity);
+          quantity = _oppositeQuantity(quantity);
           setState(() {
             _voucherItem.quantity = quantity;
             _quantityValidated = true;
@@ -642,9 +638,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     });
   }
 
-  double? _negativeQuantity(double? quantity) {
+  double? _oppositeQuantity(double? quantity) {
      if (widget.movementType == MovementTypeEnum.sale ||
-        widget.movementType == MovementTypeEnum.returnToSupplier) {
+         widget.movementType == MovementTypeEnum.returnToSupplier) {
       quantity = quantity! * -1;
     }
     return quantity;

@@ -98,6 +98,7 @@ class CustomerBoxState extends State<CustomerBox> {
             label: 'Documento',
             dataType: DataTypeEnum.identificationDocument,
             acceptEmpty: true,
+            textForValidation: 'Ingrese un documento válido, sin puntos ni guiones',
             viewCharactersCount: false,
           ),
           CreateTextFormField(
@@ -182,7 +183,7 @@ class CustomerBoxState extends State<CustomerBox> {
             await OpenDialog(
               context: context,
               title: 'Atención',
-              content: 'Cédula incorrecta',
+              content: 'Documento incorrecto',
             ).view();
             _pushFocus(context: context, isDocument: true);
           }
@@ -282,7 +283,7 @@ class CustomerBoxState extends State<CustomerBox> {
       await OpenDialog(
         context: context,
         title: 'Atención',
-        content: isDocument ? 'Cédula no registrada' : 'Apellido no registrado',
+        content: isDocument ? 'Documento no registrado' : 'Apellido no registrado',
       ).view();
     }
     _pushFocus(context: context, isDocument: isDocument);
