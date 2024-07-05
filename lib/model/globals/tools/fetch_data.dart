@@ -11,7 +11,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import '../../enums/request_type_enum.dart';
 
 ///Devuelve una lista de objetos de la base de datos.
-Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
+Future<List<Object>> fetchData <T extends Deserializable<T>>({
   required String uri,  //tomada de las constantes
   required T classObject,
   RequestTypeEnum? requestType = RequestTypeEnum.get,
@@ -29,8 +29,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
         response = await http.post(
             url,
             body: json.encode(body),
-            headers:
-            {
+            headers:{
               "Content-Type": "application/json; charset=UTF-8",
             }
         ).timeout(const Duration(seconds: timeOutSecondsResponse));

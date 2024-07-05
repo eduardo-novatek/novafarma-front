@@ -3,7 +3,7 @@
 
 const String socket = 'localhost:8080';           //server jorge
 
-const int timeOutSecondsResponse = 10;
+const int timeOutSecondsResponse = 15;
 
 const String defaultTextFromDropdownMenu = "Seleccione...";
 const double menuMaxHeight = 300.0;
@@ -37,6 +37,7 @@ const String uriUserNameExist = "user/userNameExist";
 
 //Customer
 const String uriCustomerFindAll = "/customer/findAll";
+const String uriCustomerFindAllPage = "/customer/findAllPage";
 const String uriCustomerFindDocument = "/customer/findDocument";
 const String uriCustomerFindLastnameName = "/customer/findLastnameName";
 

@@ -33,7 +33,7 @@ class CustomerSelectionDialog extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final customer = customers[index];
                   return ListTile(
-                    title: Text('${customer.name} ${customer.lastname} (${customer.document})'),
+                    title: Text('${customer.lastname}, ${customer.name} (${customer.document})'),
                     onTap: () {
                       onSelect(index); //devuelve el índice seleccionado
                       Navigator.of(context).pop();

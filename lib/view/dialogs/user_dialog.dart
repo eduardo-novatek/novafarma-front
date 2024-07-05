@@ -189,11 +189,6 @@ class _AddUserDialogState extends State<AddUserDialog> {
               text: 'Usuario ya registrado: $userName',
               messageTypeEnum: MessageTypeEnum.warning
           );
-          /*floatingMessage(
-              context: context,
-              text: 'Usuario ya registrado: $userName',
-              messageTypeEnum: MessageTypeEnum.warning
-          );*/
           _userNameFocusNode.requestFocus();
         }
         return false;
@@ -206,32 +201,18 @@ class _AddUserDialogState extends State<AddUserDialog> {
               text: 'Por favor, seleccione el rol',
               messageTypeEnum: MessageTypeEnum.warning
           );
-          /*floatingMessage(
-              context: context,
-              text: 'Por favor, seleccione el rol',
-              messageTypeEnum: MessageTypeEnum.warning
-          );*/
         }
         return false;
       }
-
-
     } catch (e) {
       FloatingMessage.show(
           context: context,
           text: "Error de conexión",
           messageTypeEnum: MessageTypeEnum.error
       );
-      /*floatingMessage(
-          context: context,
-          text: "Error de conexión",
-        messageTypeEnum: MessageTypeEnum.error
-      );*/
       return false;
     }
-
     return true;  // Validacion correcta
-
   }
 
 

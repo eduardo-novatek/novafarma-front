@@ -56,7 +56,6 @@ class CustomerDTO1 extends Deserializable<CustomerDTO1> {
       lastname: json['lastname'],
       document: json['document'],
       telephone: json['telephone'],
-      //addDate: DateFormat("dd/MM/yyyy").parse(json['addDate']),
       addDate: strToDate(json['addDate']),
       paymentNumber: json['paymentNumber'],
       partner: json['partner'],

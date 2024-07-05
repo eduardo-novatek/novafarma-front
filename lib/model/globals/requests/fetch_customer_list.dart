@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../DTOs/customer_dto1.dart';
 import '../constants.dart' show uriCustomerFindDocument, uriCustomerFindLastnameName;
-import 'fetch_data_object.dart';
+import '../tools/fetch_data.dart';
 
 Future<void> fetchCustomerList({
   required List<CustomerDTO1> customerList,
@@ -10,7 +10,7 @@ Future<void> fetchCustomerList({
   required String value
 }) async {
 
-  await fetchDataObject<CustomerDTO1>(
+  await fetchData<CustomerDTO1>(
     uri: searchByDocument
         ? '$uriCustomerFindDocument/$value'
         : '$uriCustomerFindLastnameName/$value',

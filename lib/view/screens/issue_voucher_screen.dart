@@ -22,7 +22,7 @@ import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
 import '../../model/globals/publics.dart';
-import '../../model/globals/requests/fetch_data_object.dart';
+import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
     defaultTextFromDropdownMenu, uriVoucherAdd;
@@ -30,16 +30,16 @@ import 'package:novafarma_front/model/globals/constants.dart' show
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/voucher_item_dialog.dart';
 
-class VoucherScreen extends StatefulWidget {
+class IssueVoucherScreen extends StatefulWidget {
   final ValueChanged<bool>? onBlockedStateChange;
 
-  const VoucherScreen({super.key, this.onBlockedStateChange});
+  const IssueVoucherScreen({super.key, this.onBlockedStateChange});
 
   @override
-  State<VoucherScreen> createState() => _VoucherScreenState();
+  State<IssueVoucherScreen> createState() => _IssueVoucherScreenState();
 }
 
-class _VoucherScreenState extends State<VoucherScreen> {
+class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
 
   final ThemeData _themeData = ThemeData();
 
@@ -307,12 +307,12 @@ class _VoucherScreenState extends State<VoucherScreen> {
   Table _columnsBody() {
     return Table(
       columnWidths: const {
-        0: FlexColumnWidth(0.2),
-        1: FlexColumnWidth(2),
-        2: FlexColumnWidth(1),
-        3: FlexColumnWidth(1),
-        4: FlexColumnWidth(0.6),
-        5: FixedColumnWidth(96),
+        0: FlexColumnWidth(0.2),  //(C)
+        1: FlexColumnWidth(2),    // Articulo
+        2: FlexColumnWidth(1),    // Presentacion
+        3: FlexColumnWidth(1),    // Precio unitario
+        4: FlexColumnWidth(0.6),  // Cantidad
+        5: FixedColumnWidth(96),  //botones Editar y Eliminar
       },
       children: [
         TableRow(
@@ -468,7 +468,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
       _changeStateSaved(true);
     });
     try {
-      await fetchDataObject<VoucherDTO>(
+      await fetchData<VoucherDTO>(
           uri: uriVoucherAdd,
           classObject: VoucherDTO.empty(),
           requestType: RequestTypeEnum.post,
@@ -718,17 +718,11 @@ class _VoucherScreenState extends State<VoucherScreen> {
               CustomerBox(
                 customerSelected: _customerSelected,
                 onSelectedChanged: (customer) => setState(() {
-                  if (customer == null) {
-                    /*_selectedCustomerOrSupplierId = 0;
-                    _customerSelected = null;
-                    _customer = null;
-                     */
-                    //_initializeVoucher();
-                  } else {
+                  if (customer != null) {
                     _initializeVoucher();
                     _selectedCustomerOrSupplierId = customer.customerId!;
                     _customerSelected =
-                      '${customer.name} ${customer.lastname} (${customer.document})';
+                      '${customer.lastname}, ${customer.name} (${customer.document})';
                     _updateCustomer(customer);
                     //_notesController.clear();
                   }

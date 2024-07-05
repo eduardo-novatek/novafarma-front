@@ -43,13 +43,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
       0, // Right
       0, // Bottom
     );
-    /*final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(const Offset(0, kToolbarHeight), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(const Offset(0, kToolbarHeight)), ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );*/
+    final RenderBox tileBox = context.findRenderObject() as RenderBox;
+    final Offset tilePosition = tileBox.localToGlobal(Offset.zero);
 
     showMenu<String>(
       context: context,
@@ -64,18 +59,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
             trailing: const Icon(Icons.arrow_right),
             hoverColor: Colors.transparent,
             onTap: () {
-              final RenderBox tileBox = context.findRenderObject() as RenderBox;
-              final Offset tilePosition = tileBox.localToGlobal(Offset.zero);
               _openSubMenuVouchers(context, tilePosition);
             },
           ),
         ),
 
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'customers',
           child: ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Clientes', style: TextStyle(fontSize: 17.0)),
+            leading: const Icon(Icons.person),
+            title: const Text('Clientes', style: TextStyle(fontSize: 17.0)),
+            trailing: const Icon(Icons.arrow_right),
+            hoverColor: Colors.transparent,
+            onTap: () {
+              _openSubMenuCustomers(context, tilePosition);
+            },
           ),
         ),
         const PopupMenuItem<String>(
@@ -113,11 +111,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
           setState(() {
             _currentWidget = _buildVouchersWidget();
           });
-        } else */if (result == 'customers') {
+        } else if (result == 'customers') {
           setState(() {
             _currentWidget = _buildCustomersWidget();
           });
-        } else if (result == 'suppliers') {
+        } else */if (result == 'suppliers') {
           setState(() {
             _currentWidget = _buildSuppliersWidget();
           });
@@ -169,8 +167,39 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
+  void _openSubMenuCustomers(BuildContext context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect subMenuPosition = RelativeRect.fromRect(
+      Rect.fromLTWH(position.dx + 240, position.dy + 103, 0, 0),
+      Offset.zero & overlay.size,
+    );
+    showMenu<String>(
+      context: context,
+      position: subMenuPosition,
+      elevation: 8.0,
+      items: [
+        const PopupMenuItem<String>(
+          value: 'customers_list',
+          child: ListTile(
+            leading: Icon(Icons.people),
+            title: Text('Listar'),
+          ),
+        ),
+      ],
+    ).then((String? result) {
+      if (result != null) {
+        if (result == 'customers_list') {
+          Navigator.pop(context);
+          setState(() {
+            _currentWidget = _buildCustomersWidget();
+          });
+        }
+      }
+    });
+  }
+
   Widget _buildVouchersWidget() {
-    return VoucherScreen(
+    return IssueVoucherScreen(
       onBlockedStateChange: (block) {
         setState(() {
           _enableMenu = !block;
@@ -180,7 +209,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildCustomersWidget() {
-    return const CustomerScreen();
+    return const ListCustomerScreen();
   }
 
   Widget _buildSuppliersWidget() {

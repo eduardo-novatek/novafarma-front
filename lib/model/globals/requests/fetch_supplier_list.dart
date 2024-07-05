@@ -1,10 +1,10 @@
 import '../../DTOs/supplier_dto.dart';
 import '../constants.dart' show uriSupplierFindAll;
-import 'fetch_data_object.dart';
+import '../tools/fetch_data.dart';
 
 Future<void> fetchSupplierList(List<SupplierDTO> supplierList) async {
 
-  await fetchDataObject<SupplierDTO>(
+  await fetchData<SupplierDTO>(
     uri: uriSupplierFindAll,
     classObject: SupplierDTO.empty(),
   ).then((data) {

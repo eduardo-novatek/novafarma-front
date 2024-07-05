@@ -12,13 +12,13 @@ import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriControlledMedicationAdd;
 import '../tools/floating_message.dart';
-import 'fetch_data_object.dart';
+import '../tools/fetch_data.dart';
 
 Future<void> addControlledMedication({
   required ControlledMedicationDTO controlledMedication,
   required BuildContext context}) async {
 
-  await fetchDataObject(
+  await fetchData(
       uri: uriControlledMedicationAdd,
       classObject: controlledMedication,
       requestType: RequestTypeEnum.post,

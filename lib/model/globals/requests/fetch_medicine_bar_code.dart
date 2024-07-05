@@ -3,14 +3,14 @@ import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 
 import '../../DTOs/medicine_dto1.dart';
 import '../constants.dart' show uriMedicineFindBarCode;
-import 'fetch_data_object.dart';
+import '../tools/fetch_data.dart';
 
 Future<void> fetchMedicineBarCode({
   required String barCode,
   required MedicineDTO1 medicine,
 }) async {
 
-  await fetchDataObject<MedicineDTO1>(
+  await fetchData<MedicineDTO1>(
     uri: '$uriMedicineFindBarCode/$barCode',
     classObject: MedicineDTO1.empty(),
   ).then((data) {
