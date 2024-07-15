@@ -4,6 +4,7 @@ import '../../model/DTOs/customer_dto1.dart';
 import '../../model/globals/constants.dart' show uriCustomerFindAllPage;
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
+import '../../model/globals/tools/pagination_bar.dart';
 
 class ListCustomerScreen extends StatefulWidget {
   const ListCustomerScreen({super.key});
@@ -14,7 +15,7 @@ class ListCustomerScreen extends StatefulWidget {
 
 class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
-  List<CustomerDTO1> _customerList = [];
+  final List<CustomerDTO1> _customerList = [];
 
   @override
   void initState() {
@@ -133,7 +134,13 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   }
 
   Widget _footerBody(){
-    return SizedBox.shrink();
+    return PaginationBar(
+      totalPages: 3,
+      initialPage: 0,
+      onPageChanged: (page) {
+
+      },
+    );
   }
 
   Future<void> _loadData() async {
