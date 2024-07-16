@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:intl/intl.dart';
@@ -281,12 +282,21 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     return TextInputType.text;
   }
 
-  List<MaskTextInputFormatter> _determinateMask() {
+  List<TextInputFormatter> _determinateMask() {
+    if (widget.dataType == DataTypeEnum.date) {
+      return [MaskTextInputFormatter(mask: '##/##/####')];
+    } else if (widget.dataType == DataTypeEnum.number) {
+      return [FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*$')),];
+    }
+    return [];
+  }
+
+/*List<MaskTextInputFormatter> _determinateMask() {
     if (widget.dataType == DataTypeEnum.date) {
       return [MaskTextInputFormatter(mask: '##/##/####')];
     }
     return [];
-  }
+  }*/
 
   // Esta funcion se deshabilito porque es para validar fechas enteras,
   // (no se ajusta al onChange)

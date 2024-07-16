@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
+import 'add_customer_screen.dart';
+
 class HomePageScreen extends StatefulWidget {
   final String title;
 
@@ -157,10 +159,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) {
       if (result != null) {
+        Navigator.pop(context);
         if (result == 'vouchers_emit') {
-          Navigator.pop(context);
           setState(() {
-            _currentWidget = _buildVouchersWidget();
+            _currentWidget = _buildIssueVouchersWidget();
           });
         }
       }
@@ -179,6 +181,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
       elevation: 8.0,
       items: [
         const PopupMenuItem<String>(
+          value: 'customers_add',
+          child: ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Agregar'),
+          ),
+        ),
+        const PopupMenuItem<String>(
           value: 'customers_list',
           child: ListTile(
             leading: Icon(Icons.people),
@@ -188,17 +197,25 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) {
       if (result != null) {
-        if (result == 'customers_list') {
-          Navigator.pop(context);
+        Navigator.pop(context);
+        if (result == 'customers_add') {
           setState(() {
-            _currentWidget = _buildCustomersWidget();
+            _currentWidget = _buildCustomerAddWidget();
+          });
+        } else  if (result == 'customers_list') {
+          setState(() {
+            _currentWidget = _buildCustomerListWidget();
           });
         }
       }
     });
   }
 
-  Widget _buildVouchersWidget() {
+  Widget _buildCustomerAddWidget() {
+    return AddCustomerScreen();
+  }
+
+  Widget _buildIssueVouchersWidget() {
     return IssueVoucherScreen(
       onBlockedStateChange: (block) {
         setState(() {
@@ -208,7 +225,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildCustomersWidget() {
+  Widget _buildCustomerListWidget() {
     return const ListCustomerScreen();
   }
 
