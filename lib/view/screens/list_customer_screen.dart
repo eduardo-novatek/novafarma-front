@@ -254,6 +254,100 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       children: [
         TableRow(
           children: [
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(customer.lastname!),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(customer.name),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(customer.document.toString()),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(customer.telephone!),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(dateToStr(customer.addDate!)!),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(customer.paymentNumber!.toString()),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(customer.partner! ? 'SI' : 'NO'),
+                ),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Center(
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.note,
+                      color: customer.notes!.isNotEmpty
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    tooltip: customer.notes,
+                    onPressed: null,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        )
+
+        /*
+        TableRow(
+          children: [
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(customer.lastname!),
@@ -284,17 +378,23 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
-              child: Icon(
-                Icons.note,
-                color: customer.notes!.isNotEmpty
-                  ? Colors.green
-                  : Colors.grey
+              child: Center(
+                child: IconButton(
+                  icon: Icon(
+                    Icons.note,
+                    color: customer.notes!.isNotEmpty
+                        ? Colors.green
+                        : Colors.grey,
+                  ),
+                  tooltip: customer.notes,
+                  onPressed: null,
+                ),
               ),
             )
 
-
           ],
         ),
+         */
       ],
     );
   }
