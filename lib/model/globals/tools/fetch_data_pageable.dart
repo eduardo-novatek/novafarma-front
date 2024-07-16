@@ -9,12 +9,10 @@ import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
-import '../../enums/request_type_enum.dart';
-
 ///Devuelve una lista de objetos de la base de datos, obtenidos por paginación.
 ///Envía solo solicitudes get.
 Future<PageObject> fetchDataPageable <T extends Deserializable<T>>({
-  required String uri,  //tomada de las constantes
+  required String uri,
   required T classObject,
 }) async {
 

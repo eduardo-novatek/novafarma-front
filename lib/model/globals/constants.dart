@@ -4,6 +4,7 @@
 const String socket = 'localhost:8080';           //server jorge
 
 const int timeOutSecondsResponse = 15;
+const int sizePage = 20; //Cantidad de elementos por página
 
 const String defaultTextFromDropdownMenu = "Seleccione...";
 const double menuMaxHeight = 300.0;
@@ -13,7 +14,7 @@ const String imagesPath = "assets/images/";
 
 //Credenciales SuperAdmin
 const String superAdminUser = "N0v4Tek.2o24";
-const String superAdminPass = "n0vaF4rm4";
+const String superAdminPass = "n0vaF4rm4!";
 
 //Tokens
 const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1nH1A19CwLuSCHnT3X3DYU2DvfaKnJbp1lZEVXNV0TpjWIzZrAqOTjxcPDxaDInIsdPkLi8QGHfgrQaU3ZIa8sLapH7qgyWU8eIn5AXiXcn5cRVbfh44mljLZr5jvgmtGmvW2CMUHzdrWfxCzNoUQgP6XECm2f3ShGJjXDyjkJOLYaS9fNAamqqqVBm";

@@ -1,7 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/globals/tools/floating_message.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/customer_dto1.dart';
-import '../../model/globals/constants.dart' show uriCustomerFindAllPage;
+import '../../model/enums/message_type_enum.dart';
+import '../../model/globals/constants.dart'
+    show uriCustomerFindAllPage, sizePage;
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
 import '../../model/globals/tools/pagination_bar.dart';
@@ -16,6 +21,13 @@ class ListCustomerScreen extends StatefulWidget {
 class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   final List<CustomerDTO1> _customerList = [];
+  //int _actualPage = 0;
+  bool loading = false;
+  Map<String, int> metadata = {
+    'pageNumber': 0,
+    'totalPages': 0,
+    'totalElements': 0,
+  };
 
   @override
   void initState() {
@@ -67,6 +79,33 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         children: [
           _columnsBody(),
           Expanded(
+            child: Stack(
+              children: [
+                ListView.builder(
+                  itemCount: _customerList.length,
+                  itemBuilder: (context, index) {
+                    return _buildCustomerRow(_customerList[index], index);
+                  },
+                ),
+                if (loading)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
+          ),
+          _footerBody(),
+        ],
+      ),
+    );
+  }
+
+  /* Widget _buildBody() {
+    return Expanded(
+      child: Column(
+        children: [
+          _columnsBody(),
+          Expanded(
             child: ListView.builder(
               itemCount: _customerList.length,
               itemBuilder: (context, index) {
@@ -78,7 +117,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         ],
       ),
     );
-  }
+  }*/
 
   Table _columnsBody() {
     return Table(
@@ -135,23 +174,68 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   Widget _footerBody(){
     return PaginationBar(
-      totalPages: 3,
-      initialPage: 0,
+      totalPages: metadata['totalPages'] ?? 0,
+      initialPage: metadata['pageNumber']! + 1, //1er numero de pagina para mostrar en pantalla: 1
       onPageChanged: (page) {
-
+        setState(() {
+          metadata['pageNumber'] = page - 1; //El num. de pagina inicia en 0
+          _loadData();
+        });
       },
     );
   }
 
   Future<void> _loadData() async {
+    _toggleLoading();
     await fetchDataPageable<CustomerDTO1>(
-      uri: '$uriCustomerFindAllPage/0/3',
+      uri: '$uriCustomerFindAllPage/${metadata['pageNumber']!}/$sizePage',
       classObject: CustomerDTO1.empty()
+
     ).then((pageObject) {
-      if (pageObject.totalElements == 0) return Future.value(null);
+      _customerList.clear();
+      if (pageObject.totalElements == 0) {
+        metadata['pageNumber'] = 0;
+        metadata['totalPages'] = 0;
+        metadata['totalElements'] = 0;
+        return Future.value(null);
+      }
       setState(() {
         _customerList.addAll(pageObject.content as Iterable<CustomerDTO1>);
+        metadata['pageNumber'] = pageObject.pageNumber;
+        metadata['totalPages'] = pageObject.totalPages;
+        metadata['totalElements'] = pageObject.totalElements;
       });
+
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+          context: context,
+          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
+          messageTypeEnum: error.message != null
+              ? MessageTypeEnum.warning
+              : MessageTypeEnum.error
+        );
+        if (kDebugMode) {
+          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+        }
+      } else {
+        FloatingMessage.show(
+            context: context,
+            text: 'Error obteniendo datos',
+            messageTypeEnum: MessageTypeEnum.error
+        );
+        if (kDebugMode) {
+          print('Error obteniendo datos: ${error.toString()}');
+        }
+      }
+      return null;
+    });
+    _toggleLoading();
+  }
+
+  void _toggleLoading() {
+    setState(() {
+      loading = !loading;
     });
   }
 
