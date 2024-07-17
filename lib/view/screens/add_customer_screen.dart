@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/enums/data_type_enum.dart';
+import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 class AddCustomerScreen extends StatefulWidget {
@@ -9,13 +11,20 @@ class AddCustomerScreen extends StatefulWidget {
 
 class _AddCustomerState extends State<AddCustomerScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _dateController = TextEditingController();
   final _documentController = TextEditingController();
+  final _dateController = TextEditingController();
   final _lastnameController = TextEditingController();
   final _nameController = TextEditingController();
   final _notesController = TextEditingController();
   final _telephoneController = TextEditingController();
   //final _paymentNumberController = TextEditingController();
+
+  final _documentFocusNode = FocusNode();
+  final _dateFocusNode = FocusNode();
+  final _lastnameFocusNode = FocusNode();
+  final _nameFocusNode = FocusNode();
+  final _notesFocusNode = FocusNode();
+  final _telephoneFocusNode = FocusNode();
 
   int _paymentNumbe = 0, _dependentId = 0, _partnerId = 0;
 
@@ -68,67 +77,54 @@ class _AddCustomerState extends State<AddCustomerScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min, // Ajusta el tamaño vertical al contenido
           children: [
-            TextFormField(
+            CreateTextFormField(
+              label: 'Documento',
               controller: _documentController,
-              decoration: InputDecoration(labelText: 'Documento'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Por favor, ingresa el documento';
-                }
-                return null;
-              },
+              focusNode: _documentFocusNode,
+              dataType: DataTypeEnum.identificationDocument,
+              textForValidation: 'Ingrese un documento válido',
+              acceptEmpty: false,
+              initialFocus: true,
             ),
-            TextFormField(
+            CreateTextFormField(
+              label: 'Fecha de ingreso',
               controller: _dateController,
-              decoration: InputDecoration(labelText: 'Fecha de ingreso'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Por favor, ingresa la fecha de ingreso';
-                }
-                return null;
-              },
+              focusNode: _dateFocusNode,
+              dataType: DataTypeEnum.date,
+              textForValidation: 'Ingrese una fecha válida',
+              acceptEmpty: false,
             ),
-            TextFormField(
+            CreateTextFormField(
+              label: 'Apellido',
               controller: _lastnameController,
-              decoration: InputDecoration(labelText: 'Apellido'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Por favor, ingresa el apellido';
-                }
-                return null;
-              },
+              focusNode: _lastnameFocusNode,
+              dataType: DataTypeEnum.text,
+              textForValidation: 'Ingrese un apellido',
+              acceptEmpty: false,
             ),
-            TextFormField(
+            CreateTextFormField(
+              label: 'Nombre',
               controller: _nameController,
-              decoration: InputDecoration(labelText: 'Nombre'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Por favor, ingresa el nombre';
-                }
-                return null;
-              },
+              focusNode: _nameFocusNode,
+              dataType: DataTypeEnum.text,
+              textForValidation: 'Ingrese un nombre',
+              acceptEmpty: false,
             ),
-            TextFormField(
+            CreateTextFormField(
+              label: 'Teléfono',
               controller: _telephoneController,
-              decoration: InputDecoration(labelText: 'Teléfono'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Por favor, ingresa el teléfono';
-                }
-                return null;
-              },
+              focusNode: _telephoneFocusNode,
+              dataType: DataTypeEnum.telephone,
+              acceptEmpty: true,
             ),
-            TextFormField(
+            CreateTextFormField(
+              label: 'Notas',
               controller: _notesController,
-              decoration: InputDecoration(labelText: 'Notas'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return 'Por favor, ingresa las notas';
-                }
-                return null;
-              },
+              focusNode: _notesFocusNode,
+              dataType: DataTypeEnum.text,
+              acceptEmpty: true,
+              maxValueForValidation: 100,
+              maxLines: 3,
             ),
             const SizedBox(height: 20.0),
             _footerBody(),
