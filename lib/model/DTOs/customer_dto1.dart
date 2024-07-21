@@ -1,3 +1,4 @@
+import 'package:novafarma_front/model/DTOs/user_dto_1.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
@@ -14,7 +15,9 @@ class CustomerDTO1 extends Deserializable<CustomerDTO1> {
   String? notes;
   int? partnerId;
   int? dependentId;
-  bool? isFirst;
+  //bool? isFirst;
+  ///No viene en los get. Se envía el usuario logueado en los post, put y path
+  UserDTO1? user;
 
   CustomerDTO1.empty():
       customerId = null,
@@ -29,7 +32,8 @@ class CustomerDTO1 extends Deserializable<CustomerDTO1> {
       notes = null,
       partnerId = null,
       dependentId = null,
-      isFirst = null
+      user = UserDTO1.empty()
+      //isFirst = null
   ;
 
   CustomerDTO1({
@@ -44,7 +48,8 @@ class CustomerDTO1 extends Deserializable<CustomerDTO1> {
     this.notes,
     this.partnerId,
     this.dependentId,
-    this.isFirst,
+    this.user,
+    //this.isFirst,
     required this.name,
   });
 
@@ -63,6 +68,7 @@ class CustomerDTO1 extends Deserializable<CustomerDTO1> {
       notes: json['notes'],
       partnerId: json['partnerId'],
       dependentId: json['dependentId'],
+      //user: json['user'] //el user no viene cargado en las consultas
     );
   }
 
@@ -74,13 +80,14 @@ class CustomerDTO1 extends Deserializable<CustomerDTO1> {
       'lastname': lastname,
       'document': document,
       'telephone': telephone,
-      'addDate': addDate,
+      'addDate': addDate?.toIso8601String(),  // Convierte DateTime a cadena ISO 8601
       'paymentNumber': paymentNumber,
       'partner': partner,
       'deleted': deleted,
       'notes': notes,
       'partnerId': partnerId,
       'dependentId': dependentId,
+      'user': user?.toJson(), //se envia el user logueado a operaciones post, put y path
     };
   }
 }

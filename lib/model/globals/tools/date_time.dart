@@ -79,3 +79,15 @@ String strDateViewToStrDate(String dateDMY) {
 String strDateToStrDateView(String dateYMD) {
   return DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parseStrict(dateYMD));
 }
+
+///Hora actual en formato HH:mm
+String timeNow() {
+  final formatter = DateFormat('HH:mm');
+  return formatter.format(DateTime.now());
+}
+
+///Fecha actual en formato dd/MM/yyyy
+String dateNow() {
+  final formatter = DateFormat('dd/MM/yyyy');
+  return formatter.format(DateTime.now());
+}

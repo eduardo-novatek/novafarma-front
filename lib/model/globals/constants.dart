@@ -1,7 +1,8 @@
 //const String socket = "192.168.1.8:8080";       //casa
 //const String socket = "192.168.43.203:8080";    //celu
 
-const String socket = 'localhost:8080';           //server jorge
+const String socket = 'localhost:8080';           //server applications
+const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server NovaDaily
 
 const int timeOutSecondsResponse = 15;
 const int sizePage = 20; //Cantidad de elementos por página
@@ -41,6 +42,16 @@ const String uriCustomerFindAll = "/customer/findAll";
 const String uriCustomerFindAllPage = "/customer/findAllPage";
 const String uriCustomerFindDocument = "/customer/findDocument";
 const String uriCustomerFindLastnameName = "/customer/findLastnameName";
+const String uriCustomerFindPaymentNumber = "/customer/findPaymentNumber";
+const String uriCustomerAdd = "/customer/add";
+const String uriCustomerUpdate = "/customer/update";
+
+//NovaDaily
+const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
+    //'/socio/cedula?apiToken=$novaDailyToken&cedula';
+
+const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
+    //'/socio/apellido?apiToken=$novaDailyToken&apellido';
 
 //Supplier
 const String uriSupplierFindAll = "/supplier/findAll";

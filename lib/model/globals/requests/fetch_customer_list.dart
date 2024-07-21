@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../DTOs/customer_dto1.dart';
 import '../constants.dart' show uriCustomerFindDocument, uriCustomerFindLastnameName;
 import '../tools/fetch_data.dart';
 
+/// searchByDocument: true=buscar por documento. false=buscar por apellido
 Future<void> fetchCustomerList({
   required List<CustomerDTO1> customerList,
   required bool searchByDocument, //true=buscar por documento. false=buscar por apellido
@@ -35,6 +37,10 @@ Future<void> fetchCustomerList({
       ));
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
-    throw Exception(error);
+    if (error is ErrorObject) {
+      throw ErrorObject(statusCode: error.statusCode, message: error.message);
+    } else {
+      throw Exception(error);
+    }
   });
 }

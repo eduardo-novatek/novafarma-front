@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
-import 'add_customer_screen.dart';
+import 'add_or_update_customer_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
   final String title;
@@ -181,10 +181,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
       elevation: 8.0,
       items: [
         const PopupMenuItem<String>(
-          value: 'customers_add',
+          value: 'customers_add_update',
           child: ListTile(
             leading: Icon(Icons.add),
-            title: Text('Agregar'),
+            title: Text('Agregar o actualizar'),
           ),
         ),
         const PopupMenuItem<String>(
@@ -198,7 +198,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     ).then((String? result) {
       if (result != null) {
         Navigator.pop(context);
-        if (result == 'customers_add') {
+        if (result == 'customers_add_update') {
           setState(() {
             _currentWidget = _buildCustomerAddWidget();
           });
@@ -212,7 +212,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   Widget _buildCustomerAddWidget() {
-    return AddCustomerScreen();
+    return AddOrUpdateCustomerScreen(
+      onBlockedStateChange: (block) {
+        setState(() {
+          _enableMenu = !block;
+        });
+      },
+    );
   }
 
   Widget _buildIssueVouchersWidget() {

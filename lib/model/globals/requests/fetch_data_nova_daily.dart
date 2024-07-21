@@ -2,47 +2,45 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'package:novafarma_front/model/globals/constants.dart'
-    show socket,timeOutSecondsResponse;
+    show novaDailyToken, socketNovaDaily, timeOutSecondsResponse,
+    uriNovaDailyFindPartnerDocument, uriNovaDailyFindPartnerLastname;
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/request_type_enum.dart';
 
-///Devuelve una lista de objetos de la base de datos.
-Future<List<Object>> fetchData <T extends Deserializable<T>>({
+/// value: valor a buscar. body: está por si se implementa un post
+Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
   required String uri,
   required T classObject,
+  required String value,
   RequestTypeEnum? requestType = RequestTypeEnum.get,
   Object? body,
 }) async {
 
   Uri url;
-  Response response;
+  http.Response response;
   bool generalException = true;
 
   try {
-    url = Uri.http(socket, uri);
+    url = Uri.http(
+      socketNovaDaily,
+      uriNovaDailyFindPartnerDocument,
+      {'apiToken': novaDailyToken, 'cedula': value},
+    );
 
     if (requestType == RequestTypeEnum.post) {
-      response = await http.post(
-          url,
-          body: json.encode(body),
-          headers:{
-            "Content-Type": "application/json; charset=UTF-8",
-          }
-      ).timeout(const Duration(seconds: timeOutSecondsResponse));
+        response = await http.post(
+            url,
+            body: json.encode(body),
+            headers:{
+              "Content-Type": "application/json; charset=UTF-8",
+            }
+        ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else if (requestType == RequestTypeEnum.put) {
       response = await http.put(
-          url,
-          body: json.encode(body),
-          headers: {"Content-Type": "application/json; charset=UTF-8",}
-      ).timeout(const Duration(seconds: timeOutSecondsResponse));
-
-    } else if (requestType == RequestTypeEnum.patch) {
-      response = await http.patch(
           url,
           body: json.encode(body),
           headers: {"Content-Type": "application/json; charset=UTF-8",}
@@ -56,9 +54,6 @@ Future<List<Object>> fetchData <T extends Deserializable<T>>({
     if (response.statusCode == 200) {
       try {
         if (response.body.isEmpty) return [];
-
-        //Asume que el cuerpo de la respuesta está codificado en UTF-8 por defecto
-        //dynamic decodedData = json.decode(response.body);
 
         // Intenta decodificar el Json
         try {
@@ -81,30 +76,31 @@ Future<List<Object>> fetchData <T extends Deserializable<T>>({
           } else {
             if (kDebugMode) print("Tipo de datos desconocido");
             throw ErrorObject(
-                statusCode: 0,
-                message: 'Tipo de datos desconocido'
+              statusCode: 0,
+              message: 'Tipo de datos desconocido'
             );
           }
         } catch (e) {
           //No pudo decodificar el Json, asume que es un String
           return [response.body];
+
         }
       } catch (e) {
         generalException = false;
         if (kDebugMode) print("Error al decodificar la respuesta JSON $e");
         throw ErrorObject(
-            statusCode: 0,
-            message: 'Error al decodificar la respuesta JSON $e'
+          statusCode: 0,
+          message: 'Error al decodificar la respuesta JSON $e'
         );
       }
 
     } else {
       generalException = false;
       throw ErrorObject(
-          statusCode: response.statusCode,
-          message: response.body.isNotEmpty
-              ? jsonDecode(response.body)['message']
-              : null
+        statusCode: response.statusCode,
+        message: response.body.isNotEmpty
+            ? jsonDecode(response.body)['message']
+            : null
       );
 
     }

@@ -776,16 +776,6 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
     );
   }
 
-  String timeNow() {
-    final formatter = DateFormat('HH:mm');
-    return formatter.format(DateTime.now());
-  }
-
-  String dateNow() {
-    final formatter = DateFormat('dd/MM/yyyy');
-    return formatter.format(DateTime.now());
-  }
-
   void _createListeners() {
     _dateListener();
   }
