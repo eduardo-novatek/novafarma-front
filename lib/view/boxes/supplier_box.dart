@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
 import '../../model/DTOs/supplier_dto.dart';
@@ -8,6 +10,7 @@ import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
 import '../../model/globals/tools/floating_message.dart';
+import '../../model/objects/error_object.dart';
 
 class SupplierBox extends StatefulWidget {
   //final int selectedId;
@@ -145,7 +148,13 @@ class SupplierBoxState extends State<SupplierBox> {
         widget.onSelectedChanged(null);
       });
     } catch (error) {
-      _showMessageConnectionError(context);
+      if (error is ErrorObject) {
+        if (error.statusCode != HttpStatus.notFound) {
+          _showMessageConnectionError(context);
+        }
+      } else {
+        _showMessageConnectionError(context);
+      }
     } finally {
       if (_supplierList.isEmpty) {
         _supplierList.add(

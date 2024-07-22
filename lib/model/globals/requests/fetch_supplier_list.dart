@@ -1,14 +1,15 @@
+import 'package:novafarma_front/model/objects/error_object.dart';
+
 import '../../DTOs/supplier_dto.dart';
 import '../constants.dart' show uriSupplierFindAll;
 import '../tools/fetch_data.dart';
 
 Future<void> fetchSupplierList(List<SupplierDTO> supplierList) async {
-
+  supplierList.clear();
   await fetchData<SupplierDTO>(
     uri: uriSupplierFindAll,
     classObject: SupplierDTO.empty(),
   ).then((data) {
-      supplierList.clear();
       supplierList.addAll(data.cast<SupplierDTO>().map((e) =>
           SupplierDTO(
             supplierId: e.supplierId,
@@ -21,6 +22,9 @@ Future<void> fetchSupplierList(List<SupplierDTO> supplierList) async {
           )
       ));
   }).onError((error, stackTrace) {
+    if (error is ErrorObject) {
+      throw error;
+    }
     throw Exception(error);
   });
 }
