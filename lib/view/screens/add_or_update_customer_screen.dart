@@ -267,12 +267,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   }
 
   Future<void> _submitForm() async {
+    _changeStateLoading(true);
     await addOrUpdateCustomer(
         customer: _buildCustomer(),
         isAdd: _isAdd!,
         context: context
 
     ).then((customerId) {
+      _changeStateLoading(false);
       String msg = 'Cliente ${_isAdd! ? 'agregado' : 'actualizado'} con éxito';
       FloatingMessage.show(
           text: msg,
@@ -285,7 +287,9 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
       // Se captura el error para evitar el error en consola. Este se manejó en
       // addOrUpdateCustomer
-    }).onError((error, stackTrace) => null);
+    }).onError((error, stackTrace) {
+      _changeStateLoading(false);
+    });
   }
 
   Future<bool> _validate() async {
