@@ -145,7 +145,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
   Widget _buildBody() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
       child: Form(
         key: _formKey,
         child: Column(
@@ -238,7 +238,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
   Widget _buildFooter() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

@@ -152,7 +152,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         const PopupMenuItem<String>(
           value: 'vouchers_emit',
           child: ListTile(
-            leading: Icon(Icons.assignment),
+            leading: Icon(Icons.assignment_outlined),
             title: Text('Emitir'),
           ),
         ),
@@ -190,7 +190,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         const PopupMenuItem<String>(
           value: 'customers_list',
           child: ListTile(
-            leading: Icon(Icons.people),
+            leading: Icon(Icons.list),
             title: Text('Listar'),
           ),
         ),
