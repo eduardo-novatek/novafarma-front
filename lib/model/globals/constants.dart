@@ -45,6 +45,7 @@ const String uriCustomerFindLastnameName = "/customer/findLastnameName";
 const String uriCustomerFindPaymentNumber = "/customer/findPaymentNumber";
 const String uriCustomerAdd = "/customer/add";
 const String uriCustomerUpdate = "/customer/update";
+const String uriCustomerDelete = "/customer/delete";
 
 //NovaDaily
 const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
