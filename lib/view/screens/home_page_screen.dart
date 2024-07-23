@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
-import 'add_or_update_customer_screen.dart';
-
 class HomePageScreen extends StatefulWidget {
   final String title;
 
@@ -13,9 +11,11 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+  static const Widget msgHomeScreen = Text('Bienvenido a NovaFarma');
+
   final GlobalKey _menuButton = GlobalKey();
   bool _enableMenu = true;
-  Widget _currentWidget = Container(); // Widget inicial
+  Widget _currentWidget = msgHomeScreen; // Widget inicial
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +37,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   void _openMenu(BuildContext context) {
-    final RenderBox button = _menuButton.currentContext!.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    //final RenderBox button = _menuButton.currentContext!.findRenderObject() as RenderBox;
+    //final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     const RelativeRect position = RelativeRect.fromLTRB(
       0, // Left
       kToolbarHeight, // Top
@@ -195,30 +195,45 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
       ],
-    ).then((String? result) {
+    ).then((String? result) async {
       if (result != null) {
         Navigator.pop(context);
         if (result == 'customers_add_update') {
-          setState(() {
-            _currentWidget = _buildCustomerAddWidget();
-          });
+          await _goAddOrUpdateCustomerScreen();
         } else  if (result == 'customers_list') {
-          setState(() {
-            _currentWidget = _buildCustomerListWidget();
-          });
+          await _goListCustomerScreen();
         }
       }
     });
   }
 
-  Widget _buildCustomerAddWidget() {
-    return AddOrUpdateCustomerScreen(
-      onBlockedStateChange: (block) {
-        setState(() {
-          _enableMenu = !block;
-        });
-      },
-    );
+  Future<void> _goAddOrUpdateCustomerScreen() async {
+    setState(() {
+      _currentWidget = AddOrUpdateCustomerScreen(
+        onBlockedStateChange: (block) {
+          setState(() {
+            _enableMenu = !block;
+          });
+        },
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _goListCustomerScreen() async {
+    setState(() {
+      _currentWidget = ListCustomerScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
   }
 
   Widget _buildIssueVouchersWidget() {
@@ -231,10 +246,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildCustomerListWidget() {
-    return const ListCustomerScreen();
-  }
-
   Widget _buildSuppliersWidget() {
     return const SupplierScreen();
   }
@@ -251,168 +262,3 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return const UserRoleTaskScreen();
   }
 }
-
-
-/*
-class HomePageScreen extends StatefulWidget {
-
-  //final GlobalKey<ScaffoldState> scaffoldKey;
-  final String title;
-
-  const HomePageScreen({super.key, required this.title});
-
-  @override
-  State<HomePageScreen> createState() => _HomePageScreenState();
-}
-
-class _HomePageScreenState extends State<HomePageScreen> {
-  final GlobalKey _menuButton = GlobalKey();
-  bool _enableMenu = true;
-
-  Widget _currentWidget = Container(); // Widget inicial
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        leading: IconButton(
-          onPressed: () => _enableMenu ? _openMenu(context) : null,
-          icon: const Icon(Icons.menu,),
-          color: _enableMenu ? Colors.black : Colors.grey,
-          tooltip: 'Menu',
-        ),
-      ),
-      body: Center(
-        child: _currentWidget, // Mostrar el widget actual
-      ),
-    );
-  }
-  void _openMenu(BuildContext context) {
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(const Offset(0, kToolbarHeight), ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(const Offset(0, kToolbarHeight)), ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    showMenu<String>(
-      context: context,
-      position: position,
-      items: [
-        const PopupMenuItem<String>(
-          value: 'vouchers',
-          child: ListTile(
-            leading: Icon(Icons.receipt),
-            title: Text('Comprobantes', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),
-
-        const PopupMenuItem<String>(
-          value: 'customers',
-          child: ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Clientes', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),
-
-        const PopupMenuItem<String>(
-          value: 'suppliers',
-          child: ListTile(
-            leading: Icon(Icons.store),
-            title: Text('Proveedores', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),
-
-        const PopupMenuItem<String>(
-          value: 'medicines',
-          child: ListTile(
-            leading: Icon(Icons.local_pharmacy),
-            title: Text('Medicamentos', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),
-
-        const PopupMenuItem<String>(
-          value: 'balances',
-          child: ListTile(
-            leading: Icon(Icons.note_alt_sharp),
-            title: Text('Balances', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),
-
-        const PopupMenuItem<String>(
-          value: 'users and roles',
-          child: ListTile(
-            leading: Icon(Icons.people),
-            title: Text('Usuarios y roles', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),
-      ],
-      elevation: 8.0,
-    ).then((String? result) {
-      if (result != null) {
-        if (result == 'vouchers'){
-          setState(() {
-            _currentWidget = _buildVouchersWidget();
-          });
-        } else if (result == 'customers') {
-          setState(() {
-            _currentWidget = _buildCustomersWidget();
-          });
-        } else if (result == 'suppliers') {
-          setState(() {
-            _currentWidget = _buildSuppliersWidget();
-          });
-        } else if (result == 'medicines') {
-          setState(() {
-            _currentWidget = _buildMedicinesWidget();
-          });
-        } else if (result == 'balances') {
-          setState(() {
-            _currentWidget = _buildBalancesWidget();
-          });
-        } else if (result == 'users and roles') {
-          setState(() {
-            _currentWidget = _buildUsersAndRolesWidget();
-          });
-        }
-      }
-    });
-  }
-
-  Widget _buildVouchersWidget() {
-    return VoucherScreen(
-      onBlockedStateChange: (block) {
-        setState(() {
-          _enableMenu = ! block;
-        });
-      },
-    );
-  }
-
-  Widget _buildCustomersWidget() {
-    return const CustomerScreen();
-  }
-
-  Widget _buildSuppliersWidget() {
-    return const SupplierScreen();
-  }
-
-  Widget _buildMedicinesWidget() {
-    return const MedicineScreen();
-  }
-
-  Widget _buildBalancesWidget() {
-    return const BalanceScreen();
-  }
-
-  Widget _buildUsersAndRolesWidget() {
-    return const UserRoleTaskScreen();
-  }
-
-}
-
-*/

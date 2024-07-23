@@ -18,6 +18,7 @@ class CreateTextFormField extends StatefulWidget {
   final TextEditingController controller;
   final bool? initialFocus; //Si debe tener el foco inicial (por defecto es false. Debe ser true solo 1 TextFormField del formulario)
   final FocusNode? focusNode;
+  final TextStyle? textStyle;
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
   final Function(String)? onChange;
   final Function(String)? onFieldSubmitted;
@@ -40,6 +41,7 @@ class CreateTextFormField extends StatefulWidget {
     this.onChange,
     this.onFieldSubmitted,
     this.focusNode,
+    this.textStyle,
   });
 
   @override
@@ -83,7 +85,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
               maxLength:_maxLength(),
               inputFormatters: _determinateMask(),
               decoration: _buildInputDecoration(themeData),
-              style: TextStyle(
+              style: widget.textStyle ?? TextStyle(
                   fontSize: themeData.textTheme.bodyMedium?.fontSize,
                   color: themeData.colorScheme.primary,
               ),

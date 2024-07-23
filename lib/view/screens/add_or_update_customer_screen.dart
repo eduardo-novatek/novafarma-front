@@ -1,9 +1,9 @@
 
 import 'dart:html';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/customer_dto.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
@@ -16,7 +16,6 @@ import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
-import '../../model/DTOs/user_dto.dart';
 import '../../model/DTOs/user_dto_1.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/requests/add_or_update_customer.dart';
@@ -26,12 +25,21 @@ import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/floating_message.dart';
 
 class AddOrUpdateCustomerScreen extends StatefulWidget {
+  //VoidCallback es un tipo de función predefinido en Flutter que no acepta
+  // parámetros y no devuelve ningún valor. En este caso, se utiliza para
+  // definir el tipo del callback onCancel, que se llamará cuando el usuario
+  // presione el botón de cancelar
+  final ui.VoidCallback onCancel;
   final ValueChanged<bool>? onBlockedStateChange;
 
-  const AddOrUpdateCustomerScreen({super.key, this.onBlockedStateChange});
+  const AddOrUpdateCustomerScreen({
+    super.key,
+    this.onBlockedStateChange,
+    required this.onCancel,
+  });
 
   @override
-  _AddOrUpdateCustomerScreen createState() => _AddOrUpdateCustomerScreen();
+  State<AddOrUpdateCustomerScreen> createState() => _AddOrUpdateCustomerScreen();
 }
 
 class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
@@ -362,7 +370,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   }
 
   void _cancelForm() {
-    Navigator.of(context).pop();
+    widget.onCancel(); // Llamar al callback de cancelación
   }
 
   Future<int> _confirm() async {

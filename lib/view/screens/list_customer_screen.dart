@@ -1,5 +1,12 @@
+import 'dart:ui';
+
+import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:novafarma_front/model/enums/data_type_enum.dart';
+import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -12,16 +19,21 @@ import '../../model/globals/tools/fetch_data_pageable.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 
 class ListCustomerScreen extends StatefulWidget {
-  const ListCustomerScreen({super.key});
+  //VoidCallback es un tipo de función predefinido en Flutter que no acepta
+  // parámetros y no devuelve ningún valor. En este caso, se utiliza para
+  // definir el tipo del callback onCancel, que se llamará cuando el usuario
+  // presione el botón de cancelar
+  final VoidCallback onCancel;
+  const ListCustomerScreen({super.key, required this.onCancel});
 
   @override
   State<ListCustomerScreen> createState() => _ListCustomerScreenState();
 }
 
 class _ListCustomerScreenState extends State<ListCustomerScreen> {
-
   final List<CustomerDTO1> _customerList = [];
-  //int _actualPage = 0;
+  final _lastnameFilterController = TextEditingController();
+  final _lastnameFilterFocusNode = FocusNode();
   bool loading = false;
   Map<String, int> metadata = {
     'pageNumber': 0,
@@ -33,6 +45,13 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   void initState() {
     super.initState();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _lastnameFilterController.dispose();
+    _lastnameFilterFocusNode.dispose();
   }
 
   @override
@@ -62,17 +81,125 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     return Container(
       color: Colors.blue,
       padding: const EdgeInsets.all(8.0),
-      child: const Text(
-        'Listado de clientes',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 19.0,
-        ),
-        textAlign: TextAlign.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Listado de clientes',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 19.0,
+              ),
+            ),
+          ),
+          Flexible(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: SizedBox(
+                    width: 280.0,
+                    child: CreateTextFormField(
+                      controller: _lastnameFilterController,
+                      focusNode: _lastnameFilterFocusNode,
+                      label: 'Filtrar por apellido',
+                      dataType: DataTypeEnum.text,
+                      textStyle: const TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.yellow,
+                          fontSize: 17
+                      ),
+                      acceptEmpty: true,
+                      maxValueForValidation: 25,
+                      viewCharactersCount: false,
+                      validate: false,
+                      onFieldSubmitted: (value) => _updateListWithFilter(value),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: IconButton(
+                    onPressed: () => _lastnameFilterController.clear(),
+                    icon: const Icon(Icons.close_outlined),
+                    color: Colors.red,
+                    iconSize: 15.0,
+                    tooltip: 'Borrar filtro',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Tercer widget alineado a la derecha
+          Align(
+            alignment: Alignment.centerRight,
+            child: IconButton(
+              onPressed: () => widget.onCancel(),
+              icon: const Icon(Icons.close),
+              tooltip: 'Cerrar',
+            ),
+          ),
+        ],
       ),
     );
   }
 
+
+/*
+  Widget _buildTitleBar() {
+    return Container(
+      color: Colors.blue,
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Listado de clientes',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 19.0,
+                ),
+                //textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 280.0,
+                child: CreateTextFormField(
+                  controller: _lastnameFilterController,
+                  focusNode: _lastnameFilterFocusNode,
+                  label: 'Filtrar por apellido',
+                  dataType: DataTypeEnum.text,
+                  acceptEmpty: true,
+                  maxValueForValidation: 25,
+                  viewCharactersCount: false,
+                  validate: false,
+                  onFieldSubmitted: (value) => _updateListWithFilter(value),
+                ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton.outlined(
+                  onPressed: () => widget.onCancel(), // Llamar al callback de cancelación
+                  icon: const Icon(Icons.close)
+              ),
+            ],
+          ),
+
+        ],
+      ),
+    );
+  }
+*/
   Widget _buildBody() {
     return Expanded(
       child: Column(
@@ -99,25 +226,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       ),
     );
   }
-
-  /* Widget _buildBody() {
-    return Expanded(
-      child: Column(
-        children: [
-          _columnsBody(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _customerList.length,
-              itemBuilder: (context, index) {
-                return _buildCustomerRow(_customerList[index], index);
-              },
-            ),
-          ),
-          _footerBody(),
-        ],
-      ),
-    );
-  }*/
 
   Table _columnsBody() {
     return Table(
@@ -173,16 +281,18 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   }
 
   Widget _footerBody(){
-    return PaginationBar(
-      totalPages: metadata['totalPages'] ?? 0,
-      initialPage: metadata['pageNumber']! + 1, //1er numero de pagina para mostrar en pantalla: 1
-      onPageChanged: (page) {
-        setState(() {
-          metadata['pageNumber'] = page - 1; //El num. de pagina inicia en 0
-          _loadData();
-        });
-      },
-    );
+    return metadata['totalPages'] != 0
+      ? PaginationBar(
+          totalPages: metadata['totalPages']!,
+          initialPage: metadata['pageNumber']! + 1, //1er numero de pagina para mostrar en pantalla: 1
+          onPageChanged: (page) {
+            setState(() {
+              metadata['pageNumber'] = page - 1; //El num. de pagina inicia en 0
+              _loadData();
+            });
+          },
+        )
+      : const SizedBox.shrink();
   }
 
   Future<void> _loadData() async {
@@ -344,59 +454,14 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
             ),
           ],
         )
-
-        /*
-        TableRow(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(customer.lastname!),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(customer.name),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(customer.document.toString()),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(customer.telephone!),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(dateToStr(customer.addDate!)!),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(customer.paymentNumber!.toString()),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Text(customer.partner! ? 'SI' : 'NO'),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: Center(
-                child: IconButton(
-                  icon: Icon(
-                    Icons.note,
-                    color: customer.notes!.isNotEmpty
-                        ? Colors.green
-                        : Colors.grey,
-                  ),
-                  tooltip: customer.notes,
-                  onPressed: null,
-                ),
-              ),
-            )
-
-          ],
-        ),
-         */
       ],
     );
+  }
+
+  //Actualiza la lista de clientes
+  void _updateListWithFilter(String value) {
+
+
   }
 
 }
