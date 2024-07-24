@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto2.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -67,7 +68,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   final FocusNode _quantityFocusNode = FocusNode();
 
   VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
+
+  //Carga el medicamento buscado por codigo
   MedicineDTO1 _medicine = MedicineDTO1.empty();
+  //Carga el medicamento para el objeto _controlledMedication (toma los datos de _medicine)
+  MedicineDTO2 _medicine2 = MedicineDTO2.empty();
+
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
   bool _quantityValidated = true;
@@ -356,11 +362,16 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         return;
       }
       _medicine = MedicineDTO1.empty();
+      _medicine2 = MedicineDTO2.empty();
       await fetchMedicineBarCode(
           barCode: _barCodeController.text,
           medicine: _medicine,
       ).then((value) async {
         if (_medicine.medicineId != null) {
+          _medicine2 = MedicineDTO2(
+            medicineId: _medicine.medicineId,
+            name: _medicine.name
+          );
           if (_isSupplier() || _isAdjustmentStock() ||_medicine.currentStock! > 0) {
             (bool, DateTime?) result = (true, null);
             if (! _isSupplier() && ! _isAdjustmentStock()) {
@@ -539,7 +550,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     _controlledMedication?.customerId =  widget.customerOrSupplierId;
     //_controlledMedication?.medicine?.medicineId = _medicine.medicineId!;
     //_controlledMedication?.medicine?.name = _medicine.name!;
-    _controlledMedication?.medicine = _medicine.fromJson(_medicine),
+    _controlledMedication?.medicine = _medicine2;
     _controlledMedication?.customerName =
       '${widget.customer!.name} ${widget.customer!.lastname}';
     _controlledMedication?.lastSaleDate = null;

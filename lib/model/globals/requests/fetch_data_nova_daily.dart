@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:novafarma_front/model/globals/constants.dart'
     show novaDailyToken, socketNovaDaily, timeOutSecondsResponse,
-    uriNovaDailyFindPartnerDocument, uriNovaDailyFindPartnerLastname;
+    uriNovaDailyFindPartnerDocument;
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 

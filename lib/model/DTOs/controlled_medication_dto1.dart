@@ -47,7 +47,7 @@ class ControlledMedicationDTO1 extends Deserializable<ControlledMedicationDTO1> 
       customerId: json['customerId'],
       //medicineId: json['medicine']['medicineId'],
       //medicineName: json['medicine']['name'],
-      medicine: medicine?.fromJson(json['medicine']),
+      medicine: MedicineDTO2().fromJson(json['medicine']),
       frequencyDays: json['frequencyDays'],
       toleranceDays: json['toleranceDays'],
       lastSaleDate: strToDate(json['lastSaleDate']),

@@ -7,7 +7,10 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
+import 'package:novafarma_front/view/dialogs/controlled_medication_list_from_customer_dialog.dart';
 
+import '../../model/DTOs/controlled_medication_dto.dart';
+import '../../model/DTOs/controlled_medication_dto1.dart';
 import '../../model/DTOs/customer_dto1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
@@ -576,9 +579,17 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   Future<void> _controlledMedication(int index) async {
     await fetchData(
         uri: '$uriCustomerFindControlledMedications/${_customerList[index].customerId}',
-        classObject: CustomerDTO1.empty(),
+        classObject: ControlledMedicationDTO1.empty(),
     ).then((value) {
-      print(value);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ControlledMedicationListFromCustomerDialog(
+              medications: value as List<ControlledMedicationDTO1>
+          );
+        },
+      );
+
     }).onError((error, stackTrace) {
 
     });
