@@ -85,7 +85,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                 ),
                 const SizedBox(height: 20),
                 Text('Paciente: ${widget.controlledMedication!.customerName}'),
-                Text('Medicamento: ${widget.controlledMedication!.medicineName}'),
+                Text('Medicamento: ${widget.controlledMedication!.medicine?.name}'),
                 widget.controlledMedication!.lastSaleDate != null
                   ? Text('Ultima venta: ${widget.controlledMedication!.lastSaleDate}')
                   : const SizedBox.shrink(),

@@ -243,7 +243,6 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                 _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
                     ? _boxTotalVoucher()
                     : const SizedBox.shrink(),
-                //_notesBody(),
                 const Divider(),
                 _footerBody(),
               ],

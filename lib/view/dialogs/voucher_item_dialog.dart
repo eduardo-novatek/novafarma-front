@@ -495,7 +495,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         controlledMedication.customer = CustomerDTO(
             customerId: _controlledMedication!.customerId);
         controlledMedication.medicine = MedicineDTO(
-            medicineId: _controlledMedication!.medicineId);
+            medicineId: _controlledMedication!.medicine?.medicineId);
         controlledMedication.frequencyDays =
             _controlledMedication!.frequencyDays;
         controlledMedication.toleranceDays =
@@ -537,8 +537,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     //Si _controlledMedication es null, crea el objeto vacío
     _controlledMedication ??= ControlledMedicationDTO1.empty();
     _controlledMedication?.customerId =  widget.customerOrSupplierId;
-    _controlledMedication?.medicineId = _medicine.medicineId!;
-    _controlledMedication?.medicineName = _medicine.name!;
+    //_controlledMedication?.medicine?.medicineId = _medicine.medicineId!;
+    //_controlledMedication?.medicine?.name = _medicine.name!;
+    _controlledMedication?.medicine = _medicine.fromJson(_medicine),
     _controlledMedication?.customerName =
       '${widget.customer!.name} ${widget.customer!.lastname}';
     _controlledMedication?.lastSaleDate = null;

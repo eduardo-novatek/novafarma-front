@@ -11,7 +11,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import '../../model/DTOs/customer_dto1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
-    show sizePage, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindLastnameName;
+    show sizePage, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindControlledMedications, uriCustomerFindLastnameName;
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
@@ -32,7 +32,6 @@ class ListCustomerScreen extends StatefulWidget {
 
 class _ListCustomerScreenState extends State<ListCustomerScreen> {
   final List<CustomerDTO1> _customerList = [];
-  List<Color> _iconButtonColors = [];
 
   final _lastnameFilterController = TextEditingController();
   final _lastnameFilterFocusNode = FocusNode();
@@ -162,7 +161,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 ListView.builder(
                   itemCount: _customerList.length,
                   itemBuilder: (context, index) {
-                    return _buildCustomerRow(_customerList[index], index);
+                    return _buildCustomerRow(index);
                   },
                 ),
                 if (loading)
@@ -189,9 +188,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         6: FlexColumnWidth(0.3),   // ¿socio?
         7: FlexColumnWidth(0.5),   // boton Notas
         8: FixedColumnWidth(48),  //boton
-        9: FixedColumnWidth(48),  //boton
-        10: FixedColumnWidth(48),  //boton
-
       },
       children: const [
         TableRow(
@@ -228,9 +224,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
               padding: EdgeInsets.all(8.0),
               child: Text("NOTAS", style: TextStyle(fontWeight: FontWeight.bold)),
             ),
-            SizedBox.shrink(), // Celda vacía para boton
-            SizedBox.shrink(), // Celda vacía para boton
-            SizedBox.shrink()  // Celda vacía para boton
+            SizedBox.shrink(), // Celda vacía para boton de menu
           ],
         ),
       ],
@@ -260,8 +254,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
     ).then((pageObject) {
       _customerList.clear();
-      _iconButtonColors.clear();
-
       if (pageObject.totalElements == 0) {
         metadata['pageNumber'] = 0;
         metadata['totalPages'] = 0;
@@ -270,8 +262,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       }
       setState(() {
         _customerList.addAll(pageObject.content as Iterable<CustomerDTO1>);
-        //_iconButtonColors = List<Color>.filled(_customerList.length, Colors.black54);
-        _iconButtonColors = List<Color>.generate(_customerList.length, (index) => Colors.black54); //Mutable
         metadata['pageNumber'] = pageObject.pageNumber;
         metadata['totalPages'] = pageObject.totalPages;
         metadata['totalElements'] = pageObject.totalElements;
@@ -322,13 +312,9 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
     ).then((customersFiltered) {
       _customerList.clear();
-      _iconButtonColors.clear();
-
       if (customersFiltered.isNotEmpty) {
         setState(() {
           _customerList.addAll(customersFiltered as Iterable<CustomerDTO1>);
-          //_iconButtonColors = List<Color>.filled(_customerList.length, Colors.black54);
-          _iconButtonColors = List<Color>.generate(_customerList.length, (index) => Colors.black54); //Mutable
         });
       }
 
@@ -359,7 +345,9 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     _toggleLoading();
   }
 
-  Table _buildCustomerRow(CustomerDTO1 customer, int index) {
+  Table _buildCustomerRow(int index) {
+    CustomerDTO1 customerSelected = _customerList[index];
+
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1.0),  // apellido
@@ -371,8 +359,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         6: FlexColumnWidth(0.3),   // ¿socio?
         7: FlexColumnWidth(0.5),   // boton Notas
         8: FixedColumnWidth(48),  //boton
-        9: FixedColumnWidth(48),  //boton
-        10: FixedColumnWidth(48)  //boton
       },
       children: [
         TableRow(
@@ -383,7 +369,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(customer.lastname!),
+                  child: Text(customerSelected.lastname!),
                 ),
               ),
             ),
@@ -393,7 +379,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(customer.name),
+                  child: Text(customerSelected.name),
                 ),
               ),
             ),
@@ -403,7 +389,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(customer.document.toString()),
+                  child: Text(customerSelected.document.toString()),
                 ),
               ),
             ),
@@ -413,7 +399,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(customer.telephone!),
+                  child: Text(customerSelected.telephone!),
                 ),
               ),
             ),
@@ -423,7 +409,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(dateToStr(customer.addDate!)!),
+                  child: Text(dateToStr(customerSelected.addDate!)!),
                 ),
               ),
             ),
@@ -433,7 +419,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(customer.paymentNumber!.toString()),
+                  child: Text(customerSelected.paymentNumber!.toString()),
                 ),
               ),
             ),
@@ -443,7 +429,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: Text(customer.partner! ? 'SI' : 'NO'),
+                  child: Text(customerSelected.partner! ? 'SI' : 'NO'),
                 ),
               ),
             ),
@@ -455,40 +441,72 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                   child: IconButton(
                     icon: Icon(
                       Icons.note,
-                      color: customer.notes!.isNotEmpty
+                      color: customerSelected.notes!.isNotEmpty
                           ? Colors.green
                           : Colors.grey,
                     ),
-                    tooltip: customer.notes,
+                    tooltip: customerSelected.notes,
                     onPressed: null,
                   ),
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.medical_information),
-              tooltip: 'Medicamentos controlados',
-              onPressed: () {  },
-            ),
-            IconButton(
-              icon: const Icon(Icons.assignment_outlined),
-              tooltip: 'Comprobantes emitidos',
-              onPressed: () { } ,
-            ),
-            MouseRegion(
-              onEnter: (_) => _deleteButtonOnEnter(index),
-              onExit: (_) => _deleteButtonOnExit(index),
-              child: IconButton(
-                icon: const Icon(Icons.delete),
-                color: _iconButtonColors[index],
-                tooltip: 'Eliminar',
-                onPressed: () => _delete(customer, index),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: PopupMenuButton<int>(
+                onSelected: (menuItem) => _onSelected(context, menuItem, index),
+                itemBuilder: (context) => [
+                  const PopupMenuItem<int>(
+                    value: 0,
+                    child: Row(
+                      children: [
+                        Icon(Icons.medical_information, color: Colors.black),
+                        SizedBox(width: 8),
+                        Text('Medicamentos controlados')
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: Row(
+                      children: [
+                        Icon(Icons.assignment_outlined, color: Colors.black),
+                        SizedBox(width: 8),
+                        Text('Comprobantes emitidos')
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 2,
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.black),
+                        SizedBox(width: 8),
+                        Text('Eliminar')
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            )
+            ),
           ],
         )
       ],
     );
+  }
+
+  void _onSelected(BuildContext context, int menuItem, int index) {
+    switch (menuItem) {
+      case 0:
+        _controlledMedication(index);
+        break;
+      case 1:
+      // Acción para 'Comprobantes emitidos'
+        break;
+      case 2:
+        _delete(index);
+        break;
+    }
   }
 
   void _clearFilter() {
@@ -498,11 +516,14 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     }
   }
 
-  Future<void> _delete(CustomerDTO1 customer, int index) async {
+  Future<void> _delete(int index) async {
+    CustomerDTO1 customerSelected = _customerList[index];
+
     int option = await OpenDialog(
       context: context,
       title: 'Eliminar cliente',
-      content: '${customer.lastname}, ${customer.name} (${customer.document})\n\n'
+      content: '${customerSelected.lastname}, '
+          '${customerSelected.name} (${customerSelected.document})\n\n'
           'Una vez eliminado el cliente no podrá recuperarse.\n'
           '¿Confirma?',
       textButton1: 'Si',
@@ -513,12 +534,11 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       _toggleLoading();
       try {
         await fetchData<CustomerDTO1>(
-          uri: '$uriCustomerDelete/${customer.customerId}',
+          uri: '$uriCustomerDelete/${customerSelected.customerId}',
           classObject: CustomerDTO1.empty(),
         );
         setState(() {
           _customerList.removeAt(index);
-          _iconButtonColors.removeAt(index);
         });
         FloatingMessage.show(
           context: context,
@@ -553,15 +573,14 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     }
   }
 
-  void _deleteButtonOnEnter(int index) {
-    setState(() {
-      _iconButtonColors[index] = Colors.red;
-    });
-  }
+  Future<void> _controlledMedication(int index) async {
+    await fetchData(
+        uri: '$uriCustomerFindControlledMedications/${_customerList[index].customerId}',
+        classObject: CustomerDTO1.empty(),
+    ).then((value) {
+      print(value);
+    }).onError((error, stackTrace) {
 
-  void _deleteButtonOnExit(int index) {
-    setState(() {
-      _iconButtonColors[index] = Colors.black54;
     });
   }
 
