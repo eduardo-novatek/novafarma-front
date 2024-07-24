@@ -585,7 +585,9 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         context: context,
         builder: (BuildContext context) {
           return ControlledMedicationListFromCustomerDialog(
-              medications: value as List<ControlledMedicationDTO1>
+            customerName: '${_customerList[index].lastname}, '
+                '${_customerList[index].name}',
+            medications: value as List<ControlledMedicationDTO1>
           );
         },
       );
