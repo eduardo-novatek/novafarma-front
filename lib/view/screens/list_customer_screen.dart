@@ -1,4 +1,5 @@
-import 'dart:ui';
+import 'dart:html';
+import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -22,6 +23,447 @@ import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 
 class ListCustomerScreen extends StatefulWidget {
+  final ui.VoidCallback onCancel;
+
+  const ListCustomerScreen({super.key, required this.onCancel});
+
+  @override
+  State<ListCustomerScreen> createState() => _ListCustomerScreenState();
+}
+
+class _ListCustomerScreenState extends State<ListCustomerScreen> {
+  final List<CustomerDTO1> _customerList = [];
+
+  final _lastnameFilterController = TextEditingController();
+  final _lastnameFilterFocusNode = FocusNode();
+
+  bool loading = false;
+  Map<String, int> metadata = {
+    'pageNumber': 0,
+    'totalPages': 0,
+    'totalElements': 0,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDataPageable();
+  }
+
+  @override
+  void dispose() {
+    _lastnameFilterController.dispose();
+    _lastnameFilterFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.8,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15.0),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10.0,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildTitleBar(),
+            _buildBody(),
+            _lastnameFilterController.text.trim().isEmpty
+                ? _buildFooter()
+                : const SizedBox.shrink(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitleBar() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.blueAccent,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(15.0),
+          topRight: Radius.circular(15.0),
+        ),
+      ),
+      padding: const EdgeInsets.all(16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Listado de clientes',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: SizedBox(
+                width: 300.0,
+                child: CreateTextFormField(
+                  controller: _lastnameFilterController,
+                  focusNode: _lastnameFilterFocusNode,
+                  label: 'Filtrar por apellido',
+                  dataType: DataTypeEnum.text,
+                  textStyle: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    color: Colors.white,
+                    fontSize: 16.0,
+                  ),
+                  acceptEmpty: true,
+                  maxValueForValidation: 25,
+                  viewCharactersCount: false,
+                  validate: false,
+                  onFieldSubmitted: (value) => _loadDataFilter(),
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: _clearFilter,
+            icon: const Icon(Icons.close),
+            color: Colors.white,
+            tooltip: 'Borrar filtro',
+          ),
+          IconButton(
+            onPressed: widget.onCancel,
+            icon: const Icon(Icons.close),
+            color: Colors.white,
+            tooltip: 'Cerrar',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Expanded(
+      child: Column(
+        children: [
+          _columnsBody(),
+          Expanded(
+            child: Stack(
+              children: [
+                ListView.builder(
+                  itemCount: _customerList.length,
+                  itemBuilder: (context, index) {
+                    return _buildCustomerRow(index);
+                  },
+                ),
+                if (loading)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Table _columnsBody() {
+    return Table(
+      columnWidths: const {
+        0: FlexColumnWidth(1.0),  // apellido
+        1: FlexColumnWidth(1.0),  // nombre
+        2: FlexColumnWidth(0.5),  // documento
+        3: FlexColumnWidth(0.5),  // telefono
+        4: FlexColumnWidth(0.5),  // fecha de alta
+        5: FlexColumnWidth(0.4),  // Num. cobro
+        6: FlexColumnWidth(0.3),  // ¿socio?
+        7: FlexColumnWidth(0.5),  // boton Notas
+        8: FixedColumnWidth(48),  //boton
+      },
+      children: const [
+        TableRow(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "APELLIDO",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "NOMBRE",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'DOCUMENTO',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "TELEFONO",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "ALTA",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "Nº COBRO",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "SOCIO",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                "NOTAS",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox.shrink(), // Celda vacía para boton de menu
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter() {
+    return metadata['totalPages'] != 0
+        ? PaginationBar(
+      totalPages: metadata['totalPages']!,
+      initialPage: metadata['pageNumber']! + 1,
+      onPageChanged: (page) {
+        setState(() {
+          metadata['pageNumber'] = page - 1;
+          _loadDataPageable();
+        });
+      },
+    )
+        : const SizedBox.shrink();
+  }
+
+  Future<void> _loadDataPageable() async {
+    _toggleLoading();
+    await fetchDataPageable<CustomerDTO1>(
+      uri: '$uriCustomerFindAllPage/${metadata['pageNumber']!}/$sizePage',
+      classObject: CustomerDTO1.empty(),
+    ).then((pageObject) {
+      _customerList.clear();
+      if (pageObject.totalElements == 0) {
+        metadata['pageNumber'] = 0;
+        metadata['totalPages'] = 0;
+        metadata['totalElements'] = 0;
+        return;
+      }
+      setState(() {
+        _customerList.addAll(pageObject.content as Iterable<CustomerDTO1>);
+        metadata['pageNumber'] = pageObject.pageNumber;
+        metadata['totalPages'] = pageObject.totalPages;
+        metadata['totalElements'] = pageObject.totalElements;
+      });
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+          context: context,
+          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
+          messageTypeEnum: error.message != null
+              ? MessageTypeEnum.warning
+              : MessageTypeEnum.error,
+        );
+        if (kDebugMode) {
+          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+        }
+      } else {
+        FloatingMessage.show(
+          context: context,
+          text: 'Error obteniendo datos',
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) {
+          print('Error obteniendo datos: ${error.toString()}');
+        }
+      }
+    });
+    _toggleLoading();
+  }
+
+  void _toggleLoading() {
+    setState(() {
+      loading = !loading;
+    });
+  }
+
+  Future<void> _loadDataFilter() async {
+    if (_lastnameFilterController.text.trim().isEmpty) {
+      _loadDataPageable();
+      return;
+    }
+    _toggleLoading();
+    await fetchData<CustomerDTO1>(
+      uri: '$uriCustomerFindLastnameName/${_lastnameFilterController.text.trim()}',
+      classObject: CustomerDTO1.empty(),
+    ).then((customersFiltered) {
+      _customerList.clear();
+      if (customersFiltered.isNotEmpty) {
+        setState(() {
+          _customerList.addAll(customersFiltered as Iterable<CustomerDTO1>);
+        });
+      }
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+          context: context,
+          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
+          messageTypeEnum: error.message != null
+              ? MessageTypeEnum.warning
+              : MessageTypeEnum.error,
+        );
+        if (kDebugMode) {
+          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+        }
+      } else {
+        FloatingMessage.show(
+          context: context,
+          text: 'Error obteniendo datos',
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) {
+          print('Error obteniendo datos: ${error.toString()}');
+        }
+      }
+    });
+    _toggleLoading();
+  }
+
+  void _clearFilter() {
+    if (_lastnameFilterController.text.trim().isNotEmpty) {
+      setState(() {
+        _lastnameFilterController.clear();
+      });
+      _loadDataPageable();
+    }
+  }
+
+  Widget _buildCustomerRow(int index) {
+    final CustomerDTO1 customer = _customerList[index];
+    return GestureDetector(
+      onTap: () => _showMenu(customer),
+      child: Container(
+        decoration: BoxDecoration(
+          color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.shade200,
+            ),
+          ),
+        ),
+        padding: const EdgeInsets.all(8.0),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(1.0),
+            1: FlexColumnWidth(1.0),
+            2: FlexColumnWidth(0.5),
+            3: FlexColumnWidth(0.5),
+            4: FlexColumnWidth(0.5),
+            5: FlexColumnWidth(0.4),
+            6: FlexColumnWidth(0.3),
+            7: FlexColumnWidth(0.5),
+            8: FixedColumnWidth(48),
+          },
+          children: [
+            TableRow(
+              children: [
+                _buildTableCell(customer.lastname),
+                _buildTableCell(customer.name),
+                _buildTableCell(customer.document.toString()),
+                _buildTableCell(customer.telephone.toString()),
+                _buildTableCell(dateToStr(customer.addDate)),
+                _buildTableCell(customer.paymentNumber.toString()),
+                _buildTableCell(customer.partner! ? 'Sí' : 'No'),
+                _buildTableCell(customer.notes),
+                IconButton(
+                  onPressed: () => _showMenu(customer),
+                  icon: const Icon(Icons.more_vert),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTableCell(String? text) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text ?? '',
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
+  void _showMenu(CustomerDTO1 customer) {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final Size size = renderBox.size;
+    final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy,
+        offset.dx + size.width,
+        offset.dy + size.height,
+      ),
+      items: [
+        PopupMenuItem(
+          child: const Text('Opción 1'),
+          onTap: () {
+            // Acción para la opción 1
+          },
+        ),
+        PopupMenuItem(
+          child: const Text('Opción 2'),
+          onTap: () {
+            // Acción para la opción 2
+          },
+        ),
+      ],
+    );
+  }
+}
+
+
+
+/*class ListCustomerScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
   // parámetros y no devuelve ningún valor. En este caso, se utiliza para
   // definir el tipo del callback onCancel, que se llamará cuando el usuario
@@ -597,4 +1039,4 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     });
   }
 
-}
+}*/
