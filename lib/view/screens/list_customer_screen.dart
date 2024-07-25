@@ -9,10 +9,10 @@ import 'package:novafarma_front/view/dialogs/controlled_medication_list_from_cus
 
 import '../../model/DTOs/controlled_medication_dto1.dart';
 import '../../model/DTOs/customer_dto1.dart';
+import '../../model/DTOs/voucher_dto_1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
-    show sizePage, uriCustomerDelete, uriCustomerFindAllPage,
-    uriCustomerFindControlledMedications, uriCustomerFindLastnameName;
+    show sizePage, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindControlledMedications, uriCustomerFindLastnameName, uriCustomerFindVouchersPage;
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
@@ -469,12 +469,61 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         _controlledMedication(index);
         break;
       case 1:
-      // Acción para 'Comprobantes emitidos'
+        _findVouchers(index);
         break;
       case 2:
         _delete(index);
         break;
     }
+  }
+
+  Future<void> _findVouchers(int index) async {
+    _toggleLoading();
+    await fetchData(
+      uri: '$uriCustomerFindVouchersPage'
+          '/${_customerList[index].customerId}',
+          '/${}'
+          '/${}',
+      classObject: VoucherDTO1.empty(),
+    ).then((value) {
+      _toggleLoading();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ControlledMedicationListFromCustomerDialog(
+              customerName: '${_customerList[index].lastname}, '
+                  '${_customerList[index].name}',
+              medications: value as List<ControlledMedicationDTO1>
+          );
+        },
+      );
+    }).onError((error, stackTrace) {
+      _toggleLoading();
+      String? msg;
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+          FloatingMessage.show(
+            context: context,
+            text: 'Sin datos',
+            messageTypeEnum: MessageTypeEnum.info,
+          );
+        } else {
+          msg = error.message;
+        }
+      } else {
+        msg = error.toString().contains('XMLHttpRequest error')
+            ? 'Error de conexión'
+            : error.toString();
+      }
+      if (msg != null) {
+        FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) print(error);
+      }
+    });
   }
 
   Future<void> _controlledMedication(int index) async {

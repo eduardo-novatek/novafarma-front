@@ -47,6 +47,7 @@ const String uriCustomerAdd = "/customer/add";
 const String uriCustomerUpdate = "/customer/update";
 const String uriCustomerDelete = "/customer/delete";
 const String uriCustomerFindControlledMedications = "/customer/findControlledMedications";
+const String uriCustomerFindVouchersPage = "/customer/findVouchers";
 
 //NovaDaily
 const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
