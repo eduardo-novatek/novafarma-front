@@ -1,4 +1,4 @@
-import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,11 @@ import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 
 class ListCustomerScreen extends StatefulWidget {
-  final ui.VoidCallback onCancel;
+  //VoidCallback es un tipo de función predefinido en Flutter que no acepta
+  // parámetros y no devuelve ningún valor. En este caso, se utiliza para
+  // definir el tipo del callback onCancel, que se llamará cuando el usuario
+  // presione el botón de cancelar
+  final VoidCallback onCancel;
 
   const ListCustomerScreen({super.key, required this.onCancel});
 
@@ -141,58 +145,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     );
   }
 
-  /*Widget _buildTitleBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15.0),
-          topRight: Radius.circular(15.0),
-        ),
-      ),
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Listado de clientes',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(
-            width: 300.0,
-            child: TextField(
-              controller: _lastnameFilterController,
-              focusNode: _lastnameFilterFocusNode,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Filtrar por apellido',
-                labelStyle: const TextStyle(color: Colors.white),
-                border: const OutlineInputBorder(),
-                filled: true,
-                fillColor: Colors.blue.shade300,
-                suffixIcon: IconButton(
-                  onPressed: _clearFilter,
-                  icon: const Icon(Icons.clear, color: Colors.white),
-                ),
-              ),
-              onSubmitted: (value) => _loadDataFilter(),
-            ),
-          ),
-          IconButton(
-            onPressed: widget.onCancel,
-            icon: const Icon(Icons.close),
-            color: Colors.white,
-            tooltip: 'Cerrar',
-          ),
-        ],
-      ),
-    );
-  }*/
-
   Widget _buildBody() {
     return Expanded(
       child: Column(
@@ -380,7 +332,8 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   }
 
   Widget _buildCustomerRow(int index) {
-    final CustomerDTO1 customer = _customerList[index];
+    CustomerDTO1 customer = _customerList[index];
+
     return Container(
       decoration: BoxDecoration(
         color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
@@ -390,34 +343,33 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
           ),
         ),
       ),
-      padding: const EdgeInsets.all(8.0),
       child: Table(
         columnWidths: const {
-          0: FlexColumnWidth(1.0),
-          1: FlexColumnWidth(1.0),
-          2: FlexColumnWidth(0.5),
-          3: FlexColumnWidth(0.5),
-          4: FlexColumnWidth(0.5),
-          5: FlexColumnWidth(0.4),
-          6: FlexColumnWidth(0.3),
-          7: FlexColumnWidth(0.3),
-          8: FlexColumnWidth(0.15),
+          0: FlexColumnWidth(1.0),    // apellido
+          1: FlexColumnWidth(1.0),    // nombre
+          2: FlexColumnWidth(0.5),    // documento
+          3: FlexColumnWidth(0.5),    // telefono
+          4: FlexColumnWidth(0.5),    // fecha de alta
+          5: FlexColumnWidth(0.4),    // Num. cobro
+          6: FlexColumnWidth(0.3),    // ¿socio?
+          7: FlexColumnWidth(0.3),    // Notas
+          8: FlexColumnWidth(0.15),   // menu
           //8: FixedColumnWidth(48),
         },
         children: [
           TableRow(
             children: [
-              _buildTableCell(customer.lastname),
-              _buildTableCell(customer.name),
-              _buildTableCell(customer.document.toString()),
-              _buildTableCell(customer.telephone.toString()),
-              _buildTableCell(dateToStr(customer.addDate)),
-              _buildTableCell(customer.paymentNumber.toString()),
-              _buildTableCell(customer.partner! ? 'Sí' : 'No'),
+              _buildTableCell(text: customer.lastname),
+              _buildTableCell(text: customer.name),
+              _buildTableCell(text: customer.document.toString()),
+              _buildTableCell(text: customer.telephone.toString()),
+              _buildTableCell(text: dateToStr(customer.addDate)),
+              _buildTableCell(text: customer.paymentNumber.toString()),
+              _buildTableCell(text: customer.partner! ? 'Sí' : 'No'),
               _buildTableCellNotes(customer.notes!),
               _showMenu(index),
             ],
-          ),
+          )
         ],
       ),
     );
@@ -484,14 +436,29 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     );
   }
 
-  Widget _buildTableCell(String? text) {
-    return Padding(
+  Widget _buildTableCell({String? text, bool? alignRight}) {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: Align(
+          alignment: alignRight != null && alignRight
+            ? Alignment.centerRight
+            : Alignment.centerLeft,
+          child: Text(
+            text ?? '',
+            overflow: TextOverflow.ellipsis,
+          )
+        ),
+      ),
+    );
+    /*return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
         text ?? '',
         overflow: TextOverflow.ellipsis,
       ),
-    );
+    );*/
   }
 
   void _onSelected(BuildContext context, int menuItem, int index) {
@@ -585,528 +552,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   }
 
 }
-
-//
-// 1a version mejorada
-//
-
-/*
-class ListCustomerScreen extends StatefulWidget {
-  final ui.VoidCallback onCancel;
-
-  const ListCustomerScreen({super.key, required this.onCancel});
-
-  @override
-  State<ListCustomerScreen> createState() => _ListCustomerScreenState();
-}
-
-class _ListCustomerScreenState extends State<ListCustomerScreen> {
-  final List<CustomerDTO1> _customerList = [];
-
-  final _lastnameFilterController = TextEditingController();
-  final _lastnameFilterFocusNode = FocusNode();
-
-  bool loading = false;
-  Map<String, int> metadata = {
-    'pageNumber': 0,
-    'totalPages': 0,
-    'totalElements': 0,
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _loadDataPageable();
-  }
-
-  @override
-  void dispose() {
-    _lastnameFilterController.dispose();
-    _lastnameFilterFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10.0,
-              offset: Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTitleBar(),
-            _buildBody(),
-            _lastnameFilterController.text.trim().isEmpty
-                ? _buildFooter()
-                : const SizedBox.shrink(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTitleBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(15.0),
-          topRight: Radius.circular(15.0),
-        ),
-      ),
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Listado de clientes',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: SizedBox(
-                width: 300.0,
-                child: TextField(
-                  controller: _lastnameFilterController,
-                  focusNode: _lastnameFilterFocusNode,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Filtrar por apellido',
-                    labelStyle: const TextStyle(color: Colors.white),
-                    border: const OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.blue.shade300,
-                    suffixIcon: IconButton(
-                      onPressed: _clearFilter,
-                      icon: const Icon(Icons.clear, color: Colors.white),
-                    ),
-                  ),
-                  onSubmitted: (value) => _loadDataFilter(),
-                ),
-              ),
-            ),
-          ),
-          IconButton(
-            onPressed: widget.onCancel,
-            icon: const Icon(Icons.close),
-            color: Colors.white,
-            tooltip: 'Cerrar',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBody() {
-    return Expanded(
-      child: Column(
-        children: [
-          _columnsBody(),
-          Expanded(
-            child: Stack(
-              children: [
-                ListView.builder(
-                  itemCount: _customerList.length,
-                  itemBuilder: (context, index) {
-                    return _buildCustomerRow(index);
-                  },
-                ),
-                if (loading)
-                  const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Table _columnsBody() {
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(1.0),  // apellido
-        1: FlexColumnWidth(1.0),  // nombre
-        2: FlexColumnWidth(0.5),  // documento
-        3: FlexColumnWidth(0.5),  // telefono
-        4: FlexColumnWidth(0.5),  // fecha de alta
-        5: FlexColumnWidth(0.4),  // Num. cobro
-        6: FlexColumnWidth(0.3),  // ¿socio?
-        7: FlexColumnWidth(0.3),  // boton Notas
-        8: FlexColumnWidth(0.15),
-        //8: FixedColumnWidth(48),  //boton
-      },
-      children: [
-        TableRow(
-          children: [
-            _buildColumn('APELLIDO'),
-            _buildColumn('NOMBRE'),
-            _buildColumn('DOCUMENTO'),
-            _buildColumn('TELEFONO'),
-            _buildColumn('ALTA'),
-            _buildColumn('Nº COBRO'),
-            _buildColumn('SOCIO'),
-            _buildColumn('NOTAS'),
-            const SizedBox.shrink(), // Celda vacía para boton de menu
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildColumn(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return metadata['totalPages'] != 0
-        ? PaginationBar(
-      totalPages: metadata['totalPages']!,
-      initialPage: metadata['pageNumber']! + 1,
-      onPageChanged: (page) {
-        setState(() {
-          metadata['pageNumber'] = page - 1;
-          _loadDataPageable();
-        });
-      },
-    )
-        : const SizedBox.shrink();
-  }
-
-  Future<void> _loadDataPageable() async {
-    _toggleLoading();
-    await fetchDataPageable<CustomerDTO1>(
-      uri: '$uriCustomerFindAllPage/${metadata['pageNumber']!}/$sizePage',
-      classObject: CustomerDTO1.empty(),
-    ).then((pageObject) {
-      _customerList.clear();
-      if (pageObject.totalElements == 0) {
-        metadata['pageNumber'] = 0;
-        metadata['totalPages'] = 0;
-        metadata['totalElements'] = 0;
-        return;
-      }
-      setState(() {
-        _customerList.addAll(pageObject.content as Iterable<CustomerDTO1>);
-        metadata['pageNumber'] = pageObject.pageNumber;
-        metadata['totalPages'] = pageObject.totalPages;
-        metadata['totalElements'] = pageObject.totalElements;
-      });
-    }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
-    });
-    _toggleLoading();
-  }
-
-  void _toggleLoading() {
-    setState(() {
-      loading = !loading;
-    });
-  }
-
-  Future<void> _loadDataFilter() async {
-    if (_lastnameFilterController.text.trim().isEmpty) {
-      _loadDataPageable();
-      return;
-    }
-    _toggleLoading();
-    await fetchData<CustomerDTO1>(
-      uri: '$uriCustomerFindLastnameName/${_lastnameFilterController.text.trim()}',
-      classObject: CustomerDTO1.empty(),
-    ).then((customersFiltered) {
-      _customerList.clear();
-      if (customersFiltered.isNotEmpty) {
-        setState(() {
-          _customerList.addAll(customersFiltered as Iterable<CustomerDTO1>);
-        });
-      }
-    }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
-    });
-    _toggleLoading();
-  }
-
-  void _clearFilter() {
-    if (_lastnameFilterController.text.trim().isNotEmpty) {
-      setState(() {
-        _lastnameFilterController.clear();
-      });
-      _loadDataPageable();
-    }
-  }
-
-  Widget _buildCustomerRow(int index) {
-    final CustomerDTO1 customer = _customerList[index];
-    return Container(
-      decoration: BoxDecoration(
-        color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.all(8.0),
-      child: Table(
-        columnWidths: const {
-          0: FlexColumnWidth(1.0),
-          1: FlexColumnWidth(1.0),
-          2: FlexColumnWidth(0.5),
-          3: FlexColumnWidth(0.5),
-          4: FlexColumnWidth(0.5),
-          5: FlexColumnWidth(0.4),
-          6: FlexColumnWidth(0.3),
-          7: FlexColumnWidth(0.3),
-          8: FlexColumnWidth(0.15),
-          //8: FixedColumnWidth(48),
-        },
-        children: [
-          TableRow(
-            children: [
-              _buildTableCell(customer.lastname),
-              _buildTableCell(customer.name),
-              _buildTableCell(customer.document.toString()),
-              _buildTableCell(customer.telephone.toString()),
-              _buildTableCell(dateToStr(customer.addDate)),
-              _buildTableCell(customer.paymentNumber.toString()),
-              _buildTableCell(customer.partner! ? 'Sí' : 'No'),
-              _buildTableCellNotes(customer.notes!),
-              _showMenu(index),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTableCellNotes(String notes) {
-    return TableCell(
-      verticalAlignment: TableCellVerticalAlignment.middle,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8.0),
-        child: Center(
-          child: IconButton(
-            icon: Icon(
-              Icons.note,
-              color: notes.isNotEmpty ? Colors.green : Colors.grey,
-            ),
-            tooltip: notes,
-            onPressed: null,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _showMenu(int index) {
-    return TableCell(
-      verticalAlignment: TableCellVerticalAlignment.middle,
-      child: PopupMenuButton<int>(
-        onSelected: (menuItem) => _onSelected(context, menuItem, index),
-        tooltip: 'Menú',
-        itemBuilder: (context) => [
-          const PopupMenuItem<int>(
-            value: 0,
-            child: Row(
-              children: [
-                Icon(Icons.medical_information, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Medicamentos controlados')
-              ],
-            ),
-          ),
-          const PopupMenuItem<int>(
-            value: 1,
-            child: Row(
-              children: [
-                Icon(Icons.assignment_outlined, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Comprobantes emitidos')
-              ],
-            ),
-          ),
-          const PopupMenuItem<int>(
-            value: 2,
-            child: Row(
-              children: [
-                Icon(Icons.delete, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Eliminar')
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTableCell(String? text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text ?? '',
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-
-  void _onSelected(BuildContext context, int menuItem, int index) {
-    switch (menuItem) {
-      case 0:
-        _controlledMedication(index);
-        break;
-      case 1:
-      // Acción para 'Comprobantes emitidos'
-        break;
-      case 2:
-        _delete(index);
-        break;
-    }
-  }
-
-  Future<void> _controlledMedication(int index) async {
-    await fetchData(
-      uri: '$uriCustomerFindControlledMedications/${_customerList[index].customerId}',
-      classObject: ControlledMedicationDTO1.empty(),
-    ).then((value) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return ControlledMedicationListFromCustomerDialog(
-              customerName: '${_customerList[index].lastname}, '
-                  '${_customerList[index].name}',
-              medications: value as List<ControlledMedicationDTO1>
-          );
-        },
-      );
-    }).onError((error, stackTrace) {
-    });
-  }
-
-  Future<void> _delete(int index) async {
-    CustomerDTO1 customerSelected = _customerList[index];
-
-    int option = await OpenDialog(
-      context: context,
-      title: 'Eliminar cliente',
-      content: '${customerSelected.lastname}, '
-          '${customerSelected.name} (${customerSelected.document})\n\n'
-          'Una vez eliminado el cliente no podrá recuperarse.\n'
-          '¿Confirma?',
-      textButton1: 'Si',
-      textButton2: 'No',
-    ).view();
-
-    if (option == 1) {
-      _toggleLoading();
-      try {
-        await fetchData<CustomerDTO1>(
-          uri: '$uriCustomerDelete/${customerSelected.customerId}',
-          classObject: CustomerDTO1.empty(),
-        );
-        setState(() {
-          _customerList.removeAt(index);
-        });
-        FloatingMessage.show(
-          context: context,
-          text: 'Cliente eliminado con éxito',
-          messageTypeEnum: MessageTypeEnum.info,
-        );
-      } catch (error) {
-        if (error is ErrorObject) {
-          FloatingMessage.show(
-            context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-          }
-        } else {
-          FloatingMessage.show(
-            context: context,
-            text: 'Error obteniendo datos',
-            messageTypeEnum: MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('Error obteniendo datos: ${error.toString()}');
-          }
-        }
-      } finally {
-        _toggleLoading();
-      }
-    }
-  }
-
-}*/
-
-
 
 //
 // ORIGINAL
