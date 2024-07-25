@@ -1,4 +1,5 @@
-import 'dart:ui';
+import 'dart:html';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class ListCustomerScreen extends StatefulWidget {
   // parámetros y no devuelve ningún valor. En este caso, se utiliza para
   // definir el tipo del callback onCancel, que se llamará cuando el usuario
   // presione el botón de cancelar
-  final VoidCallback onCancel;
+  final ui.VoidCallback onCancel;
 
   const ListCustomerScreen({super.key, required this.onCancel});
 
@@ -60,7 +61,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(30.0),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.8,
         decoration: BoxDecoration(
@@ -154,6 +155,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
             child: Stack(
               children: [
                 ListView.builder(
+                  padding: const EdgeInsets.only(right: 30.0),
                   itemCount: _customerList.length,
                   itemBuilder: (context, index) {
                     return _buildCustomerRow(index);
@@ -476,10 +478,12 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   }
 
   Future<void> _controlledMedication(int index) async {
+    _toggleLoading();
     await fetchData(
       uri: '$uriCustomerFindControlledMedications/${_customerList[index].customerId}',
       classObject: ControlledMedicationDTO1.empty(),
     ).then((value) {
+      _toggleLoading();
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -491,6 +495,31 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         },
       );
     }).onError((error, stackTrace) {
+      _toggleLoading();
+      String? msg;
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+          FloatingMessage.show(
+            context: context,
+            text: 'Sin datos',
+            messageTypeEnum: MessageTypeEnum.info,
+          );
+        } else {
+          msg = error.message;
+        }
+      } else {
+        msg = error.toString().contains('XMLHttpRequest error')
+          ? 'Error de conexión'
+          : error.toString();
+      }
+      if (msg != null) {
+        FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) print(error);
+      }
     });
   }
 
