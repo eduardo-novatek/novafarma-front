@@ -25,7 +25,7 @@ class ControlledMedicationListFromCustomerDialog extends StatelessWidget {
           borderRadius: BorderRadius.circular(15.0),
           boxShadow: const [
             BoxShadow(
-              color: Colors.black26,
+              color: Colors.white54, //Colors.black26,
               blurRadius: 10.0,
               offset: Offset(0, 5),
             ),
