@@ -135,30 +135,12 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tipo: ${nameMovementTypeFromInteger(voucher.movementType!)}'),
+        Text('Tipo: ${nameMovementTypeFromInteger(voucher.movementType!.index)}'),
         Text('Total: \$ ${voucher.total}'),
         Text('Notas: ${voucher.notes}'),
       ],
     );
   }
-
-  Widget _viewNextDate(DateTime? date, int days) {
-    DateTime next = date != null ? date.add(Duration(days: days)) : DateTime.now();
-    return Row(
-      children: [
-        const Text('Próximo retiro: '),
-        Text(
-          dateToStr(next)!,
-          style: TextStyle(
-            color: next.isAfter(DateTime.now()) ? Colors.red : Colors.green,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _writeDays(int days) => days > 1 ? 'días' : 'día';
 
   Future<void> _loadData() async {
     _toggleLoading();
@@ -166,7 +148,7 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
     uri: '$uriCustomerFindVouchersPage'
         '/${widget.customerId}'
         '/${0}'
-        '/${3}',
+        '/${30}',
     classObject: VoucherDTO1.empty(),
     ).then((value) {
       _toggleLoading();

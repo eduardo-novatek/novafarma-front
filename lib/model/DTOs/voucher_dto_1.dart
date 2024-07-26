@@ -1,10 +1,12 @@
+import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
+import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
 class VoucherDTO1 extends Deserializable<VoucherDTO1> {
   int? voucherId;
   String? voucherNumber;
   DateTime? date;
-  int? movementType;
+  MovementTypeEnum? movementType;
   double? total;
   String? notes;
 
@@ -31,8 +33,8 @@ class VoucherDTO1 extends Deserializable<VoucherDTO1> {
     return VoucherDTO1(
       voucherId: json['voucherId'],
       voucherNumber: json['voucherNumber'],
-      date: json['date'],
-      movementType: json['movementType'],
+      date: strToDate(json['dateTime']),
+      movementType: nameBDtoMovementTypeEnum(json['movementType']!),
       total: json['total'],
       notes: json['notes'],
     );
