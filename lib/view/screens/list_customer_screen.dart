@@ -18,6 +18,7 @@ import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
 import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
+import '../dialogs/vouchers_from_customer_dialog.dart';
 
 class ListCustomerScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
@@ -38,7 +39,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   final _lastnameFilterController = TextEditingController();
   final _lastnameFilterFocusNode = FocusNode();
 
-  bool loading = false;
+  bool _loading = false;
   Map<String, int> metadata = {
     'pageNumber': 0,
     'totalPages': 0,
@@ -161,7 +162,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
                     return _buildCustomerRow(index);
                   },
                 ),
-                if (loading)
+                if (_loading)
                   const Center(
                     child: CircularProgressIndicator(),
                   ),
@@ -219,15 +220,15 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   Widget _buildFooter() {
     return metadata['totalPages'] != 0
         ? PaginationBar(
-      totalPages: metadata['totalPages']!,
-      initialPage: metadata['pageNumber']! + 1,
-      onPageChanged: (page) {
-        setState(() {
-          metadata['pageNumber'] = page - 1;
-          _loadDataPageable();
-        });
-      },
-    )
+            totalPages: metadata['totalPages']!,
+            initialPage: metadata['pageNumber']! + 1,
+            onPageChanged: (page) {
+              setState(() {
+                metadata['pageNumber'] = page - 1;
+                _loadDataPageable();
+              });
+            },
+          )
         : const SizedBox.shrink();
   }
 
@@ -278,7 +279,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   void _toggleLoading() {
     setState(() {
-      loading = !loading;
+      _loading = !_loading;
     });
   }
 
@@ -469,7 +470,16 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         _controlledMedication(index);
         break;
       case 1:
-        _findVouchers(index);
+        CustomerDTO1 customer = _customerList[index];
+        showDialog(
+          context: context,
+          builder: (context) {
+            return VouchersFromCustomerDialog(
+              customerId: customer.customerId!,
+              customerName: '${customer.lastname}, ${customer.name}',
+            );
+          },
+        );
         break;
       case 2:
         _delete(index);
@@ -477,7 +487,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     }
   }
 
-  Future<void> _findVouchers(int index) async {
+ /* Future<void> _findVouchers(int index) async {
     _toggleLoading();
     await fetchData(
       uri: '$uriCustomerFindVouchersPage'
@@ -524,7 +534,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         if (kDebugMode) print(error);
       }
     });
-  }
+  }*/
 
   Future<void> _controlledMedication(int index) async {
     _toggleLoading();

@@ -15,6 +15,16 @@ String nameMovementType(MovementTypeEnum movementTypeEnum) {
   }
 }
 
+String nameMovementTypeFromInteger(int movementType) {
+  switch (movementType) {
+    case 0: return "Compra";
+    case 1: return "Venta";
+    case 2: return "Devolución al proveedor";
+    case 3: return "Ajuste de stock";
+    default:  return "";
+  }
+}
+
 MovementTypeEnum? toMovementTypeEnum(String movementType) {
   switch (movementType) {
     case "Compra": return MovementTypeEnum.purchase;
