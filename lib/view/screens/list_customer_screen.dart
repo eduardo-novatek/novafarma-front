@@ -18,6 +18,7 @@ import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
 import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
+import '../../model/globals/tree_views/vouchers_from_customer_tree_view.dart';
 import '../dialogs/vouchers_from_customer_dialog.dart';
 
 class ListCustomerScreen extends StatefulWidget {
@@ -366,7 +367,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
               _buildTableCell(text: customer.name),
               _buildTableCell(text: customer.document.toString()),
               _buildTableCell(text: customer.telephone.toString()),
-              _buildTableCell(text: dateToStr(customer.addDate)),
+              _buildTableCell(text: dateTimeToStr(customer.addDate)),
               _buildTableCell(text: customer.paymentNumber.toString()),
               _buildTableCell(text: customer.partner! ? 'Sí' : 'No'),
               _buildTableCellNotes(customer.notes!),
@@ -474,9 +475,11 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         showDialog(
           context: context,
           builder: (context) {
-            return VouchersFromCustomerDialog(
-              customerId: customer.customerId!,
-              customerName: '${customer.lastname}, ${customer.name}',
+            return AlertDialog(
+              content: VouchersFromCustomerTreeView(
+                customerId: customer.customerId!,
+                customerName: '${customer.lastname}, ${customer.name}',
+              ),
             );
           },
         );

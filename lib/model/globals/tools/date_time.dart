@@ -24,8 +24,8 @@ DateTime? strToDate(String? dateStr) {
   return date;
 }
 
-///Dada una fecha en formato String (dateStr), devuelve la fecha en formato
-///DateTime, incluyendo la hora actual. Si el argumento dateStr es "yyyy-MM-dd",
+///Dada una fecha y hora en formato String, devuelve la fecha en formato
+///DateTime, incluyendo hora y minutos. Si el argumento dateStr es "yyyy-MM-dd",
 ///devuelve un objeto DateTime con igual formato. Idem para dateStr="dd/MM/yyyy".
 ///Si falla la conversión o el año < 1900, retorna null.
 DateTime? strToDateTime(String? dateStr) {
@@ -47,11 +47,11 @@ DateTime? strToDateTime(String? dateStr) {
 
   final now = DateTime.now();
   dateTime = DateTime(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-      now.hour,
-      now.minute
+    dateTime.year,
+    dateTime.month,
+    dateTime.day,
+    now.hour,
+    now.minute,
   );
 
   return dateTime;
@@ -67,6 +67,19 @@ String? dateToStr(DateTime? date) {
     return null;
   }
 }
+
+///Dada una fecha en formato DateTime: yyyy-MM-dd HH:mm:ss:mmmm, la devuelve en
+///formato String como "dd/MM/yyyy HH:mm". Si la fecha es nula o no pudo
+///convertir, devuelve null.
+String? dateTimeToStr(DateTime? date) {
+  if (date == null) return null;
+  try {
+    return  DateFormat('dd/MM/yyyy HH:mm').format(date);
+  } catch (e) {
+    return null;
+  }
+}
+
 
 ///Dada una fecha en formato de visualización de tipo String: "dd/MM/yyyy",
 ///la devuelve en formato String: "yyyy-MM-dd"

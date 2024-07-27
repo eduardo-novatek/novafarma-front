@@ -570,7 +570,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   void _updateFields(Object customer) {
     if (customer is CustomerDTO1) {
       _dateController.value =
-          TextEditingValue(text: dateToStr(customer.addDate)!);
+          TextEditingValue(text: dateTimeToStr(customer.addDate)!);
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name);
       _paymentNumberController.value = TextEditingValue(
@@ -584,7 +584,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
     } else if (customer is PartnerNovaDailyDTO) {
       _dateController.value =
-          TextEditingValue(text: dateToStr(customer.addDate)!);
+          TextEditingValue(text: dateTimeToStr(customer.addDate)!);
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name!);
       _paymentNumberController.value = TextEditingValue(

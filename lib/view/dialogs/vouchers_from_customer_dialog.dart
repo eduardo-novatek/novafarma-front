@@ -112,7 +112,7 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
                         ListTile(
                           leading: const Icon(Icons.medical_services, color: Colors.blue),
                           title: Text(
-                            dateToStr(voucher.date) ?? 'Sin datos',
+                            dateToStr(voucher.dateTime) ?? 'Sin datos',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: _subTitle(voucher),

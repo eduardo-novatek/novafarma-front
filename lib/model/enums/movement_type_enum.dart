@@ -5,7 +5,7 @@ enum MovementTypeEnum {
   adjustmentStock   // AJUSTE DE STOCK al realizar un balance
 }
 
-MovementTypeEnum? nameBDtoMovementTypeEnum(String movementTypeDataBase) {
+MovementTypeEnum? nameDBtoMovementTypeEnum(String movementTypeDataBase) {
   switch (movementTypeDataBase) {
     case "SALE": return MovementTypeEnum.sale;
     case "PURCHASE": return MovementTypeEnum.purchase;
