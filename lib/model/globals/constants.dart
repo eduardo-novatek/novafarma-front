@@ -5,7 +5,8 @@ const String socket = 'localhost:8080';           //server applications
 const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server NovaDaily
 
 const int timeOutSecondsResponse = 15;
-const int sizePage = 20; //Cantidad de elementos por página
+const int sizePageCustomerList = 20;
+const int sizePageVoucherListOfCustomer = 10;
 
 const String defaultTextFromDropdownMenu = "Seleccione...";
 const double menuMaxHeight = 300.0;

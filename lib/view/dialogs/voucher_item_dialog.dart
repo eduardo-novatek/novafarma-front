@@ -388,7 +388,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                       '${_medicine.presentation!.name} '
                       '${_medicine.presentation!.quantity} '
                       '${_medicine.presentation!.unitName}'
-                      '\n\nPróxima fecha de retiro: ${dateTimeToStr(result.$2!)}',
+                      '\n\nPróxima fecha de retiro: ${dateToStr(result.$2!)}',
                 );
               }
               _barCodeFocusNode.requestFocus();

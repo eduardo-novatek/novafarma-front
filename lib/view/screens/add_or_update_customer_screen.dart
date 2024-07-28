@@ -452,16 +452,16 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   /// null si se lanzó un error.
   Future<bool?> _registeredDocument() async {
     bool? registered;
-    List<CustomerDTO1> _customerList = [];
+    List<CustomerDTO1> customerList = [];
     _changeStateLoading(true);
 
     try {
       await fetchCustomerList(
-          customerList: _customerList,
+          customerList: customerList,
           searchByDocument: true,
           value: _documentController.text,
       );
-      _updateFields(_customerList[0]);
+      _updateFields(customerList[0]);
       registered = true;
 
     } catch (error) {
@@ -570,7 +570,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   void _updateFields(Object customer) {
     if (customer is CustomerDTO1) {
       _dateController.value =
-          TextEditingValue(text: dateTimeToStr(customer.addDate)!);
+          TextEditingValue(text: dateToStr(customer.addDate)!);
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name);
       _paymentNumberController.value = TextEditingValue(

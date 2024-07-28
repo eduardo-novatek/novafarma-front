@@ -12,13 +12,12 @@ import '../../model/DTOs/customer_dto1.dart';
 import '../../model/DTOs/voucher_dto_1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
-    show sizePage, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindControlledMedications, uriCustomerFindLastnameName, uriCustomerFindVouchersPage;
-import '../../model/globals/tools/date_time.dart';
+    show sizePageCustomerList, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindControlledMedications, uriCustomerFindLastnameName, uriCustomerFindVouchersPage;
+import '../../model/globals/tools/date_time.dart' show dateToStr;
 import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/fetch_data_pageable.dart';
 import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
-import '../../model/globals/tree_views/vouchers_from_customer_tree_view.dart';
 import '../dialogs/vouchers_from_customer_dialog.dart';
 
 class ListCustomerScreen extends StatefulWidget {
@@ -41,7 +40,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   final _lastnameFilterFocusNode = FocusNode();
 
   bool _loading = false;
-  Map<String, int> metadata = {
+  final Map<String, int> _metadata = {
     'pageNumber': 0,
     'totalPages': 0,
     'totalElements': 0,
@@ -219,13 +218,13 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   }
 
   Widget _buildFooter() {
-    return metadata['totalPages'] != 0
+    return _metadata['totalPages'] != 0
         ? PaginationBar(
-            totalPages: metadata['totalPages']!,
-            initialPage: metadata['pageNumber']! + 1,
+            totalPages: _metadata['totalPages']!,
+            initialPage: _metadata['pageNumber']! + 1,
             onPageChanged: (page) {
               setState(() {
-                metadata['pageNumber'] = page - 1;
+                _metadata['pageNumber'] = page - 1;
                 _loadDataPageable();
               });
             },
@@ -236,22 +235,23 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   Future<void> _loadDataPageable() async {
     _toggleLoading();
     await fetchDataPageable<CustomerDTO1>(
-      uri: '$uriCustomerFindAllPage/${metadata['pageNumber']!}/$sizePage',
+      uri: '$uriCustomerFindAllPage/${_metadata['pageNumber']!}/$sizePageCustomerList',
       classObject: CustomerDTO1.empty(),
     ).then((pageObject) {
       _customerList.clear();
       if (pageObject.totalElements == 0) {
-        metadata['pageNumber'] = 0;
-        metadata['totalPages'] = 0;
-        metadata['totalElements'] = 0;
+        _metadata['pageNumber'] = 0;
+        _metadata['totalPages'] = 0;
+        _metadata['totalElements'] = 0;
         return;
+      } else {
+        setState(() {
+          _customerList.addAll(pageObject.content as Iterable<CustomerDTO1>);
+          _metadata['pageNumber'] = pageObject.pageNumber;
+          _metadata['totalPages'] = pageObject.totalPages;
+          _metadata['totalElements'] = pageObject.totalElements;
+        });
       }
-      setState(() {
-        _customerList.addAll(pageObject.content as Iterable<CustomerDTO1>);
-        metadata['pageNumber'] = pageObject.pageNumber;
-        metadata['totalPages'] = pageObject.totalPages;
-        metadata['totalElements'] = pageObject.totalElements;
-      });
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
@@ -337,7 +337,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   Widget _buildCustomerRow(int index) {
     CustomerDTO1 customer = _customerList[index];
-
     return Container(
       decoration: BoxDecoration(
         color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
@@ -367,7 +366,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
               _buildTableCell(text: customer.name),
               _buildTableCell(text: customer.document.toString()),
               _buildTableCell(text: customer.telephone.toString()),
-              _buildTableCell(text: dateTimeToStr(customer.addDate)),
+              _buildTableCell(text: dateToStr(customer.addDate)),
               _buildTableCell(text: customer.paymentNumber.toString()),
               _buildTableCell(text: customer.partner! ? 'Sí' : 'No'),
               _buildTableCellNotes(customer.notes!),
@@ -468,21 +467,10 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   void _onSelected(BuildContext context, int menuItem, int index) {
     switch (menuItem) {
       case 0:
-        _controlledMedication(index);
+        _controlledMedications(index);
         break;
       case 1:
-        CustomerDTO1 customer = _customerList[index];
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: VouchersFromCustomerTreeView(
-                customerId: customer.customerId!,
-                customerName: '${customer.lastname}, ${customer.name}',
-              ),
-            );
-          },
-        );
+        _vouchersCustomer(index);
         break;
       case 2:
         _delete(index);
@@ -490,43 +478,41 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     }
   }
 
- /* Future<void> _findVouchers(int index) async {
+  Future<void> _vouchersCustomer(int index) async {
     _toggleLoading();
-    await fetchData(
-      uri: '$uriCustomerFindVouchersPage'
-          '/${_customerList[index].customerId}',
-          '/${}'
-          '/${}',
-      classObject: VoucherDTO1.empty(),
-    ).then((value) {
-      _toggleLoading();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return ControlledMedicationListFromCustomerDialog(
-              customerName: '${_customerList[index].lastname}, '
-                  '${_customerList[index].name}',
-              medications: value as List<ControlledMedicationDTO1>
-          );
-        },
-      );
+    //Verifico la existencia de por lo menos un voucher
+    await fetchDataPageable(
+        uri: '$uriCustomerFindVouchersPage/${_customerList[index].customerId}/0/1',
+        classObject: VoucherDTO1.empty(),
+    ).then((pageObject) {
+     if (pageObject.totalElements == 0) {
+       FloatingMessage.show(
+         context: context,
+         text: 'Sin datos',
+         messageTypeEnum: MessageTypeEnum.info,
+       );
+     } else {
+       CustomerDTO1 customer = _customerList[index];
+       showDialog(
+         context: context,
+         builder: (context) {
+           return AlertDialog(
+             content: VouchersFromCustomerDialog(
+               customerId: customer.customerId!,
+               customerName: '${customer.lastname}, ${customer.name}',
+             ),
+           );
+         },
+       );
+     }
     }).onError((error, stackTrace) {
-      _toggleLoading();
       String? msg;
       if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-          FloatingMessage.show(
-            context: context,
-            text: 'Sin datos',
-            messageTypeEnum: MessageTypeEnum.info,
-          );
-        } else {
           msg = error.message;
-        }
       } else {
         msg = error.toString().contains('XMLHttpRequest error')
-            ? 'Error de conexión'
-            : error.toString();
+          ? 'Error de conexión'
+          : error.toString();
       }
       if (msg != null) {
         FloatingMessage.show(
@@ -537,9 +523,10 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         if (kDebugMode) print(error);
       }
     });
-  }*/
+    _toggleLoading();
+  }
 
-  Future<void> _controlledMedication(int index) async {
+  Future<void> _controlledMedications(int index) async {
     _toggleLoading();
     await fetchData(
       uri: '$uriCustomerFindControlledMedications/${_customerList[index].customerId}',

@@ -45,13 +45,13 @@ DateTime? strToDateTime(String? dateStr) {
   }
   if (dateTime.year < 1900) return null;
 
-  final now = DateTime.now();
+  //final now = DateTime.now();
   dateTime = DateTime(
     dateTime.year,
     dateTime.month,
     dateTime.day,
-    now.hour,
-    now.minute,
+    dateTime.hour,
+    dateTime.minute,
   );
 
   return dateTime;
