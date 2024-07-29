@@ -6,7 +6,7 @@ const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server Nov
 
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
-const int sizePageVoucherListOfCustomer = 10;
+const int sizePageVoucherListOfCustomer = 8;
 
 const String defaultTextFromDropdownMenu = "Seleccione...";
 const double menuMaxHeight = 300.0;
@@ -65,6 +65,7 @@ const String uriMedicineFindBarCode = "/medicine/findBarCode";
 
 //Voucher
 const String uriVoucherAdd = "/voucher/add";
+const String uriVoucherFindVoucherItems = "/voucher/findVoucherItems";
 
 //Controlled Medication
 const String uriDateAuthorizationSale = "controlledMedication/dateAuthorizationSale";
