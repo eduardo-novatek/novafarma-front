@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/DTOs/voucher_dto_1.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
@@ -265,18 +266,20 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
     _setLoading(false);
   }
 
+
+
   Widget _buildFooter() {
     return _metadata['totalPages'] != 0
         ? PaginationBar(
-      totalPages: _metadata['totalPages']!,
-      initialPage: _metadata['pageNumber']! + 1,
-      onPageChanged: (page) {
-        setState(() {
-          _metadata['pageNumber'] = page - 1;
-          _loadDataPageable();
-        });
-      },
-    )
+            totalPages: _metadata['totalPages']!,
+            initialPage: _metadata['pageNumber']! + 1,
+            onPageChanged: (page) {
+              setState(() {
+                _metadata['pageNumber'] = page - 1;
+                _loadDataPageable();
+              });
+            },
+          )
         : const SizedBox.shrink();
   }
 

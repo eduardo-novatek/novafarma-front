@@ -30,80 +30,94 @@ class _PaginationBarState extends State<PaginationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          icon: const Icon(
-            Icons.first_page,
-            size: 30,
+    return Container(
+      color: Colors.transparent,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(
+              Icons.first_page,
+              size: 30,
+            ),
+            tooltip: 'Primera página',
+            onPressed: currentPage > 1 ? _goToStart : null,
           ),
-          tooltip: 'Primera página',
-          onPressed: currentPage > 1 ? _goToStart : null,
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.chevron_left,
-            size: 30,
+          IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 30,
+            ),
+            tooltip: 'Página anterior',
+            onPressed: currentPage > 1 ? _goBack : null,
           ),
-          tooltip: 'Página anterior',
-          onPressed: currentPage > 1 ? _goBack : null,
-        ),
-        SizedBox(
-          width: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  textAlign: TextAlign.right,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, ),
-                  onSubmitted: (value) {
-                    int? page = int.tryParse(value);
-                    if (page != null) {
-                      _goToPage(page);
-                    } else {
-                      _controller.text = currentPage.toString();
-                    }
-                  },
+          SizedBox(
+            width: 60,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    textAlign: TextAlign.right,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none, // Elimina el borde
+                      isDense: true, // Reduce el padding
+                      contentPadding: EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    onSubmitted: (value) {
+                      int? page = int.tryParse(value);
+                      if (page != null) {
+                        _goToPage(page);
+                      } else {
+                        _controller.text = currentPage.toString();
+                      }
+                    },
+                  ),
                 ),
-              ),
-              Baseline(
-                baseline: 0,
-                baselineType: TextBaseline.alphabetic,
-                child: Text(
-                  ' /  ${widget.totalPages}',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                Baseline(
+                  baseline: 0,
+                  baselineType: TextBaseline.alphabetic,
+                  child: Text(
+                    ' /  ${widget.totalPages}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          icon: const Icon(
-            Icons.chevron_right,
-            size: 30,
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(
+              Icons.chevron_right,
+              size: 30,
+            ),
+            tooltip: 'Página siguiente',
+            onPressed: currentPage < widget.totalPages ? _goForward : null,
           ),
-          tooltip: 'Página siguiente',
-          onPressed: currentPage < widget.totalPages ? _goForward : null,
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.last_page,
-            size: 30,
+          IconButton(
+            icon: const Icon(
+              Icons.last_page,
+              size: 30,
+            ),
+            tooltip: 'Última página',
+            onPressed: currentPage < widget.totalPages ? _goToEnd : null,
           ),
-          tooltip: 'Últina págna',
-          onPressed: currentPage < widget.totalPages ? _goToEnd : null,
-        ),
-      ],
+        ],
+      ),
     );
   }
 

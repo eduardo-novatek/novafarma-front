@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
+import 'add_or_update_supplier_screen.dart';
+
 class HomePageScreen extends StatefulWidget {
   final String title;
 
@@ -78,13 +80,20 @@ class _HomePageScreenState extends State<HomePageScreen> {
             },
           ),
         ),
-        const PopupMenuItem<String>(
+
+        PopupMenuItem<String>(
           value: 'suppliers',
           child: ListTile(
-            leading: Icon(Icons.store),
-            title: Text('Proveedores', style: TextStyle(fontSize: 17.0)),
+            leading: const Icon(Icons.store),
+            title: const Text('Proveedores', style: TextStyle(fontSize: 17.0)),
+            trailing: const Icon(Icons.arrow_right),
+            hoverColor: Colors.transparent,
+            onTap: () {
+              _openSubMenuSuppliers(context, tilePosition);
+            },
           ),
         ),
+
         const PopupMenuItem<String>(
           value: 'medicines',
           child: ListTile(
@@ -92,6 +101,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
             title: Text('Medicamentos', style: TextStyle(fontSize: 17.0)),
           ),
         ),
+
         const PopupMenuItem<String>(
           value: 'balances',
           child: ListTile(
@@ -99,6 +109,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
             title: Text('Balances', style: TextStyle(fontSize: 17.0)),
           ),
         ),
+
         /*const PopupMenuItem<String>(
           value: 'users and roles',
           child: ListTile(
@@ -184,14 +195,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
           value: 'customers_add_update',
           child: ListTile(
             leading: Icon(Icons.add),
-            title: Text('Agregar o actualizar'),
+            title: Text('Agregar o actualizar clientes'),
           ),
         ),
         const PopupMenuItem<String>(
           value: 'customers_list',
           child: ListTile(
             leading: Icon(Icons.list),
-            title: Text('Listar'),
+            title: Text('Listar clientes'),
           ),
         ),
       ],
@@ -202,6 +213,44 @@ class _HomePageScreenState extends State<HomePageScreen> {
           await _goAddOrUpdateCustomerScreen();
         } else  if (result == 'customers_list') {
           await _goListCustomerScreen();
+        }
+      }
+    });
+  }
+
+  void _openSubMenuSuppliers(BuildContext context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect subMenuPosition = RelativeRect.fromRect(
+      Rect.fromLTWH(position.dx + 240, position.dy + 151, 0, 0),
+      Offset.zero & overlay.size,
+    );
+    showMenu<String>(
+      context: context,
+      position: subMenuPosition,
+      elevation: 8.0,
+      items: [
+        const PopupMenuItem<String>(
+          value: 'suppliers_add_update',
+          child: ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Agregar o actualizar proveedores'),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'supplier_list',
+          child: ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Listar proveedores'),
+          ),
+        ),
+      ],
+    ).then((String? result) async {
+      if (result != null) {
+        Navigator.pop(context);
+        if (result == 'suppliers_add_update') {
+          await _goAddOrUpdateSupplierScreen();
+        } else  if (result == 'supplier_list') {
+          //await _goListSupplierScreen();
         }
       }
     });
@@ -227,6 +276,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Future<void> _goListCustomerScreen() async {
     setState(() {
       _currentWidget = ListCustomerScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _goAddOrUpdateSupplierScreen() async {
+    setState(() {
+      _currentWidget = AddOrUpdateSupplierScreen(
+        onBlockedStateChange: (block) {
+          setState(() {
+            _enableMenu = !block;
+          });
+        },
         onCancel: () {
           setState(() {
             _currentWidget = msgHomeScreen;

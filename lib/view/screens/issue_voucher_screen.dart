@@ -507,7 +507,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
       supplier: _supplier != null
         ? SupplierDTO1(supplierId: _supplier!.supplierId)
         : null,
-      dateTime:  strToDateTime(_dateController.text),
+      dateTime:  strToDateTime('${_dateController.text} ${timeNow()}'),
       notes: _notesController.text,
       total:_totalPriceVoucher,
       voucherItemList: _getVoucherItems()

@@ -1,0 +1,577 @@
+
+import 'dart:html';
+import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
+import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
+import 'package:novafarma_front/model/enums/data_type_enum.dart';
+import 'package:novafarma_front/model/enums/message_type_enum.dart';
+import 'package:novafarma_front/model/globals/constants.dart' show
+  uriCustomerFindPaymentNumber;
+import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
+import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
+import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
+
+import '../../model/DTOs/supplier_dto.dart';
+import '../../model/DTOs/user_dto_1.dart';
+import '../../model/globals/publics.dart';
+import '../../model/globals/requests/add_or_update_customer.dart';
+import '../../model/globals/requests/fetch_customer_list.dart';
+import '../../model/globals/requests/fetch_supplier_list.dart';
+import '../../model/globals/tools/build_circular_progress.dart';
+import '../../model/globals/tools/date_time.dart';
+import '../../model/globals/tools/floating_message.dart';
+
+class AddOrUpdateSupplierScreen extends StatefulWidget {
+  //VoidCallback es un tipo de función predefinido en Flutter que no acepta
+  // parámetros y no devuelve ningún valor. En este caso, se utiliza para
+  // definir el tipo del callback onCancel, que se llamará cuando el usuario
+  // presione el botón de cancelar
+  final ui.VoidCallback onCancel;
+  final ValueChanged<bool>? onBlockedStateChange;
+
+  const AddOrUpdateSupplierScreen({
+    super.key,
+    this.onBlockedStateChange,
+    required this.onCancel,
+  });
+
+  @override
+  State<AddOrUpdateSupplierScreen> createState() => _AddOrUpdateCustomerScreen();
+}
+
+class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _formNameKey = GlobalKey<FormState>();
+
+  final _nameController = TextEditingController();
+  final _telephone1Controller = TextEditingController();
+  final _telephone2Controller = TextEditingController();
+  final _addressController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _notesController = TextEditingController();
+
+  final _nameFocusNode = FocusNode();
+  final _telephone1FocusNode = FocusNode();
+  final _telephone2FocusNode = FocusNode();
+  final _addressFocusNode = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _notesFocusNode = FocusNode();
+
+  int _supplierId = 0;
+  bool? _isAdd; // true: add, false: update, null: hubo error
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _createListeners();
+    _initialize(initDocument: true);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController.dispose();
+    _telephone1Controller.dispose();
+    _telephone2Controller.dispose();
+    _addressController.dispose();
+    _emailController.dispose();
+    _notesController.dispose();
+
+    _nameFocusNode.dispose();
+    _telephone1FocusNode.dispose();
+    _telephone2FocusNode.dispose();
+    _addressFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _notesFocusNode.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.4,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.black,
+                width: 1.0,
+              ),
+            ),
+            child: Stack(
+              children: [
+                AbsorbPointer(
+                    absorbing: _isLoading,
+                    child:
+                      Column(
+                        mainAxisSize: MainAxisSize.min, // Ajusta el tamaño vertical al contenido
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildTitleBar(),
+                          _buildBody(),
+                          _buildFooter(),
+                        ],
+                      ),
+                ),
+                if (_isLoading)
+                  Positioned.fill(
+                    child: Container(
+                      child: buildCircularProgress(size: 30.0)
+                      ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitleBar() {
+    return Container(
+      color: Colors.blue,
+      padding: const EdgeInsets.all(8.0),
+      child: const Text(
+        'Agregar o actualizar proveedores',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 19.0,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Ajusta el tamaño vertical al contenido
+          children: [
+            Form(
+              key: _formNameKey,
+              child:  CreateTextFormField(
+                label: 'Nombre',
+                controller: _nameController,
+                focusNode: _nameFocusNode,
+                dataType: DataTypeEnum.text,
+                maxValueForValidation: 30,
+                viewCharactersCount: false,
+                textForValidation: 'Ingrese un nombre de hasta 30 caracteres',
+                acceptEmpty: false,
+                onFieldSubmitted: (p0) =>
+                    FocusScope.of(context).requestFocus(_telephone1FocusNode),
+              ),
+            ),
+            CreateTextFormField(
+              label: 'Teléfono 1',
+              controller: _telephone1Controller,
+              focusNode: _telephone1FocusNode,
+              dataType: DataTypeEnum.telephone,
+              maxValueForValidation: 10,
+              textForValidation: 'Ingrese un teléfono de hasta 10 dígitos',
+              acceptEmpty: false,
+              onFieldSubmitted: (p0) =>
+                  FocusScope.of(context).requestFocus(_telephone2FocusNode),
+            ),
+            CreateTextFormField(
+              label: 'Teléfono 2',
+              controller: _telephone2Controller,
+              focusNode: _telephone2FocusNode,
+              dataType: DataTypeEnum.telephone,
+              maxValueForValidation: 10,
+              textForValidation: 'Ingrese un teléfono de hasta 10 dígitos',
+              acceptEmpty: true,
+              onFieldSubmitted: (p0) =>
+                  FocusScope.of(context).requestFocus(_addressFocusNode),
+            ),
+            CreateTextFormField(
+              label: 'Dirección',
+              controller: _addressController,
+              focusNode: _addressFocusNode,
+              dataType: DataTypeEnum.text,
+              acceptEmpty: true,
+              maxValueForValidation: 70,
+              textForValidation: 'Ingrese una dirección de hasta 70 caracteres',
+            ),
+            CreateTextFormField(
+              label: 'email',
+              controller: _emailController,
+              focusNode: _emailFocusNode,
+              dataType: DataTypeEnum.email,
+              acceptEmpty: true,
+              maxValueForValidation: 60,
+              textForValidation: 'Ingrese un email de hasta 60 caracteres',
+            ),
+            CreateTextFormField(
+              label: 'Notas',
+              controller: _notesController,
+              focusNode: _notesFocusNode,
+              dataType: DataTypeEnum.text,
+              acceptEmpty: true,
+              maxValueForValidation: 100,
+              viewCharactersCount: true,
+            ),
+            const SizedBox(height: 20.0),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          ElevatedButton(
+            onPressed: _isAdd == null ? null : () async {
+              if (! _formKey.currentState!.validate()) return;
+              if (! await _validate()) return;
+              if (await _confirm() == 1) {
+                _submitForm();
+              }
+            },
+            child: const Text('Aceptar'),
+          ),
+          const SizedBox(width: 16.0,),
+          ElevatedButton(
+            onPressed: () async {
+              if (await _cancel() == 1) {
+                _cancelForm();
+              }
+            },
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submitForm() async {
+    _changeStateLoading(true);
+    await addOrUpdateCustomer(
+        customer: _buildCustomer(),
+        isAdd: _isAdd!,
+        context: context
+
+    ).then((supplierId) {
+      _changeStateLoading(false);
+      String msg = 'Proveedor ${_isAdd! ? 'agregado' : 'actualizado'} con éxito';
+      FloatingMessage.show(
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.info,
+          context: context
+      );
+      _initialize(initDocument: true);
+      FocusScope.of(context).requestFocus(_nameFocusNode);
+      if (kDebugMode) print('$msg (id: $supplierId)');
+
+      // Se captura el error para evitar el error en consola. Este se manejó en
+      // addOrUpdateCustomer
+    }).onError((error, stackTrace) {
+      _changeStateLoading(false);
+    });
+  }
+
+  Future<bool> _validate() async {
+    if (! await _validatePaymentNumber()) return Future.value(false);
+    return Future.value(true);
+  }
+
+  Future<bool> _validatePaymentNumber() async {
+    bool valid = true;
+    bool warning = false;
+    String msgError = 'Error indeterminado';
+
+    await fetchData(
+        uri: '$uriCustomerFindPaymentNumber/'
+            '${int.parse(_paymentNumberController.text.trim())}',
+        classObject: CustomerDTO1.empty()
+    ).then((customer) {
+      if (customer[0] is CustomerDTO1){
+        CustomerDTO1 c = customer[0] as CustomerDTO1;
+        if (c.document != int.parse(_documentController.text.trim())) {
+          msgError = 'Número de cobro ya registrado para ${c.lastname}, ${c.name}';
+          warning = true;
+          valid = false;
+        }
+      }
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.internalServerError) {
+          msgError = error.message ?? 'Error: internalServerError';
+          valid = false;
+        }
+      } else {
+        if (error.toString().contains('XMLHttpRequest error')) {
+          msgError = 'Error de conexión';
+        } else {
+          msgError = error.toString();
+        }
+        valid = false;
+      }
+    });
+
+    if (! valid) {
+      FloatingMessage.show(
+        context: context,
+        text: msgError,
+        secondsDelay: 5,
+        messageTypeEnum: warning ? MessageTypeEnum.warning : MessageTypeEnum.error
+      );
+      if (kDebugMode) print(msgError);
+    }
+    return Future.value(valid);
+  }
+
+  CustomerDTO1 _buildCustomer() {
+    return CustomerDTO1(
+      customerId: _supplierId == 0 ? null : _supplierId,
+      user: UserDTO1(userId: userLogged['userId']),
+      document: int.parse(_documentController.text.trim()),
+      addDate: strToDate(_dateController.text),
+      lastname: _lastnameController.text.trim(),
+      name: _nameController.text.trim(),
+      paymentNumber: int.parse(_paymentNumberController.text.trim()),
+      telephone: _telephone1Controller.text.trim(),
+      notes: _notesController.text.trim(),
+      partner: _partnerId != 0,
+      partnerId: _partnerId,
+      dependentId: _dependentId,
+      deleted: false,
+    );
+  }
+
+  void _cancelForm() {
+    widget.onCancel(); // Llamar al callback de cancelación
+  }
+
+  Future<int> _confirm() async {
+    return await OpenDialog(
+        title: 'Confirmar',
+        content: _isAdd! ? '¿Agregar el cliente?' : '¿Actualizar el cliente?',
+        textButton1: 'Si',
+        textButton2: 'No',
+        context: context
+    ).view();
+  }
+
+  Future<int> _cancel() async {
+    return await OpenDialog(
+        title: 'Confirmar',
+        content: '¿Cancelar y cerrar el formulario?',
+        textButton1: 'Si',
+        textButton2: 'No',
+        context: context
+    ).view();
+  }
+
+  void _createListeners() {
+    _nameListener();
+  }
+
+  void _nameListener() {
+    bool? registered;
+    _nameFocusNode.addListener(() async {
+      // Pierde foco
+      if (!_nameFocusNode.hasFocus) {
+        if (_nameController.text.trim().isEmpty) {
+          FocusScope.of(context).requestFocus(_nameFocusNode);
+          return;
+        }
+        if (! _formNameKey.currentState!.validate()) {
+          FocusScope.of(context).requestFocus(_nameFocusNode);
+          return;
+        }
+        registered = await _registeredName();
+        if (registered != null) {
+          _isAdd = ! registered!;
+        }
+
+        // Recibe foco
+      } else if (_nameFocusNode.hasFocus) {
+        _initialize(initDocument: false);
+      }
+    });
+  }
+
+
+  /// true si el documento ya existe en la bbdd de novafarma, false si no existe.
+  /// null si se lanzó un error.
+  Future<bool?> _registeredName() async {
+    bool? registered;
+    List<SupplierDTO> supplierList = [];
+    _changeStateLoading(true);
+
+    try {
+      await fetchSupplierList(supplierList);
+      _updateFields(supplierList[0]);
+      registered = true;
+
+    } catch (error) {
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+          registered = false;
+        } else {
+          await OpenDialog(
+              context: context,
+              title: 'Error',
+              content: error.message != null
+                  ? error.message!
+                  : 'Error ${error.statusCode}'
+          ).view();
+        }
+      } else {
+        if (error.toString().contains('XMLHttpRequest error')) {
+          await OpenDialog(
+            context: context,
+            title: 'Error de conexión',
+            content: 'No es posible conectar con el servidor',
+          ).view();
+        } else {
+          if (error.toString().contains('TimeoutException')) {
+            await OpenDialog(
+              context: context,
+              title: 'Error de conexión',
+              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
+            ).view();
+          } else {
+            await OpenDialog(
+              context: context,
+              title: 'Error desconocido',
+              content: error.toString(),
+            ).view();
+          }
+        }
+      }
+    } finally {
+      _changeStateLoading(false);
+    }
+
+    if (registered == null) FocusScope.of(context).requestFocus(_nameFocusNode);
+    return Future.value(registered);
+
+  }
+
+  Future<void> _registeredDocumentNovaDaily() async {
+    List<PartnerNovaDailyDTO> _partnerNovaDailyList = [];
+    _changeStateLoading(true);
+
+    try {
+      await fetchPartnerNovaDailyList(
+        partnerNovaDailyList: _partnerNovaDailyList,
+        searchByDocument: true,
+        value: _documentController.text,
+      );
+      _updateFields(_partnerNovaDailyList[0]);
+
+    } catch (error) {
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+
+        } else {
+          await OpenDialog(
+              context: context,
+              title: 'Error',
+              content: error.message != null
+                  ? error.message!
+                  : 'Error ${error.statusCode}'
+          ).view();
+        }
+      } else {
+        if (error.toString().contains('XMLHttpRequest error')) {
+          await OpenDialog(
+            context: context,
+            title: 'Error de conexión',
+            content: 'No es posible conectar con el servidor',
+          ).view();
+        } else {
+          if (error.toString().contains('TimeoutException')) {
+            await OpenDialog(
+              context: context,
+              title: 'Error de conexión',
+              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
+            ).view();
+          } else {
+            await OpenDialog(
+              context: context,
+              title: 'Error desconocido',
+              content: error.toString(),
+            ).view();
+          }
+        }
+      }
+    } finally {
+      _changeStateLoading(false);
+    }
+
+    //if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
+    //return Future.value(registered);
+
+  }
+
+  /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
+  void _updateFields(Object customer) {
+    if (customer is CustomerDTO1) {
+      _dateController.value =
+          TextEditingValue(text: dateToStr(customer.addDate)!);
+      _lastnameController.value = TextEditingValue(text: customer.lastname!);
+      _nameController.value = TextEditingValue(text: customer.name);
+      _paymentNumberController.value = TextEditingValue(
+          text: customer.paymentNumber.toString());
+      _telephone1Controller.value = TextEditingValue(text: customer.telephone!);
+      _notesController.value = TextEditingValue(text: customer.notes!);
+
+      _supplierId = customer.customerId!;
+      _partnerId = customer.partnerId!;
+      _dependentId = customer.dependentId!;
+
+    } else if (customer is PartnerNovaDailyDTO) {
+      _dateController.value =
+          TextEditingValue(text: dateTimeToStr(customer.addDate)!);
+      _lastnameController.value = TextEditingValue(text: customer.lastname!);
+      _nameController.value = TextEditingValue(text: customer.name!);
+      _paymentNumberController.value = TextEditingValue(
+          text: customer.paymentNumber.toString());
+      _telephone1Controller.value = TextEditingValue(text: customer.telephone!);
+      _notesController.value = TextEditingValue(text: customer.notes!);
+
+      //_customerId = customer.partnerId!; //Tomo el id de socio de NovaDaily
+      //_partnerId = customer.partnerId!;
+      //_dependentId = customer.;
+    }
+
+  }
+
+  void _initialize({required bool initDocument}) {
+    setState(() {
+      if (initDocument) _nameController.value = TextEditingValue.empty;
+      _telephone1Controller.value = TextEditingValue.empty;
+      _telephone2Controller.value = TextEditingValue.empty;
+      _addressController.value = TextEditingValue.empty;
+      _emailController.value = TextEditingValue.empty;
+      _notesController.value = TextEditingValue.empty;
+    });
+    _isAdd = null;
+    _supplierId = 0;
+  }
+
+  void _changeStateLoading(bool isLoading) {
+    setState(() {
+      _isLoading = isLoading;
+    });
+    widget.onBlockedStateChange!(isLoading);
+  }
+
+}
