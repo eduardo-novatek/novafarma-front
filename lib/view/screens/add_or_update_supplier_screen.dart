@@ -20,6 +20,7 @@ import '../../model/DTOs/supplier_dto.dart';
 import '../../model/DTOs/user_dto_1.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/requests/add_or_update_customer.dart';
+import '../../model/globals/requests/add_or_update_supplier.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
 import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
@@ -237,7 +238,6 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           ElevatedButton(
             onPressed: _isAdd == null ? null : () async {
               if (! _formKey.currentState!.validate()) return;
-              if (! await _validate()) return;
               if (await _confirm() == 1) {
                 _submitForm();
               }
@@ -260,8 +260,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
 
   Future<void> _submitForm() async {
     _changeStateLoading(true);
-    await addOrUpdateCustomer(
-        customer: _buildCustomer(),
+    await addOrUpdateSupplier(
+        supplier: _buildSupplier(),
         isAdd: _isAdd!,
         context: context
 
@@ -284,72 +284,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
     });
   }
 
-  Future<bool> _validate() async {
-    if (! await _validatePaymentNumber()) return Future.value(false);
-    return Future.value(true);
-  }
-
-  Future<bool> _validatePaymentNumber() async {
-    bool valid = true;
-    bool warning = false;
-    String msgError = 'Error indeterminado';
-
-    await fetchData(
-        uri: '$uriCustomerFindPaymentNumber/'
-            '${int.parse(_paymentNumberController.text.trim())}',
-        classObject: CustomerDTO1.empty()
-    ).then((customer) {
-      if (customer[0] is CustomerDTO1){
-        CustomerDTO1 c = customer[0] as CustomerDTO1;
-        if (c.document != int.parse(_documentController.text.trim())) {
-          msgError = 'Número de cobro ya registrado para ${c.lastname}, ${c.name}';
-          warning = true;
-          valid = false;
-        }
-      }
-    }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.internalServerError) {
-          msgError = error.message ?? 'Error: internalServerError';
-          valid = false;
-        }
-      } else {
-        if (error.toString().contains('XMLHttpRequest error')) {
-          msgError = 'Error de conexión';
-        } else {
-          msgError = error.toString();
-        }
-        valid = false;
-      }
-    });
-
-    if (! valid) {
-      FloatingMessage.show(
-        context: context,
-        text: msgError,
-        secondsDelay: 5,
-        messageTypeEnum: warning ? MessageTypeEnum.warning : MessageTypeEnum.error
-      );
-      if (kDebugMode) print(msgError);
-    }
-    return Future.value(valid);
-  }
-
-  CustomerDTO1 _buildCustomer() {
-    return CustomerDTO1(
-      customerId: _supplierId == 0 ? null : _supplierId,
-      user: UserDTO1(userId: userLogged['userId']),
-      document: int.parse(_documentController.text.trim()),
-      addDate: strToDate(_dateController.text),
-      lastname: _lastnameController.text.trim(),
+  SupplierDTO _buildSupplier() {
+    return SupplierDTO(
+      supplierId: _supplierId == 0 ? null : _supplierId,
       name: _nameController.text.trim(),
-      paymentNumber: int.parse(_paymentNumberController.text.trim()),
-      telephone: _telephone1Controller.text.trim(),
-      notes: _notesController.text.trim(),
-      partner: _partnerId != 0,
-      partnerId: _partnerId,
-      dependentId: _dependentId,
-      deleted: false,
+      telephone1: _telephone1Controller.text.trim(),
+      telephone2: _telephone2Controller.text.trim(),
+      address: _addressController.text.trim(),
+      notes: _notesController.text.trim()
     );
   }
 
@@ -407,8 +349,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
   }
 
 
-  /// true si el documento ya existe en la bbdd de novafarma, false si no existe.
-  /// null si se lanzó un error.
+  /// true si el nombre del proveedor ya existe; null si se lanzó un error.
   Future<bool?> _registeredName() async {
     bool? registered;
     List<SupplierDTO> supplierList = [];
@@ -464,94 +405,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
 
   }
 
-  Future<void> _registeredDocumentNovaDaily() async {
-    List<PartnerNovaDailyDTO> _partnerNovaDailyList = [];
-    _changeStateLoading(true);
-
-    try {
-      await fetchPartnerNovaDailyList(
-        partnerNovaDailyList: _partnerNovaDailyList,
-        searchByDocument: true,
-        value: _documentController.text,
-      );
-      _updateFields(_partnerNovaDailyList[0]);
-
-    } catch (error) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-
-        } else {
-          await OpenDialog(
-              context: context,
-              title: 'Error',
-              content: error.message != null
-                  ? error.message!
-                  : 'Error ${error.statusCode}'
-          ).view();
-        }
-      } else {
-        if (error.toString().contains('XMLHttpRequest error')) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException')) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }
-      }
-    } finally {
-      _changeStateLoading(false);
-    }
-
-    //if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
-    //return Future.value(registered);
-
-  }
-
-  /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
-  void _updateFields(Object customer) {
-    if (customer is CustomerDTO1) {
-      _dateController.value =
-          TextEditingValue(text: dateToStr(customer.addDate)!);
-      _lastnameController.value = TextEditingValue(text: customer.lastname!);
-      _nameController.value = TextEditingValue(text: customer.name);
-      _paymentNumberController.value = TextEditingValue(
-          text: customer.paymentNumber.toString());
-      _telephone1Controller.value = TextEditingValue(text: customer.telephone!);
-      _notesController.value = TextEditingValue(text: customer.notes!);
-
-      _supplierId = customer.customerId!;
-      _partnerId = customer.partnerId!;
-      _dependentId = customer.dependentId!;
-
-    } else if (customer is PartnerNovaDailyDTO) {
-      _dateController.value =
-          TextEditingValue(text: dateTimeToStr(customer.addDate)!);
-      _lastnameController.value = TextEditingValue(text: customer.lastname!);
-      _nameController.value = TextEditingValue(text: customer.name!);
-      _paymentNumberController.value = TextEditingValue(
-          text: customer.paymentNumber.toString());
-      _telephone1Controller.value = TextEditingValue(text: customer.telephone!);
-      _notesController.value = TextEditingValue(text: customer.notes!);
-
-      //_customerId = customer.partnerId!; //Tomo el id de socio de NovaDaily
-      //_partnerId = customer.partnerId!;
-      //_dependentId = customer.;
-    }
-
+  void _updateFields(SupplierDTO supplier) {
+    _supplierId = supplier.supplierId!;
+    _nameController.value = TextEditingValue(text: supplier.name);
+    _telephone1Controller.value = TextEditingValue(text: supplier.telephone1!);
+    _telephone2Controller.value = TextEditingValue(text: supplier.telephone2!);
+    _addressController.value = TextEditingValue(text: supplier.address!);
+    _emailController.value = TextEditingValue(text: supplier.email!);
+    _notesController.value = TextEditingValue(text: supplier.notes!);
   }
 
   void _initialize({required bool initDocument}) {

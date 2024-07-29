@@ -1,13 +1,12 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
-import '../constants.dart' show uriCustomerAdd, uriCustomerUpdate;
+import '../constants.dart' show uriSupplierAdd, uriSupplierUpdate;
 import '../tools/floating_message.dart';
 import '../tools/fetch_data.dart';
 
@@ -18,15 +17,14 @@ Future<int?> addOrUpdateSupplier({
   required BuildContext context}) async {
 
   int id = 0; //id del proveedor persistido
-
-  await fetchData(
+  await fetchData<SupplierDTO>(
       uri: isAdd ? uriSupplierAdd : uriSupplierUpdate,
-      classObject: supplier,
+      classObject: SupplierDTO.empty(),
       requestType: isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch,
       body: supplier
 
-  ).then((customerId) {
-    id = customerId.isNotEmpty ? customerId[0] as int : supplier.customerId!;
+  ).then((supplierId) {
+    id = supplierId.isNotEmpty ? supplierId[0] as int : supplier.supplierId!;
 
   }).onError((error, stackTrace) {
     String msg = '';
