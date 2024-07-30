@@ -4,10 +4,13 @@ import '../../DTOs/supplier_dto.dart';
 import '../constants.dart' show uriSupplierFindAll;
 import '../tools/fetch_data.dart';
 
-Future<void> fetchSupplierList(List<SupplierDTO> supplierList) async {
+Future<void> fetchSupplierList({
+  required List<SupplierDTO> supplierList,
+  String uri = uriSupplierFindAll,
+}) async {
   supplierList.clear();
   await fetchData<SupplierDTO>(
-    uri: uriSupplierFindAll,
+    uri: uri,
     classObject: SupplierDTO.empty(),
   ).then((data) {
       supplierList.addAll(data.cast<SupplierDTO>().map((e) =>

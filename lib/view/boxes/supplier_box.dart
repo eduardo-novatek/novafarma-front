@@ -136,7 +136,7 @@ class SupplierBoxState extends State<SupplierBox> {
       _isLoading = true;
     });
     try {
-      await fetchSupplierList(_supplierList).then((value) {
+      await fetchSupplierList(supplierList: _supplierList).then((value) {
         _supplierList.insert(
           0,
           SupplierDTO(

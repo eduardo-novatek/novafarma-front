@@ -10,7 +10,7 @@ import '../constants.dart' show uriSupplierAdd, uriSupplierUpdate;
 import '../tools/floating_message.dart';
 import '../tools/fetch_data.dart';
 
-///Devuelve el id del cliente persistido o id=0 si hubo un error
+///Devuelve el id del proveedor persistido o id=0 si hubo un error
 Future<int?> addOrUpdateSupplier({
   required SupplierDTO supplier,
   required bool isAdd,

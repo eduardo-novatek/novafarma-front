@@ -59,6 +59,7 @@ const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
 
 //Supplier
 const String uriSupplierFindAll = "/supplier/findAll";
+const String uriSupplierFindName = "/supplier/findName";
 const String uriSupplierAdd = "/supplier/add";
 const String uriSupplierUpdate = "/supplier/update";
 

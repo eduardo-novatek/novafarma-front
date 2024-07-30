@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 
 import '../../model/DTOs/customer_dto1.dart';
 
-class CustomerSelectionDialog extends StatelessWidget {
-  final List<CustomerDTO1> customers;
+class SupplierSelectionDialog extends StatelessWidget {
+  final List<SupplierDTO> suppliers;
   final Function(int) onSelect;
 
-  const CustomerSelectionDialog({
+  const SupplierSelectionDialog({
     super.key,
-    required this.customers,
+    required this.suppliers,
     required this.onSelect
   });
 
@@ -19,7 +20,7 @@ class CustomerSelectionDialog extends StatelessWidget {
         borderRadius: BorderRadius.zero, // Esquinas rectas
       ),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.3, // 30% del ancho de la pantalla
+        width: MediaQuery.of(context).size.width * 0.2, // 30% del ancho de la pantalla
         height: MediaQuery.of(context).size.height * 0.5, // 50% del alto de la pantalla
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -29,11 +30,11 @@ class CustomerSelectionDialog extends StatelessWidget {
               child: ListView.builder(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(), // Permitir desplazamiento siempre
-                itemCount: customers.length,
+                itemCount: suppliers.length,
                 itemBuilder: (context, index) {
-                  final customer = customers[index];
+                  final supplier = suppliers[index];
                   return ListTile(
-                    title: Text('${customer.lastname}, ${customer.name} (${customer.document})'),
+                    title: Text(supplier.name),
                     onTap: () {
                       onSelect(index); //devuelve el índice seleccionado
                       Navigator.of(context).pop();

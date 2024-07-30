@@ -8,8 +8,7 @@ import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show
-  uriCustomerFindPaymentNumber;
+import 'package:novafarma_front/model/globals/constants.dart' show uriCustomerFindPaymentNumber, uriSupplierFindName;
 import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
@@ -26,6 +25,7 @@ import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/floating_message.dart';
+import '../dialogs/supplier_selection_dialog.dart';
 
 class AddOrUpdateSupplierScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
@@ -66,12 +66,13 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
   int _supplierId = 0;
   bool? _isAdd; // true: add, false: update, null: hubo error
   bool _isLoading = false;
+  bool _isInitializing = false;
 
   @override
   void initState() {
     super.initState();
     _createListeners();
-    _initialize(initDocument: true);
+    _initialize(initName: true);
   }
 
   @override
@@ -178,8 +179,9 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               controller: _telephone1Controller,
               focusNode: _telephone1FocusNode,
               dataType: DataTypeEnum.telephone,
+              minValueForValidation: 8,
               maxValueForValidation: 10,
-              textForValidation: 'Ingrese un teléfono de hasta 10 dígitos',
+              textForValidation: 'El teléfono debe contener entre 8 y 10 dígitos',
               acceptEmpty: false,
               onFieldSubmitted: (p0) =>
                   FocusScope.of(context).requestFocus(_telephone2FocusNode),
@@ -203,6 +205,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               acceptEmpty: true,
               maxValueForValidation: 70,
               textForValidation: 'Ingrese una dirección de hasta 70 caracteres',
+              onFieldSubmitted: (p0) =>
+                  FocusScope.of(context).requestFocus(_emailFocusNode),
             ),
             CreateTextFormField(
               label: 'email',
@@ -212,6 +216,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               acceptEmpty: true,
               maxValueForValidation: 60,
               textForValidation: 'Ingrese un email de hasta 60 caracteres',
+              onFieldSubmitted: (p0) =>
+                  FocusScope.of(context).requestFocus(_notesFocusNode),
             ),
             CreateTextFormField(
               label: 'Notas',
@@ -273,7 +279,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           messageTypeEnum: MessageTypeEnum.info,
           context: context
       );
-      _initialize(initDocument: true);
+      _initialize(initName: true);
       FocusScope.of(context).requestFocus(_nameFocusNode);
       if (kDebugMode) print('$msg (id: $supplierId)');
 
@@ -291,6 +297,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
       telephone1: _telephone1Controller.text.trim(),
       telephone2: _telephone2Controller.text.trim(),
       address: _addressController.text.trim(),
+      email: _emailController.text.trim(),
       notes: _notesController.text.trim()
     );
   }
@@ -302,7 +309,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
   Future<int> _confirm() async {
     return await OpenDialog(
         title: 'Confirmar',
-        content: _isAdd! ? '¿Agregar el cliente?' : '¿Actualizar el cliente?',
+        content: _isAdd! ? '¿Agregar el proveedor?' : '¿Actualizar el proveedor?',
         textButton1: 'Si',
         textButton2: 'No',
         context: context
@@ -326,6 +333,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
   void _nameListener() {
     bool? registered;
     _nameFocusNode.addListener(() async {
+      if (_isInitializing) return;
+
       // Pierde foco
       if (!_nameFocusNode.hasFocus) {
         if (_nameController.text.trim().isEmpty) {
@@ -336,35 +345,59 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           FocusScope.of(context).requestFocus(_nameFocusNode);
           return;
         }
-        registered = await _registeredName();
-        if (registered != null) {
-          _isAdd = ! registered!;
-        }
+        //_isCheckingName = true; // Iniciar verificación de nombre
+        await _registeredName()
+          .then((registered) {
+            //_isCheckingName = false; // Finalizar verificación de nombre
+            if (registered != null) {
+              _isAdd = ! registered;
+            }
+            return null;
+          });
 
         // Recibe foco
       } else if (_nameFocusNode.hasFocus) {
-        _initialize(initDocument: false);
+        _initialize(initName: false);
       }
     });
   }
 
-
-  /// true si el nombre del proveedor ya existe; null si se lanzó un error.
+  /// true/false si el nombre del proveedor ya existe/no existe; null si se lanzó un error.
   Future<bool?> _registeredName() async {
-    bool? registered;
+    bool? registered = false;
     List<SupplierDTO> supplierList = [];
     _changeStateLoading(true);
 
     try {
-      await fetchSupplierList(supplierList);
-      _updateFields(supplierList[0]);
-      registered = true;
-
-    } catch (error) {
+      await fetchSupplierList(
+          supplierList: supplierList,
+          uri: '$uriSupplierFindName/${_nameController.text.trim()}'
+      );
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SupplierSelectionDialog(
+            suppliers: supplierList,
+            onSelect: (index) {
+              //Si no canceló
+              if (index != -1) {
+                _updateFields(supplierList[index]);
+                registered = true;
+                //Canceló...Si encontró solo uno y es el mismo nombre...
+              } else if (supplierList.length == 1
+                  && _nameController.text.trim() == supplierList[0].name) {
+                registered = true;
+              }
+            },
+          );
+        }
+      );
+    }catch (error) {
       if (error is ErrorObject) {
         if (error.statusCode == HttpStatus.notFound) {
           registered = false;
         } else {
+          registered = null;
           await OpenDialog(
               context: context,
               title: 'Error',
@@ -374,6 +407,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           ).view();
         }
       } else {
+        registered = null;
         if (error.toString().contains('XMLHttpRequest error')) {
           await OpenDialog(
             context: context,
@@ -400,7 +434,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
       _changeStateLoading(false);
     }
 
-    if (registered == null) FocusScope.of(context).requestFocus(_nameFocusNode);
+    //if (registered == null && mounted) FocusScope.of(context).requestFocus(_nameFocusNode);
     return Future.value(registered);
 
   }
@@ -415,14 +449,16 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
     _notesController.value = TextEditingValue(text: supplier.notes!);
   }
 
-  void _initialize({required bool initDocument}) {
+  void _initialize({required bool initName}) {
     setState(() {
-      if (initDocument) _nameController.value = TextEditingValue.empty;
+      _isInitializing = true;
+      if (initName) _nameController.value = TextEditingValue.empty;
       _telephone1Controller.value = TextEditingValue.empty;
       _telephone2Controller.value = TextEditingValue.empty;
       _addressController.value = TextEditingValue.empty;
       _emailController.value = TextEditingValue.empty;
       _notesController.value = TextEditingValue.empty;
+      _isInitializing = false;
     });
     _isAdd = null;
     _supplierId = 0;
