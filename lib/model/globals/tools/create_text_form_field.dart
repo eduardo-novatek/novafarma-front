@@ -70,162 +70,163 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
     super.dispose();
   }
 
-    @override
+
+  @override
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
 
     return Stack(
-          children: [
-            TextFormField (
-              focusNode: widget.focusNode,
-              controller: widget.controller,
-              autofocus: widget.initialFocus!,
-              keyboardType: _determinateInputType(),
-              maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
-              maxLength:_maxLength(),
-              inputFormatters: _determinateMask(),
-              decoration: _buildInputDecoration(themeData),
-              style: widget.textStyle ?? TextStyle(
-                  fontSize: themeData.textTheme.bodyMedium?.fontSize,
-                  color: themeData.colorScheme.primary,
-              ),
-              obscureText: _isObscureText,
-              onChanged: (value) {
-               if (widget.onChange != null) widget.onChange!(value);
-              },
-              onFieldSubmitted: (value) {
-                if (widget.onFieldSubmitted != null) widget.onFieldSubmitted!(value);
-              },
-              validator: (String? value) {
+      children: [
+        TextFormField (
+          focusNode: widget.focusNode,
+          controller: widget.controller,
+          autofocus: widget.initialFocus!,
+          keyboardType: _determinateInputType(),
+          maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
+          maxLength: _maxLength(),
+          inputFormatters: _determinateMask(),
+          decoration: _buildInputDecoration(themeData),
+          style: widget.textStyle ?? TextStyle(
+              fontSize: themeData.textTheme.bodyMedium?.fontSize,
+              color: themeData.colorScheme.primary,
+          ),
+          obscureText: _isObscureText,
+          onChanged: (value) {
+           if (widget.onChange != null) widget.onChange!(value);
+          },
+          onFieldSubmitted: (value) {
+            if (widget.onFieldSubmitted != null) widget.onFieldSubmitted!(value);
+          },
+          validator: (String? value) {
 
-                if (!widget.validate) return null;
-                if (widget.acceptEmpty && value!.trim().isEmpty) return null;
+            if (!widget.validate) return null;
+            if (widget.acceptEmpty && value!.trim().isEmpty) return null;
 
-                bool hasError = false;
-                if (value!.trim().isEmpty) {
-                  hasError = true;
+            bool hasError = false;
+            if (value!.trim().isEmpty) {
+              hasError = true;
 
-                } else if (widget.dataType == DataTypeEnum.text ||
-                    widget.dataType == DataTypeEnum.password){
+            } else if (widget.dataType == DataTypeEnum.text ||
+                widget.dataType == DataTypeEnum.password){
 
-                  bool errorMin = false;
-                  bool errorMax = false;
+              bool errorMin = false;
+              bool errorMax = false;
 
-                  if (widget.minValueForValidation != null){
-                    errorMin = (value.trim().length < widget.minValueForValidation!);
-                  }
-                  if (widget.maxValueForValidation != null){
-                    errorMax = (value.trim().length > widget.maxValueForValidation!);
-                  }
-                  hasError = (errorMin || errorMax);
+              if (widget.minValueForValidation != null){
+                errorMin = (value.trim().length < widget.minValueForValidation!);
+              }
+              if (widget.maxValueForValidation != null){
+                errorMax = (value.trim().length > widget.maxValueForValidation!);
+              }
+              hasError = (errorMin || errorMax);
 
-                } else if (widget.dataType == DataTypeEnum.number ||
-                           widget.dataType == DataTypeEnum.telephone) {
-                    var number = double.tryParse(value);
-                    hasError = (number == null);
-                    if (!hasError) {
-                      if (widget.minValueForValidation != null) {
-                        if (widget.dataType == DataTypeEnum.telephone) {
-                          hasError = (
-                              value.trim().length < widget.minValueForValidation!);
-                        } else { //Es numero
-                          hasError = (number < widget.minValueForValidation!);
-                        }
-                      }
-                      if (!hasError && (widget.maxValueForValidation != null)) {
-                        if (widget.dataType == DataTypeEnum.telephone) {
-                          hasError = (
-                              value.trim().length > widget.maxValueForValidation!);
-                        } else { //Es numero
-                          hasError = (number > widget.maxValueForValidation!);
-                        }
-                      }
+            } else if (widget.dataType == DataTypeEnum.number ||
+                       widget.dataType == DataTypeEnum.telephone) {
+                var number = double.tryParse(value);
+                hasError = (number == null);
+                if (!hasError) {
+                  if (widget.minValueForValidation != null) {
+                    if (widget.dataType == DataTypeEnum.telephone) {
+                      hasError = (
+                          value.trim().length < widget.minValueForValidation!);
+                    } else { //Es numero
+                      hasError = (number < widget.minValueForValidation!);
                     }
-
-                } else if (widget.dataType == DataTypeEnum.date) {
-                  try {
-                    final inputDate = DateFormat('dd/MM/yyyy')
-                        .parseStrict(value.trim());
-                    hasError =
-                        inputDate.isAfter(DateTime.now()) ||
-                        inputDate.year < 1900;
-
-                  } catch (e) {
-                    hasError = true;
                   }
-
-                }else if (widget.dataType == DataTypeEnum.time) {
-                  try {
-                    final RegExp regExp =
-                      RegExp(r'^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
-                    hasError = ! regExp.hasMatch(value.trim());
-
-                  } catch (e) {
-                    hasError = true;
+                  if (!hasError && (widget.maxValueForValidation != null)) {
+                    if (widget.dataType == DataTypeEnum.telephone) {
+                      hasError = (
+                          value.trim().length > widget.maxValueForValidation!);
+                    } else { //Es numero
+                      hasError = (number > widget.maxValueForValidation!);
+                    }
                   }
-
-                } else if (widget.dataType == DataTypeEnum.email) {
-                    final emailRegExp =
-                      RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
-                    hasError = !emailRegExp.hasMatch(value.trim());
-
-                } else if (widget.dataType == DataTypeEnum.identificationDocument) {
-                    hasError = ! _validateDocument(value.trim());
                 }
 
-                // Actualizar el estado de validación correspondiente a esta instancia
-                if (widget.validationStates != null) {
-                  widget.validationStates![_index] = !hasError;
-                }
+            } else if (widget.dataType == DataTypeEnum.date) {
+              try {
+                final inputDate = DateFormat('dd/MM/yyyy')
+                    .parseStrict(value.trim());
+                hasError =
+                    inputDate.isAfter(DateTime.now()) ||
+                    inputDate.year < 1900;
 
-                if (hasError){
-                  widget.focusNode?.requestFocus();
-                  return widget.textForValidation;
-                }
+              } catch (e) {
+                hasError = true;
+              }
 
-                return null;
-              },
-            ),
+            }else if (widget.dataType == DataTypeEnum.time) {
+              try {
+                final RegExp regExp =
+                  RegExp(r'^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$');
+                hasError = ! regExp.hasMatch(value.trim());
 
-            Positioned(
-              right: 0,
-              top: 10,
-              child: widget.dataType == DataTypeEnum.password
-                  ? IconButton(
-                        onPressed: () {
-                            setState(() {
-                              _isObscureText = ! _isObscureText;
-                            });
-                        },
-                        icon: Icon(
-                          _isObscureText ? Icons.visibility : Icons.visibility_off,
-                        )
+              } catch (e) {
+                hasError = true;
+              }
+
+            } else if (widget.dataType == DataTypeEnum.email) {
+                final emailRegExp =
+                  RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+                hasError = !emailRegExp.hasMatch(value.trim());
+
+            } else if (widget.dataType == DataTypeEnum.identificationDocument) {
+                hasError = ! _validateDocument(value.trim());
+            }
+
+            // Actualizar el estado de validación correspondiente a esta instancia
+            if (widget.validationStates != null) {
+              widget.validationStates![_index] = !hasError;
+            }
+
+            if (hasError){
+              widget.focusNode?.requestFocus();
+              return widget.textForValidation;
+            }
+
+            return null;
+          },
+        ),
+
+        Positioned(
+          right: 0,
+          top: 10,
+          child: widget.dataType == DataTypeEnum.password
+              ? IconButton(
+                    onPressed: () {
+                        setState(() {
+                          _isObscureText = ! _isObscureText;
+                        });
+                    },
+                    icon: Icon(
+                      _isObscureText ? Icons.visibility : Icons.visibility_off,
                     )
-
-                  : const SizedBox.shrink(),
-
-              ),
-          ],
-        );
+                )
+              : const SizedBox.shrink(),
+          ),
+      ],
+    );
 
   }
 
-    InputDecoration _buildInputDecoration(ThemeData themeData) {
+
+  InputDecoration _buildInputDecoration(ThemeData themeData) {
       return InputDecoration(
-                labelText: widget.label,
-                labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
-                counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
-                border: widget.isUnderline!
-                  ? const UnderlineInputBorder()
-                  : OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    )
-            );
+          labelText: widget.label,
+          labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
+          counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
+          border: widget.isUnderline!
+            ? const UnderlineInputBorder()
+            : OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+      );
     }
 
     int? _maxLength() {
       return (widget.dataType == DataTypeEnum.text
-                    || widget.dataType == DataTypeEnum.password)
+                    || widget.dataType == DataTypeEnum.password
+                      || widget.dataType == DataTypeEnum.email)
                 && widget.maxValueForValidation != null
                     ? widget.maxValueForValidation
                     : null;

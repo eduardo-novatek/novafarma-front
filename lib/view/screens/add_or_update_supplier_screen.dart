@@ -205,6 +205,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               acceptEmpty: true,
               maxValueForValidation: 70,
               textForValidation: 'Ingrese una dirección de hasta 70 caracteres',
+              viewCharactersCount: false,
               onFieldSubmitted: (p0) =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
             ),
@@ -216,6 +217,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               acceptEmpty: true,
               maxValueForValidation: 60,
               textForValidation: 'Ingrese un email de hasta 60 caracteres',
+              viewCharactersCount: false,
               onFieldSubmitted: (p0) =>
                   FocusScope.of(context).requestFocus(_notesFocusNode),
             ),
@@ -226,7 +228,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               dataType: DataTypeEnum.text,
               acceptEmpty: true,
               maxValueForValidation: 100,
-              viewCharactersCount: true,
+              viewCharactersCount: false,
             ),
             const SizedBox(height: 20.0),
           ],
@@ -385,14 +387,15 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
                 registered = true;
                 //Canceló...Si encontró solo uno y es el mismo nombre...
               } else if (supplierList.length == 1
-                  && _nameController.text.trim() == supplierList[0].name) {
-                registered = true;
+                  && _nameController.text.trim().toUpperCase()
+                      == supplierList[0].name) {
+                registered = null;
               }
             },
           );
         }
       );
-    }catch (error) {
+    } catch (error) {
       if (error is ErrorObject) {
         if (error.statusCode == HttpStatus.notFound) {
           registered = false;
@@ -433,8 +436,11 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
     } finally {
       _changeStateLoading(false);
     }
-
-    //if (registered == null && mounted) FocusScope.of(context).requestFocus(_nameFocusNode);
+    if (registered == null && mounted) {
+      FocusScope.of(context).removeListener(() {_nameFocusNode;});
+      FocusScope.of(context).requestFocus(_nameFocusNode);
+      FocusScope.of(context).addListener(() {_nameFocusNode;});
+    }
     return Future.value(registered);
 
   }
