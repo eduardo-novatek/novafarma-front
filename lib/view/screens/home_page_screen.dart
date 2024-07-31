@@ -120,19 +120,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) {
       if (result != null) {
-        /*if (result == 'vouchers') {
-          setState(() {
-            _currentWidget = _buildVouchersWidget();
-          });
-        } else if (result == 'customers') {
-          setState(() {
-            _currentWidget = _buildCustomersWidget();
-          });
-        } else */if (result == 'suppliers') {
-          setState(() {
-            _currentWidget = _buildSuppliersWidget();
-          });
-        } else if (result == 'medicines') {
+        if (result == 'medicines') {
           setState(() {
             _currentWidget = _buildMedicinesWidget();
           });
@@ -250,7 +238,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         if (result == 'suppliers_add_update') {
           await _goAddOrUpdateSupplierScreen();
         } else  if (result == 'supplier_list') {
-          //await _goListSupplierScreen();
+          await _goListSupplierScreen();
         }
       }
     });
@@ -302,6 +290,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
+  Future<void> _goListSupplierScreen() async {
+    setState(() {
+      _currentWidget = ListSupplierScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
   Widget _buildIssueVouchersWidget() {
     return IssueVoucherScreen(
       onBlockedStateChange: (block) {
@@ -310,10 +310,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         });
       },
     );
-  }
-
-  Widget _buildSuppliersWidget() {
-    return const SupplierScreen();
   }
 
   Widget _buildMedicinesWidget() {
