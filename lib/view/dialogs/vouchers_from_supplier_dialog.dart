@@ -9,9 +9,10 @@ import 'package:novafarma_front/model/globals/tools/numberFormats.dart';
 import '../../model/DTOs/voucher_item_dto_2.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/tools/fetch_data.dart';
+import '../../model/globals/tools/fetch_data_pageable.dart';
+import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/error_object.dart';
-import '../../model/globals/constants.dart' show uriSupplierFindVouchers,
-  uriVoucherFindVoucherItems;
+import '../../model/globals/constants.dart' show sizePageVoucherListOfCustomer, sizePageVoucherListOfSupplier, uriSupplierFindVouchers, uriVoucherFindVoucherItems;
 import '../../model/globals/tools/floating_message.dart';
 
 class VouchersFromSupplierDialog extends StatefulWidget {
@@ -32,13 +33,17 @@ class _VouchersFromSupplierDialogState extends State<VouchersFromSupplierDialog>
   final List<VoucherDTO1> _voucherPageList = [];
   final Map<String, List<VoucherItemDTO2>> _voucherItems = {};
   final Map<String, bool> _voucherLoading = {};
-
   bool _loading = true;
+  final Map<String, int> _metadata = {
+    'pageNumber': 0,
+    'totalPages': 0,
+    'totalElements': 0,
+  };
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadDataPageable();
   }
 
   @override
@@ -66,6 +71,7 @@ class _VouchersFromSupplierDialogState extends State<VouchersFromSupplierDialog>
                   ? const Center(child: CircularProgressIndicator())
                   : _buildListView(),
             ),
+            _buildFooter(),
           ],
         ),
       ),
@@ -159,7 +165,10 @@ class _VouchersFromSupplierDialogState extends State<VouchersFromSupplierDialog>
                         _buildTableCell(
                           text: _buildPresentation(item.medicine!.presentation!),
                         ),
-                        _buildTableCell(text: item.quantity.toString()),
+                        _buildTableCell(
+                            text: item.quantity.toString(),
+                            rightAlign: true
+                        ),
                         _buildTableCell(
                             text: '\$${formatDouble(item.unitPrice!)}',
                             rightAlign: true
@@ -181,10 +190,14 @@ class _VouchersFromSupplierDialogState extends State<VouchersFromSupplierDialog>
     bool rightAlign = false,
     double size = 13,
     bool iconControlled = false}) {
+
     return TableCell(
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: Row(
+          mainAxisAlignment: rightAlign
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
           children: [
             _buildControlledIcon(iconControlled, size),
             Text(
@@ -215,15 +228,21 @@ class _VouchersFromSupplierDialogState extends State<VouchersFromSupplierDialog>
     );
   }
 
-  Future<void> _loadData() async {
+  Future<void> _loadDataPageable() async {
     _setLoading(true);
-    await fetchData(
-      uri: '$uriSupplierFindVouchers/${widget.supplierId}',
+    await fetchDataPageable(
+      uri: '$uriSupplierFindVouchers'
+          '/${widget.supplierId}'
+          '/${_metadata['pageNumber']!}'
+          '/$sizePageVoucherListOfSupplier',
       classObject: VoucherDTO1.empty(),
-    ).then((data) {
+    ).then((pageObject) {
       setState(() {
         _voucherPageList.clear();
-        _voucherPageList.addAll(data as Iterable<VoucherDTO1>);
+        _voucherPageList.addAll(pageObject.content as Iterable<VoucherDTO1>);
+        _metadata['pageNumber'] = pageObject.pageNumber;
+        _metadata['totalPages'] = pageObject.totalPages;
+        _metadata['totalElements'] = pageObject.totalElements;
       });
     }).onError((error, stackTrace) {
       String? msg;
@@ -290,6 +309,21 @@ class _VouchersFromSupplierDialogState extends State<VouchersFromSupplierDialog>
 
   String _buildPresentation(PresentationDTO presentation) {
     return '${presentation.name} ${presentation.quantity} ${presentation.unitName}';
+  }
+
+  Widget _buildFooter() {
+    return _metadata['totalPages'] != 0
+      ? PaginationBar(
+          totalPages: _metadata['totalPages']!,
+          initialPage: _metadata['pageNumber']! + 1,
+          onPageChanged: (page) {
+            setState(() {
+              _metadata['pageNumber'] = page - 1;
+              _loadDataPageable();
+            });
+          },
+        )
+      : const SizedBox.shrink();
   }
 
 }

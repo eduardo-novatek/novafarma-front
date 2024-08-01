@@ -7,6 +7,7 @@ const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server Nov
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
 const int sizePageVoucherListOfCustomer = 8;
+const int sizePageVoucherListOfSupplier = 8;
 
 const String defaultTextFromDropdownMenu = "Seleccione...";
 const double menuMaxHeight = 300.0;

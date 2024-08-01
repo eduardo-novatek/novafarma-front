@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -352,46 +353,38 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
   Future<void> _vouchersSupplier(int index) async {
     _toggleLoading();
     //Verifico la existencia de por lo menos un voucher
-    await fetchData(
-        uri: '$uriSupplierFindVouchers/${_supplierList[index].supplierId}',
+    await fetchDataPageable(
+        uri: '$uriSupplierFindVouchers/${_supplierList[index].supplierId}/0/1',
         classObject: VoucherDTO1.empty(),
-    ).then((data) {
-      if (data.isEmpty) {
+    ).then((pageObject) {
+      if (pageObject.totalElements == 0) {
         FloatingMessage.show(
           context: context,
           text: 'Sin datos',
           messageTypeEnum: MessageTypeEnum.info,
         );
-     } else {
-       SupplierDTO supplier = _supplierList[index];
-       showDialog(
-         context: context,
-         builder: (context) {
-           return AlertDialog(
-             content: VouchersFromSupplierDialog(
-               supplierId: supplier.supplierId!,
-               supplierName: supplier.name,
-             ),
-           );
-         },
-       );
-     }
+      } else {
+        SupplierDTO supplier = _supplierList[index];
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: VouchersFromSupplierDialog(
+                supplierId: supplier.supplierId!,
+                supplierName: supplier.name,
+              ),
+            );
+          },
+        );
+      }
     }).onError((error, stackTrace) {
       String? msg;
       if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-          FloatingMessage.show(
-            context: context,
-            text: 'Sin datos',
-            messageTypeEnum: MessageTypeEnum.info,
-          );
-        } else {
-          msg = error.message;
-        }
+        msg = error.message;
       } else {
         msg = error.toString().contains('XMLHttpRequest error')
-          ? 'Error de conexión'
-          : error.toString();
+            ? 'Error de conexión'
+            : error.toString();
       }
       if (msg != null) {
         FloatingMessage.show(
@@ -411,7 +404,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     int option = await OpenDialog(
       context: context,
       title: 'Eliminar proveedor',
-      content: '${supplierSelected.name})\n\n'
+      content: '${supplierSelected.name}\n\n'
           '¿Confirma?',
       textButton1: 'Si',
       textButton2: 'No',
