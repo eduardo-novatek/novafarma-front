@@ -34,6 +34,18 @@ class ListCustomerScreen extends StatefulWidget {
 }
 
 class _ListCustomerScreenState extends State<ListCustomerScreen> {
+
+  static const double _spaceMenuAndBorder = 30.0;
+  static const double _colLastname = 1.0;
+  static const double _colName = 1.0;
+  static const double _colDocument = 0.5;
+  static const double _colTelephone = 0.5;
+  static const double _colAddDate = 0.5;
+  static const double _colPayNumber = 0.4;
+  static const double _colPartner = 0.3;
+  static const double _colNotes = 0.3;
+  static const double _colMenu = 0.2;
+
   final List<CustomerDTO1> _customerList = [];
 
   final _lastnameFilterController = TextEditingController();
@@ -156,7 +168,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
             child: Stack(
               children: [
                 ListView.builder(
-                  padding: const EdgeInsets.only(right: 30.0),
+                  padding: const EdgeInsets.only(right: _spaceMenuAndBorder),
                   itemCount: _customerList.length,
                   itemBuilder: (context, index) {
                     return _buildCustomerRow(index);
@@ -174,35 +186,37 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     );
   }
 
-  Table _columnsBody() {
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(1.0),  // apellido
-        1: FlexColumnWidth(1.0),  // nombre
-        2: FlexColumnWidth(0.5),  // documento
-        3: FlexColumnWidth(0.5),  // telefono
-        4: FlexColumnWidth(0.5),  // fecha de alta
-        5: FlexColumnWidth(0.4),  // Num. cobro
-        6: FlexColumnWidth(0.3),  // ¿socio?
-        7: FlexColumnWidth(0.3),  // boton Notas
-        8: FlexColumnWidth(0.15),
-        //8: FixedColumnWidth(48),  //boton
-      },
-      children: [
-        TableRow(
-          children: [
-            _buildColumn('APELLIDO'),
-            _buildColumn('NOMBRE'),
-            _buildColumn('DOCUMENTO'),
-            _buildColumn('TELEFONO'),
-            _buildColumn('ALTA'),
-            _buildColumn('Nº COBRO'),
-            _buildColumn('SOCIO'),
-            _buildColumn('NOTAS'),
-            const SizedBox.shrink(), // Celda vacía para boton de menu
-          ],
-        ),
-      ],
+  Widget _columnsBody() {
+    return Padding(
+      padding: const EdgeInsets.only(right: _spaceMenuAndBorder),
+      child: Table(
+        columnWidths: const {
+          0: FlexColumnWidth(_colLastname),
+          1: FlexColumnWidth(_colName),
+          2: FlexColumnWidth(_colDocument),
+          3: FlexColumnWidth(_colTelephone),
+          4: FlexColumnWidth(_colAddDate),
+          5: FlexColumnWidth(_colPayNumber),
+          6: FlexColumnWidth(_colPartner),
+          7: FlexColumnWidth(_colNotes),
+          8: FlexColumnWidth(_colMenu),
+        },
+        children: [
+          TableRow(
+            children: [
+              _buildColumn('APELLIDO'),
+              _buildColumn('NOMBRE'),
+              _buildColumn('DOCUMENTO'),
+              _buildColumn('TELEFONO'),
+              _buildColumn('ALTA'),
+              _buildColumn('Nº COBRO'),
+              _buildColumn('SOCIO'),
+              _buildColumn('NOTAS'),
+              const SizedBox.shrink(), // Celda vacía para boton de menu
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -348,16 +362,15 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       ),
       child: Table(
         columnWidths: const {
-          0: FlexColumnWidth(1.0),    // apellido
-          1: FlexColumnWidth(1.0),    // nombre
-          2: FlexColumnWidth(0.5),    // documento
-          3: FlexColumnWidth(0.5),    // telefono
-          4: FlexColumnWidth(0.5),    // fecha de alta
-          5: FlexColumnWidth(0.4),    // Num. cobro
-          6: FlexColumnWidth(0.3),    // ¿socio?
-          7: FlexColumnWidth(0.3),    // Notas
-          8: FlexColumnWidth(0.15),   // menu
-          //8: FixedColumnWidth(48),
+          0: FlexColumnWidth(_colLastname),
+          1: FlexColumnWidth(_colName),
+          2: FlexColumnWidth(_colDocument),
+          3: FlexColumnWidth(_colTelephone),
+          4: FlexColumnWidth(_colAddDate),
+          5: FlexColumnWidth(_colPayNumber),
+          6: FlexColumnWidth(_colPartner),
+          7: FlexColumnWidth(_colNotes),
+          8: FlexColumnWidth(_colMenu),
         },
         children: [
           TableRow(
@@ -378,12 +391,13 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     );
   }
 
-  Widget _buildTableCellNotes(String notes) {
+  TableCell _buildTableCellNotes(String notes) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0),
-        child: Center(
+        child: Align(
+          alignment: Alignment.centerLeft,
           child: IconButton(
             icon: Icon(
               Icons.note,
@@ -397,7 +411,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     );
   }
 
-  Widget _showMenu(int index) {
+  TableCell _showMenu(int index) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: PopupMenuButton<int>(
@@ -439,7 +453,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     );
   }
 
-  Widget _buildTableCell({String? text, bool? alignRight}) {
+  TableCell _buildTableCell({String? text, bool? alignRight}) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Padding(
@@ -455,13 +469,6 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         ),
       ),
     );
-    /*return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text ?? '',
-        overflow: TextOverflow.ellipsis,
-      ),
-    );*/
   }
 
   void _onSelected(BuildContext context, int menuItem, int index) {

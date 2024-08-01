@@ -29,17 +29,18 @@ class ListSupplierScreen extends StatefulWidget {
 }
 
 class _ListSupplierScreenState extends State<ListSupplierScreen> {
+
+  static const double _spaceMenuAndBorder = 30.0;
+  static const double _colName = 1.5;
+  static const double _colTel1 = 0.5;
+  static const double _colTel2 = 0.5;
+  static const double _colAddress = 1.2;
+  static const double _colEmail = 1.5;
+  static const double _colNotes = 0.3;
+  static const double _colMenu = 0.2;
+
   final List<SupplierDTO> _supplierList = [];
-
-  //final _lastnameFilterController = TextEditingController();
-  //final _lastnameFilterFocusNode = FocusNode();
-
   bool _loading = false;
-  /*final Map<String, int> _metadata = {
-    'pageNumber': 0,
-    'totalPages': 0,
-    'totalElements': 0,
-  };*/
 
   @override
   void initState() {
@@ -50,8 +51,6 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
   @override
   void dispose() {
     super.dispose();
-    //_lastnameFilterController.dispose();
-    //_lastnameFilterFocusNode.dispose();
   }
 
   @override
@@ -59,7 +58,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -123,7 +122,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
             child: Stack(
               children: [
                 ListView.builder(
-                  padding: const EdgeInsets.only(right: 30.0),
+                  padding: const EdgeInsets.only(right: _spaceMenuAndBorder),
                   itemCount: _supplierList.length,
                   itemBuilder: (context, index) {
                     return _buildSupplierRow(index);
@@ -141,40 +140,49 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     );
   }
 
-  Table _columnsBody() {
-    return Table(
-      columnWidths: const {
-        0: FlexColumnWidth(1.0),  // nombre
-        1: FlexColumnWidth(0.5),  // telefono1
-        2: FlexColumnWidth(0.5),  // telefono2
-        3: FlexColumnWidth(2.0),  // direccion
-        4: FlexColumnWidth(1.5),  // email
-        5: FlexColumnWidth(0.3),  // boton Notas
-        6: FlexColumnWidth(0.15),
-      },
-      children: [
-        TableRow(
-          children: [
-            _buildColumn('NOMBRE'),
-            _buildColumn('TELÉFONO 1'),
-            _buildColumn('TELÉFONO 2'),
-            _buildColumn('DIRECCIÓN'),
-            _buildColumn('EMAIL'),
-            _buildColumn('NOTAS'),
-            const SizedBox.shrink(), // Celda vacía para boton de menu
-          ],
-        ),
-      ],
+  Widget _columnsBody() {
+    return Padding(
+      padding: const EdgeInsets.only(right: _spaceMenuAndBorder),
+      child: Table(
+        columnWidths: const {
+          0: FlexColumnWidth(_colName),
+          1: FlexColumnWidth(_colTel1),
+          2: FlexColumnWidth(_colTel2),
+          3: FlexColumnWidth(_colAddress),
+          4: FlexColumnWidth(_colEmail),
+          5: FlexColumnWidth(_colNotes),
+          6: FlexColumnWidth(_colMenu),
+        },
+        children: [
+          TableRow(
+            children: [
+              _buildColumn('NOMBRE'),
+              _buildColumn('TELÉFONO 1'),
+              _buildColumn('TELÉFONO 2'),
+              _buildColumn('DIRECCIÓN'),
+              _buildColumn('EMAIL'),
+              _buildColumn('NOTAS'),
+              const SizedBox.shrink(), // Celda vacía para boton de menu
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildColumn(String text) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          text,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+              fontSize: 15.0,
+              fontWeight: FontWeight.bold
+          ),
+        ),
       ),
     );
   }
@@ -234,14 +242,13 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
       ),
       child: Table(
         columnWidths: const {
-          0: FlexColumnWidth(1.0),  // nombre
-          1: FlexColumnWidth(0.5),  // telefono1
-          2: FlexColumnWidth(0.5),  // telefono2
-          3: FlexColumnWidth(2.0),  // direccion
-          4: FlexColumnWidth(1.5),  // email
-          5: FlexColumnWidth(0.3),  // boton Notas
-          6: FlexColumnWidth(0.15),
-          //8: FixedColumnWidth(48),
+          0: FlexColumnWidth(_colName),
+          1: FlexColumnWidth(_colTel1),
+          2: FlexColumnWidth(_colTel2),
+          3: FlexColumnWidth(_colAddress),
+          4: FlexColumnWidth(_colEmail),
+          5: FlexColumnWidth(_colNotes),
+          6: FlexColumnWidth(_colMenu),
         },
         children: [
           TableRow(
@@ -260,12 +267,13 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     );
   }
 
-  Widget _buildTableCellNotes(String notes) {
+  TableCell _buildTableCellNotes(String notes) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0),
-        child: Center(
+        child: Align(
+          alignment: Alignment.centerLeft,
           child: IconButton(
             icon: Icon(
               Icons.note,
@@ -279,7 +287,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     );
   }
 
-  Widget _showMenu(int index) {
+  TableCell _showMenu(int index) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: PopupMenuButton<int>(
@@ -311,7 +319,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     );
   }
 
-  Widget _buildTableCell({String? text, bool? alignRight}) {
+  TableCell _buildTableCell({String? text, bool? alignRight}) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Padding(
@@ -323,6 +331,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
           child: Text(
             text ?? '',
             overflow: TextOverflow.ellipsis,
+            //style: const TextStyle(fontSize: 14.0),
           )
         ),
       ),
