@@ -17,7 +17,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   final GlobalKey _menuButton = GlobalKey();
   bool _enableMenu = true;
-  Widget _currentWidget = msgHomeScreen; // Widget inicial
+  Widget _currentWidget = msgHomeScreen;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         ),
       ),
       body: Center(
-        child: _currentWidget, // Mostrar el widget actual
+        child: _currentWidget,
       ),
     );
   }
@@ -94,11 +94,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
 
-        const PopupMenuItem<String>(
-          value: 'medicines',
+        PopupMenuItem<String>(
+          value: 'articles',
           child: ListTile(
-            leading: Icon(Icons.local_pharmacy),
-            title: Text('Medicamentos', style: TextStyle(fontSize: 17.0)),
+            leading: const Icon(Icons.local_pharmacy),
+            title: const Text('Artículos', style: TextStyle(fontSize: 17.0)),
+            trailing: const Icon(Icons.arrow_right),
+            hoverColor: Colors.transparent,
+            onTap: () {
+              _openSubMenuArticles(context, tilePosition);
+            },
           ),
         ),
 
@@ -244,6 +249,95 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
+  void _openSubMenuArticles(BuildContext context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect subMenuPosition = RelativeRect.fromRect(
+      Rect.fromLTWH(position.dx + 240, position.dy + 200, 0, 0),
+      Offset.zero & overlay.size,
+    );
+    showMenu<String>(
+      context: context,
+      position: subMenuPosition,
+      elevation: 8.0,
+      items: [
+        PopupMenuItem<String>(
+          value: 'medicines',
+          child: ListTile(
+            leading: const Icon(Icons.medical_information),
+            title: const Text('Medicamentos'),
+            trailing: const Icon(Icons.arrow_right),
+            hoverColor: Colors.transparent,
+            onTap: () {
+              _openSubMenuMedicines(context, position);
+            },
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'presentations',
+          child: ListTile(
+            leading: Icon(Icons.library_books),
+            title: Text('Presentaciones'),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'units',
+          child: ListTile(
+            leading: Icon(Icons.ac_unit_sharp),
+            title: Text('Unidades de medida'),
+          ),
+        ),
+      ],
+    ).then((String? result) async {
+      if (result != null) {
+        Navigator.pop(context);
+        if (result == 'suppliers_add_update') {
+          await _goAddOrUpdateSupplierScreen();
+        } else  if (result == 'supplier_list') {
+          await _goListSupplierScreen();
+        }
+      }
+    });
+  }
+
+  void _openSubMenuMedicines(BuildContext context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect subMenuPosition = RelativeRect.fromRect(
+      Rect.fromLTWH(position.dx + 473, position.dy + 200, 0, 0),
+      Offset.zero & overlay.size,
+    );
+    showMenu<String>(
+      context: context,
+      position: subMenuPosition,
+      elevation: 8.0,
+      items: [
+        const PopupMenuItem<String>(
+          value: 'medicines_add_update',
+          child: ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Agregar o actualizar medicamentos'),
+            hoverColor: Colors.transparent,
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'medicine_list',
+          child: ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Listar medicamentos'),
+          ),
+        ),
+      ],
+    ).then((String? result) async {
+      if (result != null) {
+        Navigator.pop(context);
+        if (result == 'medicines_add_update') {
+          //await _goAddOrUpdateMedicineScreen();
+        } else  if (result == 'medicine_list') {
+
+        }
+      }
+    });
+  }
+
   Future<void> _goAddOrUpdateCustomerScreen() async {
     setState(() {
       _currentWidget = AddOrUpdateCustomerScreen(
@@ -260,6 +354,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
       );
     });
   }
+
+ /* Future<void> _goAddOrUpdateMedicineScreen() async {
+    setState(() {
+      _currentWidget = AddOrUpdateMedicineScreen(
+        onBlockedStateChange: (block) {
+          setState(() {
+            _enableMenu = !block;
+          });
+        },
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }*/
 
   Future<void> _goListCustomerScreen() async {
     setState(() {
