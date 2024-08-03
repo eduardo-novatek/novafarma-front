@@ -54,7 +54,6 @@ const String uriCustomerFindVouchersPage = "/customer/findVouchers";
 //NovaDaily
 const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
     //'/socio/cedula?apiToken=$novaDailyToken&cedula';
-
 const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
     //'/socio/apellido?apiToken=$novaDailyToken&apellido';
 
@@ -68,6 +67,8 @@ const String uriSupplierDelete = "/supplier/delete";
 
 //Medicine
 const String uriMedicineFindBarCode = "/medicine/findBarCode";
+const String uriMedicineAdd = "/medicine/add";
+const String uriMedicineUpdate = "/medicine/update";
 
 //Voucher
 const String uriVoucherAdd = "/voucher/add";

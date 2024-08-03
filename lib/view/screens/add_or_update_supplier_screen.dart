@@ -66,7 +66,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
   int _supplierId = 0;
   bool? _isAdd; // true: add, false: update, null: hubo error
   bool _isLoading = false;
-  bool _isInitializing = false;
+  //bool _isInitializing = false;
 
   @override
   void initState() {
@@ -333,9 +333,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
   }
 
   void _nameListener() {
-    bool? registered;
     _nameFocusNode.addListener(() async {
-      if (_isInitializing) return;
+      //if (_isInitializing) return;
 
       // Pierde foco
       if (!_nameFocusNode.hasFocus) {
@@ -348,8 +347,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           return;
         }
         //_isCheckingName = true; // Iniciar verificación de nombre
-        await _registeredName()
-          .then((registered) {
+        await _registeredName().then((registered) {
             //_isCheckingName = false; // Finalizar verificación de nombre
             if (registered != null) {
               _isAdd = ! registered;
@@ -457,14 +455,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
 
   void _initialize({required bool initName}) {
     setState(() {
-      _isInitializing = true;
+      //_isInitializing = true;
       if (initName) _nameController.value = TextEditingValue.empty;
       _telephone1Controller.value = TextEditingValue.empty;
       _telephone2Controller.value = TextEditingValue.empty;
       _addressController.value = TextEditingValue.empty;
       _emailController.value = TextEditingValue.empty;
       _notesController.value = TextEditingValue.empty;
-      _isInitializing = false;
+      //_isInitializing = false;
     });
     _isAdd = null;
     _supplierId = 0;

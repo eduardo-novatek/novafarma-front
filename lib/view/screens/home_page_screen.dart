@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
-import 'add_or_update_supplier_screen.dart';
-
 class HomePageScreen extends StatefulWidget {
   final String title;
 
@@ -125,11 +123,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) {
       if (result != null) {
-        if (result == 'medicines') {
-          setState(() {
-            _currentWidget = _buildMedicinesWidget();
-          });
-        } else if (result == 'balances') {
+        if (result == 'balances') {
           setState(() {
             _currentWidget = _buildBalancesWidget();
           });
@@ -252,7 +246,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
   void _openSubMenuArticles(BuildContext context, Offset position) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final RelativeRect subMenuPosition = RelativeRect.fromRect(
-      Rect.fromLTWH(position.dx + 240, position.dy + 200, 0, 0),
+      Rect.fromLTWH(position.dx + 240, position.dy + 200, 0, 0), // Coordenadas originales
       Offset.zero & overlay.size,
     );
     showMenu<String>(
@@ -267,42 +261,37 @@ class _HomePageScreenState extends State<HomePageScreen> {
             title: const Text('Medicamentos'),
             trailing: const Icon(Icons.arrow_right),
             hoverColor: Colors.transparent,
-            onTap: () {
-              _openSubMenuMedicines(context, position);
-            },
+            onTap: () => _openSubMenuMedicines(context, position),
           ),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'presentations',
           child: ListTile(
-            leading: Icon(Icons.library_books),
-            title: Text('Presentaciones'),
+            leading: const Icon(Icons.library_books),
+            title: const Text('Presentaciones'),
+            trailing: const Icon(Icons.arrow_right),
+            hoverColor: Colors.transparent,
+            onTap: () => _openSubMenuPresentations(context, position),
           ),
         ),
-        const PopupMenuItem<String>(
+        PopupMenuItem<String>(
           value: 'units',
           child: ListTile(
-            leading: Icon(Icons.ac_unit_sharp),
-            title: Text('Unidades de medida'),
+            leading: const Icon(Icons.ac_unit_sharp),
+            title: const Text('Unidades de medida'),
+            trailing: const Icon(Icons.arrow_right),
+            hoverColor: Colors.transparent,
+            onTap: () => _openSubMenuUnits(context, position),
           ),
         ),
       ],
-    ).then((String? result) async {
-      if (result != null) {
-        Navigator.pop(context);
-        if (result == 'suppliers_add_update') {
-          await _goAddOrUpdateSupplierScreen();
-        } else  if (result == 'supplier_list') {
-          await _goListSupplierScreen();
-        }
-      }
-    });
+    );
   }
 
   void _openSubMenuMedicines(BuildContext context, Offset position) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final RelativeRect subMenuPosition = RelativeRect.fromRect(
-      Rect.fromLTWH(position.dx + 473, position.dy + 200, 0, 0),
+      Rect.fromLTWH(position.dx + 473, position.dy + 200, 0, 0), // Coordenadas originales
       Offset.zero & overlay.size,
     );
     showMenu<String>(
@@ -328,11 +317,89 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) async {
       if (result != null) {
-        Navigator.pop(context);
+        Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
         if (result == 'medicines_add_update') {
-          //await _goAddOrUpdateMedicineScreen();
-        } else  if (result == 'medicine_list') {
+          await _goAddOrUpdateMedicineScreen();
+        } else if (result == 'medicine_list') {
+          // Acción para listar medicamentos
+        }
+      }
+    });
+  }
 
+  void _openSubMenuPresentations(BuildContext context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect subMenuPosition = RelativeRect.fromRect(
+      Rect.fromLTWH(position.dx + 473, position.dy + 243, 0, 0), // Coordenadas originales
+      Offset.zero & overlay.size,
+    );
+    showMenu<String>(
+      context: context,
+      position: subMenuPosition,
+      elevation: 8.0,
+      items: [
+        const PopupMenuItem<String>(
+          value: 'presentations_add_update',
+          child: ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Agregar o actualizar presentaciones'),
+            hoverColor: Colors.transparent,
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'medicine_list',
+          child: ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Listar presentaciones'),
+          ),
+        ),
+      ],
+    ).then((String? result) async {
+      if (result != null) {
+        Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
+        if (result == 'medicines_add_update') {
+
+        } else if (result == 'medicine_list') {
+          // Acción para listar medicamentos
+        }
+      }
+    });
+  }
+
+  void _openSubMenuUnits(BuildContext context, Offset position) {
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RelativeRect subMenuPosition = RelativeRect.fromRect(
+      Rect.fromLTWH(position.dx + 473, position.dy + 297, 0, 0), // Coordenadas originales
+      Offset.zero & overlay.size,
+    );
+    showMenu<String>(
+      context: context,
+      position: subMenuPosition,
+      elevation: 8.0,
+      items: [
+        const PopupMenuItem<String>(
+          value: 'units_add_update',
+          child: ListTile(
+            leading: Icon(Icons.add),
+            title: Text('Agregar o actualizar unidades de medida'),
+            hoverColor: Colors.transparent,
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'medicine_list',
+          child: ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Listar unidades de medida'),
+          ),
+        ),
+      ],
+    ).then((String? result) async {
+      if (result != null) {
+        Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
+        if (result == 'units_add_update') {
+
+        } else if (result == 'units_list') {
+          // Acción para listar medicamentos
         }
       }
     });
@@ -355,7 +422,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
- /* Future<void> _goAddOrUpdateMedicineScreen() async {
+  Future<void> _goAddOrUpdateMedicineScreen() async {
     setState(() {
       _currentWidget = AddOrUpdateMedicineScreen(
         onBlockedStateChange: (block) {
@@ -370,7 +437,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         },
       );
     });
-  }*/
+  }
 
   Future<void> _goListCustomerScreen() async {
     setState(() {
@@ -423,9 +490,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  Widget _buildMedicinesWidget() {
-    return const MedicineScreen();
-  }
 
   Widget _buildBalancesWidget() {
     return const BalanceScreen();
