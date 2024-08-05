@@ -33,8 +33,8 @@ import '../constants.dart' show menuMaxHeight;
 /// Widget _drawDropDownGender(String text) {
 ///     return CustomDropdown<PersonGenderObject>(
 ///       themeData: themeData,
-///       modelList: personGenderList,
-///       model: personGendersList[0],
+///       optionList: personGenderList,
+///       selectedOption: personGendersList[0],
 ///       callback: (gender) {
 ///         print(gender);
 ///       });
@@ -43,9 +43,9 @@ import '../constants.dart' show menuMaxHeight;
 class CustomDropdown<T extends Object> extends StatefulWidget {
 
   final ThemeData themeData;
-  final List<T?> modelList;
-  final T? model;
-  final bool modelSelected; //true: el item 'model' queda seleccionado. false: el primer item queda seleccionado
+  final List<T?> optionList;
+  final T? selectedOption;
+  final bool isSelected; //true: 'selectedOption' queda seleccionada. false: la 1er opcion queda seleccionada
   final Function(T?) callback;
   final FocusNode? focusNode;
 
@@ -53,9 +53,9 @@ class CustomDropdown<T extends Object> extends StatefulWidget {
         super.key,
         this.focusNode,
         required this.themeData,
-        required this.modelList,
-        required this.model,
-        required this.modelSelected,
+        required this.optionList,
+        required this.selectedOption,
+        required this.isSelected,
         required this.callback,
   });
 
@@ -70,11 +70,13 @@ class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
   @override
   void initState() {
     super.initState();
-    object = widget.model;
+    //object = widget.model;
   }
 
   @override
   Widget build(BuildContext context) {
+    object = widget.selectedOption;
+
     return Focus(
       focusNode: widget.focusNode,
       child: SingleChildScrollView(
@@ -87,8 +89,8 @@ class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
             fontSize: widget.themeData.textTheme.bodyMedium?.fontSize,
           ),
           isDense: true,
-          value: widget.modelSelected ? object : widget.modelList[0],
-          items: widget.modelList.map((T? value) {
+          value: widget.isSelected ? object : widget.optionList[0],
+          items: widget.optionList.map((T? value) {
             return DropdownMenuItem<T>(
               value: value,
               child: Text(value != null ? value.toString() : ''),
@@ -97,9 +99,9 @@ class _CustomDropdownState<T extends Object> extends State<CustomDropdown<T>> {
 
           onChanged: (val) {
             widget.callback(val);
-            setState(() {
+            /*setState(() {
               object = val;
-            });
+            });*/
           },
         ),
       ),

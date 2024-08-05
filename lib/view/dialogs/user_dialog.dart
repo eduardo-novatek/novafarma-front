@@ -37,7 +37,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
 
-  String selectedRole = defaultTextFromDropdownMenu;
+  String selectedRole = defaultFirstOption;
   ThemeData themeData = ThemeData();
 
   @override
@@ -47,7 +47,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
       widget.roleList.insert(
           0,
           RoleDTO(
-              isFirst: true, roleId: null, name: defaultTextFromDropdownMenu)
+              isFirst: true, roleId: null, name: defaultFirstOption)
       );
     }
   }
@@ -129,9 +129,9 @@ class _AddUserDialogState extends State<AddUserDialog> {
                       ),
                       CustomDropdown<RoleDTO>(
                         themeData: themeData,
-                        modelList: widget.roleList,
-                        model: widget.roleList[0],
-                        modelSelected: true,
+                        optionList: widget.roleList,
+                        selectedOption: widget.roleList[0],
+                        isSelected: true,
                         callback: (role) {
                           selectedRole = role!.name;
                         },
@@ -194,7 +194,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
         return false;
       }
 
-      if (selectedRole == defaultTextFromDropdownMenu) {
+      if (selectedRole == defaultFirstOption) {
         if (context.mounted) {
           FloatingMessage.show(
               context: context,

@@ -12,7 +12,7 @@ Map<String, dynamic> userLogged = {
 };
 
 final List<String> movementTypes = [
-  defaultTextFromDropdownMenu,
+  defaultFirstOption,
   nameMovementType(MovementTypeEnum.purchase),
   nameMovementType(MovementTypeEnum.sale),
   nameMovementType(MovementTypeEnum.returnToSupplier),

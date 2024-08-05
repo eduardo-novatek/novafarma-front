@@ -9,7 +9,8 @@ const int sizePageCustomerList = 20;
 const int sizePageVoucherListOfCustomer = 8;
 const int sizePageVoucherListOfSupplier = 8;
 
-const String defaultTextFromDropdownMenu = "Seleccione...";
+const String defaultFirstOption = "Seleccione...";
+const String defaultLastOption = "Nuevo...";
 const double menuMaxHeight = 300.0;
 const double menuMaxWeight = 300.0;
 
@@ -77,3 +78,9 @@ const String uriVoucherFindVoucherItems = "/voucher/findVoucherItems";
 //Controlled Medication
 const String uriDateAuthorizationSale = "controlledMedication/dateAuthorizationSale";
 const String uriControlledMedicationAdd = "/controlledMedication/add";
+
+//Units
+const String uriUnitFindAll = "/unit/findAll";
+const String uriUnitAdd = "/unit/add";
+const String uriUnitUpdate = "unit/update";
+

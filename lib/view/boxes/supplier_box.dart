@@ -8,19 +8,19 @@ import '../../model/DTOs/supplier_dto.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
-import '../../model/globals/constants.dart' show defaultTextFromDropdownMenu;
+import '../../model/globals/constants.dart' show defaultFirstOption;
 import '../../model/globals/tools/floating_message.dart';
 import '../../model/objects/error_object.dart';
 
 class SupplierBox extends StatefulWidget {
   //final int selectedId;
-  final bool selectFist;
+  final bool selectFirst;
   final ValueChanged<SupplierDTO?> onSelectedChanged;
   final ValueChanged<bool>? onRefreshButtonChange;
 
   const SupplierBox({
     super.key,
-    required this.selectFist,
+    required this.selectFirst,
     this.onRefreshButtonChange,
     //required this.selectedId,
     required this.onSelectedChanged,
@@ -33,6 +33,8 @@ class SupplierBox extends StatefulWidget {
 class SupplierBoxState extends State<SupplierBox> {
 
   final List<SupplierDTO> _supplierList = [];
+  int? _supplierIdSelected;
+
   bool _isLoading = false;
 
   @override
@@ -90,10 +92,13 @@ class SupplierBoxState extends State<SupplierBox> {
           if (widget.onRefreshButtonChange != null) widget.onRefreshButtonChange!(false);
         }
       },
-      icon: const Icon(
-        Icons.refresh_rounded,
-        color: Colors.blue,
-        size: 16.0,
+      icon: const Tooltip(
+        message: 'Actualizar proveedores',
+        child: Icon(
+          Icons.refresh_rounded,
+          color: Colors.blue,
+          size: 16.0,
+        ),
       ),
     );
   }
@@ -104,14 +109,18 @@ class SupplierBoxState extends State<SupplierBox> {
         padding: const EdgeInsets.only(left: 10.0),
         child: CustomDropdown<SupplierDTO>(
           themeData: ThemeData(),
-          modelList: _supplierList,
-          model: _supplierList.isNotEmpty ? _supplierList[0] : null,
-          modelSelected: ! widget.selectFist,
+          optionList: _supplierList,
+          selectedOption: _supplierList.isNotEmpty
+            ? _supplierList.firstWhere((e) => e.supplierId == _supplierIdSelected)
+            : null,
+          isSelected: ! widget.selectFirst,
           callback: (supplier) {
             setState(() {
               if (supplier!.supplierId == 0) {
+                _supplierIdSelected = 0;
                 widget.onSelectedChanged(null);
               } else {
+                _supplierIdSelected = supplier.supplierId;
                 widget.onSelectedChanged(
                     SupplierDTO(
                       supplierId: supplier.supplierId,
@@ -141,12 +150,14 @@ class SupplierBoxState extends State<SupplierBox> {
           0,
           SupplierDTO(
             isFirst: true,
-            name: defaultTextFromDropdownMenu,
+            name: defaultFirstOption,
             supplierId: 0,
           ),
         );
+        _supplierIdSelected = 0; //supplierId = 0, indica defaultTextFromDropdownMenu
         widget.onSelectedChanged(null);
       });
+
     } catch (error) {
       if (error is ErrorObject) {
         if (error.statusCode != HttpStatus.notFound) {
@@ -160,10 +171,11 @@ class SupplierBoxState extends State<SupplierBox> {
         _supplierList.add(
           SupplierDTO(
             isFirst: true,
-            name: defaultTextFromDropdownMenu,
+            name: defaultFirstOption,
             supplierId: 0,
           ),
         );
+        _supplierIdSelected = 0; //supplierId = 0, indica defaultTextFromDropdownMenu
         widget.onSelectedChanged(null);
       }
       setState(() {

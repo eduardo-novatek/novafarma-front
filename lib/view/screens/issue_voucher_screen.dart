@@ -25,7 +25,7 @@ import '../../model/globals/publics.dart';
 import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
-    defaultTextFromDropdownMenu, uriVoucherAdd;
+    defaultFirstOption, uriVoucherAdd;
 
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/voucher_item_dialog.dart';
@@ -48,7 +48,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
 
   final FocusNode _dateFocusNode = FocusNode();
 
-  String _selectedMovementType = defaultTextFromDropdownMenu;
+  String _selectedMovementType = defaultFirstOption;
   int _selectedCustomerOrSupplierId = 0; //id del Customer o Supplier seleccionado
   String? _customerSelected; //'Nombre Apellido (documento)' del Customer seleccionado
   CustomerDTO1? _customer;
@@ -193,9 +193,9 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: CustomDropdown<String>(
                       themeData: _themeData,
-                      modelList: movementTypes,
-                      model: movementTypes[0],
-                      modelSelected: true,
+                      optionList: movementTypes,
+                      selectedOption: _selectedMovementType, //movementTypes[0],
+                      isSelected: true,
                       callback: (movementType) {
                         //Si cambió el tipo de comprobante
                         if (_selectedMovementType != movementType!) {
@@ -206,12 +206,6 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                                 _selectedMovementType == nameMovementType(MovementTypeEnum.purchase) ||
                                     _selectedMovementType == nameMovementType(MovementTypeEnum.returnToSupplier));
                             _initializeVoucher();
-                            //_customer = null;
-                            //_supplier = null;
-                            //_selectedCustomerOrSupplierId = 0;
-
-                            //_voucherItemList.clear();
-                            //_barCodeList.clear();
                           });
                         }
                       },
@@ -227,7 +221,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
   }
 
   Widget _buildBody() {
-    return _selectedMovementType != defaultTextFromDropdownMenu
+    return _selectedMovementType != defaultFirstOption
         ? Expanded(
             child: Column(
               children: [
@@ -667,7 +661,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
   }
 
   Widget _buildSupplierOrCustomerBox() {
-    if (_selectedMovementType != defaultTextFromDropdownMenu) {
+    if (_selectedMovementType != defaultFirstOption) {
       //Es Proveedor?
       if (_isSupplier){
         return Container(
@@ -684,7 +678,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
             children: [
               _buildSectionTitleBar(sectionTitle: "Datos proveedor"),
               SupplierBox(
-                selectFist: _selectedCustomerOrSupplierId == 0,
+                selectFirst: _selectedCustomerOrSupplierId == 0,
                 onSelectedChanged: (supplier) => setState(() {
                   if (supplier == null || supplier.supplierId == 0) {
                     _selectedCustomerOrSupplierId = 0;

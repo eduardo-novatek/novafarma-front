@@ -10,6 +10,7 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriCustomerFindPaymentNumber;
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
@@ -470,7 +471,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
           registered = false;
         } else {
           await OpenDialog(
-              context: context,
+              context: mounted ? context : context,
               title: 'Error',
               content: error.message != null
                   ? error.message!
@@ -478,7 +479,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
           ).view();
         }
       } else {
-        if (error.toString().contains('XMLHttpRequest error')) {
+        genericError(error, mounted ? context : context);
+        /*if (error.toString().contains('XMLHttpRequest error')) {
           await OpenDialog(
             context: context,
             title: 'Error de conexión',
@@ -498,7 +500,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
               content: error.toString(),
             ).view();
           }
-        }
+        }*/
       }
     } finally {
       _changeStateLoading(false);

@@ -5,9 +5,11 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
+import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriSupplierFindName;
+import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption, defaultLastOption, uriUnitFindAll;
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
@@ -16,7 +18,10 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
+import '../../model/globals/tools/custom_dropdown.dart';
+import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/floating_message.dart';
+import '../dialogs/unit_show_dialog.dart';
 
 class AddOrUpdateMedicineScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
@@ -40,12 +45,10 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
   final _formKey = GlobalKey<FormState>();
   final _formBarCodeKey = GlobalKey<FormState>();
   final _formNameKey = GlobalKey<FormState>();
-  final _formPresentationKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
-  final _presentationNameController = TextEditingController();
+  final _presentationContainerController = TextEditingController();
   final _presentationQuantityController = TextEditingController();
-  final _presentationUnitNameController = TextEditingController();
   final _barCodeController = TextEditingController();
   final _lastAddDateController = TextEditingController();
   final _lastCostPriceController = TextEditingController();
@@ -54,7 +57,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
   bool? _controlled;
 
   final _nameFocusNode = FocusNode();
-  final _presentationNameFocusNode = FocusNode();
+  final _presentationContainerFocusNode = FocusNode();
   final _presentationQuantityFocusNode = FocusNode();
   final _presentationUnitNameFocusNode = FocusNode();
   final _barCodeFocusNode = FocusNode();
@@ -67,11 +70,16 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
   int _medicineId = 0, _presentationId = 0;
   bool? _isAdd; // true: add, false: update, null: hubo error
   bool _isLoading = false;
-  //bool _isInitializing = false;
+
+  final List<UnitDTO> _unitList = [
+    UnitDTO(unitId: 0, name: defaultFirstOption)
+  ];
+  String _unitSelected = defaultFirstOption;
 
   @override
   void initState() {
     super.initState();
+    _updateUnits(true);
     _createListeners();
     _initialize(initNameAndPresentation: true);
   }
@@ -80,9 +88,9 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
   void dispose() {
     super.dispose();
     _nameController.dispose();
-    _presentationNameController.dispose();
+    _presentationContainerController.dispose();
     _presentationQuantityController.dispose();
-    _presentationUnitNameController.dispose();
+    //_presentationUnitNameController.dispose();
     _barCodeController.dispose();
     _lastAddDateController.dispose();
     _lastCostPriceController.dispose();
@@ -90,7 +98,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     _currentStockController.dispose();
 
     _nameFocusNode.dispose();
-    _presentationNameFocusNode.dispose();
+    _presentationContainerFocusNode.dispose();
     _presentationQuantityFocusNode.dispose();
     _presentationUnitNameFocusNode.dispose();
     _barCodeFocusNode.dispose();
@@ -108,7 +116,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.4,
+            width: MediaQuery.of(context).size.width * 0.35,
             decoration: BoxDecoration(
               border: Border.all(
                 color: Colors.black,
@@ -161,7 +169,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
 
   Widget _buildBody() {
     return Padding(
-      padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+      padding: const EdgeInsets.only(left: 8.0, top: 16.0, right: 8.0),
       child: Form(
         key: _formKey,
         child: Column(
@@ -176,6 +184,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
                 dataType: DataTypeEnum.text,
                 maxValueForValidation: 13,
                 textForValidation: 'Ingrese un código de hasta 13 caracteres',
+                viewCharactersCount: false,
                 acceptEmpty: false,
                 onFieldSubmitted: (p0) =>
                     FocusScope.of(context).requestFocus(_nameFocusNode),
@@ -189,13 +198,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
                 focusNode: _nameFocusNode,
                 dataType: DataTypeEnum.text,
                 maxValueForValidation: 50,
-                viewCharactersCount: true,
+                viewCharactersCount: false,
                 textForValidation: 'Ingrese un nombre de hasta 50 caracteres',
                 acceptEmpty: false,
                 onFieldSubmitted: (p0) =>
-                    FocusScope.of(context).requestFocus(_lastCostPriceFocusNode),
+                    FocusScope.of(context).requestFocus(_presentationContainerFocusNode),
               ),
             ),
+            _buildFormPresentation(),
             CreateTextFormField(
               label: 'Precio de costo',
               controller: _lastCostPriceController,
@@ -204,6 +214,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
               minValueForValidation: 0,
               maxValueForValidation: 999999,
               textForValidation: 'Ingrese un precio de costo de hasta 6 dígitos',
+              viewCharactersCount: false,
               acceptEmpty: false,
               onFieldSubmitted: (p0) =>
                   FocusScope.of(context).requestFocus(_lastSalePriceFocusNode),
@@ -246,6 +257,119 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
                 ),
               ],
             )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormPresentation() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 15.0, bottom: 5.0),
+      child: Container(
+        width: double.infinity, // Para asegurar que el contenedor tome todo el ancho disponible
+        decoration: BoxDecoration(
+          border: Border.all(
+            style: BorderStyle.solid,
+            color: Colors.blue,
+          ),
+        ),
+        child: Stack(
+          clipBehavior: Clip.none, // Permite que los elementos se superpongan fuera del contenedor
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 20.0, top: 8.0, right: 10.0, bottom: 8.0),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 190,
+                    child: CreateTextFormField(
+                      label: 'Envase',
+                      controller: _presentationContainerController,
+                      focusNode: _presentationContainerFocusNode,
+                      dataType: DataTypeEnum.text,
+                      maxValueForValidation: 20,
+                      viewCharactersCount: false,
+                      textForValidation: 'Requerido',
+                      acceptEmpty: false,
+                      onFieldSubmitted: (p0) =>
+                          FocusScope.of(context).requestFocus(_presentationQuantityFocusNode),
+                    ),
+                  ),
+                  const Spacer(),
+                  SizedBox(
+                    width: 60,
+                    child: CreateTextFormField(
+                      label: 'Cantidad',
+                      controller: _presentationQuantityController,
+                      focusNode: _presentationQuantityFocusNode,
+                      dataType: DataTypeEnum.number,
+                      minValueForValidation: 0,
+                      maxValueForValidation: 99999,
+                      viewCharactersCount: false,
+                      textForValidation: 'Requerido',
+                      acceptEmpty: false,
+                    ),
+                  ),
+                  const Spacer(),
+                  Flexible(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Unidad',
+                                style: TextStyle(fontSize: 11.5),
+                              ),
+                              _buildRefreshUnitsButton(),
+                            ],
+                          ),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: CustomDropdown<String>(
+                              focusNode: _presentationUnitNameFocusNode,
+                              themeData: ThemeData(),
+                              optionList:  _unitList.map((e) => e.name).toList(),
+                              selectedOption: _unitSelected,
+                              isSelected: true, //! _isAdd!,
+                              callback: (unit) {
+                                if (unit == defaultLastOption) _addUnit();
+                                setState(() {
+                                  _unitSelected  = unit!;
+                                });
+                                // Callback function
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 10.0,
+              top: -10.0,
+              child: Container(
+                color: Colors.white, // Color de fondo para que el título no se solape con el borde
+                padding: const EdgeInsets.symmetric(horizontal: 5.0), // Padding interno del título
+                child: const Text(
+                  'Presentación',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.normal,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -323,9 +447,9 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
   PresentationDTO _buildPresentation() {
     return PresentationDTO(
       presentationId: _presentationId == 0 ? null : _presentationId,
-      name: _presentationNameController.text.trim(),
+      name: _presentationContainerController.text.trim(),
       quantity: int.parse(_presentationQuantityController.text.trim()),
-      unitName: _presentationUnitNameController.text.trim(),
+      unitName: _unitSelected,
     );
   }
 
@@ -482,7 +606,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     bool? registered = false;
     List<MedicineDTO1> medicineList = [];
 
-    /*_changeStateLoading(true);
+   /* _changeStateLoading(true);
     try {
       await fetchSupplierList(
           supplierList: medicineList,
@@ -554,7 +678,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
       FocusScope.of(context).requestFocus(_nameFocusNode);
       FocusScope.of(context).addListener(() {_nameFocusNode;});
     }
-     */
+*/
     return Future.value(registered);
   }
 
@@ -564,12 +688,10 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
 
     _barCodeController.value = TextEditingValue(text: medicine.barCode!);
     _nameController.value = TextEditingValue(text: medicine.name!);
-    _presentationNameController.value = TextEditingValue(
+    _presentationContainerController.value = TextEditingValue(
         text: medicine.presentation!.name!);
     _presentationQuantityController.value = TextEditingValue(
         text: medicine.presentation!.quantity!.toString());
-    _presentationUnitNameController.value = TextEditingValue(
-        text: medicine.presentation!.unitName!);
     _lastCostPriceController.value = TextEditingValue(
         text: medicine.lastCostPrice!.toString());
     _lastSalePriceController.value = TextEditingValue(
@@ -577,15 +699,18 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     _currentStockController.value = TextEditingValue(
         text: medicine.currentStock!.toString());
     _controlled = medicine.controlled!;
+    setState(() {
+      _unitSelected = medicine.presentation!.unitName!;
+    });
   }
 
   void _initialize({required bool initNameAndPresentation}) {
     setState(() {
       if (initNameAndPresentation) {
         _nameController.value = TextEditingValue.empty;
-        _presentationNameController.value = TextEditingValue.empty;
+        _presentationContainerController.value = TextEditingValue.empty;
         _presentationQuantityController.value = TextEditingValue.empty;
-        _presentationUnitNameController.value = TextEditingValue.empty;
+        _unitSelected = defaultFirstOption;
       }
       _barCodeController.value = TextEditingValue.empty;
       _lastCostPriceController.value = TextEditingValue.empty;
@@ -605,4 +730,93 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     widget.onBlockedStateChange!(isLoading);
   }
 
+  Future<void> _updateUnits(bool isInitState) async {
+    if (isInitState) {
+      setState(() {
+        _isLoading = true;
+      });
+    } else {
+      _changeStateLoading(true);
+    }
+
+    await fetchData<UnitDTO>(
+      uri: uriUnitFindAll,
+      classObject: UnitDTO.empty(),
+    ).then((data) {
+      _unitList.clear();
+      if (mounted) {
+        setState(() {
+          _unitList.add(UnitDTO(unitId: 0, name: defaultFirstOption));
+          _unitList.addAll(
+              data.cast<UnitDTO>().map((e) =>
+                  UnitDTO(unitId: e.unitId, name: e.name))
+          );
+          _unitList.add(UnitDTO(unitId: -1, name: defaultLastOption));
+        });
+      }
+
+    }).onError((error, stackTrace) {
+      genericError(error!, context);
+    });
+
+    if (isInitState) {
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      _changeStateLoading(false);
+    }
+  }
+
+  IconButton _buildRefreshUnitsButton() {
+    return IconButton(
+      onPressed: () async {
+        if (!_isLoading) {
+          // llama al callback: esta haciendo el refresh...
+          if (widget.onBlockedStateChange != null) {
+            widget.onBlockedStateChange!(true);
+          }
+          await _updateUnits(false);
+          // llama al callback: no está haciendo el refresh...
+          if (widget.onBlockedStateChange != null) {
+            widget.onBlockedStateChange!(false);
+          }
+        }
+      },
+      icon: const Tooltip(
+        message: 'Actualizar unidades',
+        child: Icon(
+          Icons.refresh_rounded,
+          color: Colors.blue,
+          size: 16.0,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addUnit() async {
+    final String? unit = await unitShowDialog(context: context, isAdd: true);
+    if (unit != null) {
+      await _updateUnits(false).then((_) {
+        if (mounted) {
+          setState(() {
+            _unitSelected = unit;
+          });
+        }
+      });
+    }
+  }
+  /*void _addUnit() async {
+    await unitShowDialog(context: context, isAdd: true)
+      .then((value) async {
+        await _updateUnits(false).then((v){
+          setState(() {
+            _unitSelected = value;  //Selecciona la unidad agregada
+          });
+        });
+
+      }).onError((error, stackTrace) {
+        if (kDebugMode) print(error);
+    });
+  }*/
 }
