@@ -768,27 +768,31 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     }
   }
 
-  IconButton _buildRefreshUnitsButton() {
-    return IconButton(
-      onPressed: () async {
-        if (!_isLoading) {
-          // llama al callback: esta haciendo el refresh...
-          if (widget.onBlockedStateChange != null) {
-            widget.onBlockedStateChange!(true);
+  Widget _buildRefreshUnitsButton() {
+    return SizedBox(
+      width: 30,
+      height: 30,
+      child: IconButton(
+        onPressed: () async {
+          if (!_isLoading) {
+            // llama al callback: esta haciendo el refresh...
+            if (widget.onBlockedStateChange != null) {
+              widget.onBlockedStateChange!(true);
+            }
+            await _updateUnits(false);
+            // llama al callback: no está haciendo el refresh...
+            if (widget.onBlockedStateChange != null) {
+              widget.onBlockedStateChange!(false);
+            }
           }
-          await _updateUnits(false);
-          // llama al callback: no está haciendo el refresh...
-          if (widget.onBlockedStateChange != null) {
-            widget.onBlockedStateChange!(false);
-          }
-        }
-      },
-      icon: const Tooltip(
-        message: 'Actualizar unidades',
-        child: Icon(
-          Icons.refresh_rounded,
-          color: Colors.blue,
-          size: 16.0,
+        },
+        icon: const Tooltip(
+          message: 'Actualizar unidades',
+          child: Icon(
+            Icons.refresh_rounded,
+            color: Colors.blue,
+            size: 16.0,
+          ),
         ),
       ),
     );
@@ -806,17 +810,5 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
       });
     }
   }
-  /*void _addUnit() async {
-    await unitShowDialog(context: context, isAdd: true)
-      .then((value) async {
-        await _updateUnits(false).then((v){
-          setState(() {
-            _unitSelected = value;  //Selecciona la unidad agregada
-          });
-        });
 
-      }).onError((error, stackTrace) {
-        if (kDebugMode) print(error);
-    });
-  }*/
 }

@@ -71,81 +71,87 @@ class _UnitDialogState extends State<_UnitDialog> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
-            width: constraints.maxWidth * 0.30, // % del ancho disponible
-            height: constraints.maxHeight * 0.40,
+            width: constraints.maxWidth * 0.2, // % del ancho disponible
+            height: constraints.maxHeight * (widget.isAdd ? 0.26 : 0.4),
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Stack(
-                  children: [
-                    AbsorbPointer(
-                      absorbing: _isLoading,
-                      child:
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        // Ajusta el tamaño vertical al contenido
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const Text('Nueva unidad de medida',
-                            style: TextStyle(fontSize: 15,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          CreateTextFormField(
-                            label: 'Unidad de medida',
-                            controller: _unitNameController,
-                            focusNode: _unitNameFocusNode,
-                            dataType: DataTypeEnum.text,
-                            maxValueForValidation: 4,
-                            viewCharactersCount: false,
-                            textForValidation: 'Requerido',
-                            acceptEmpty: false,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 27.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                ElevatedButton(
-                                  child: const Text("Aceptar"),
-                                  onPressed: () async {
-                                    if (!_formKey.currentState!.validate()) return;
-                                    if (await _confirm() == 1) {
-                                      await _submitForm().then((unit) {
-                                        if (mounted) {
-                                          Navigator.of(context).pop(unit);
-                                        }
-                                      }).onError((error, stackTrace) {
-                                        if (mounted) {
+            child: Expanded(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Stack(
+                    children: [
+                      AbsorbPointer(
+                        absorbing: _isLoading,
+                        child:
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          // Ajusta el tamaño vertical al contenido
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text('Nueva unidad de medida',
+                              style: TextStyle(fontSize: 15,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            CreateTextFormField(
+                              label: 'Unidad de medida',
+                              controller: _unitNameController,
+                              focusNode: _unitNameFocusNode,
+                              dataType: DataTypeEnum.text,
+                              maxValueForValidation: 4,
+                              viewCharactersCount: false,
+                              textForValidation: 'Requerido',
+                              acceptEmpty: false,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 27.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      child: const Text("Aceptar"),
+                                      onPressed: () async {
+                                        if (!_formKey.currentState!.validate()) return;
+                                        if (await _confirm() == 1) {
+                                          await _submitForm().then((unit) {
+                                            if (mounted) {
+                                              Navigator.of(context).pop(unit);
+                                            }
+                                          }).onError((error, stackTrace) {
+                                            if (mounted) {
+                                              Navigator.of(context).pop(null);
+                                            }
+                                          });
+                                        } else {
                                           Navigator.of(context).pop(null);
                                         }
-                                      });
-                                    } else {
-                                      Navigator.of(context).pop(null);
-                                    }
-                                  },
-                                ),
-                                const SizedBox(width: 8),
-                                ElevatedButton(
-                                  child: const Text("Cancelar"),
-                                  onPressed: () {
-                                    Navigator.of(context).pop(false);
-                                  },
-                                ),
-                              ],
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      child: const Text("Cancelar"),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    if (_isLoading)
-                      Positioned.fill(
-                          child: Container(
-                              child: buildCircularProgress(size: 30.0)
-                          )
-                      ),
-                  ]
-                )
+                      if (_isLoading)
+                        Positioned.fill(
+                            child: Container(
+                                child: buildCircularProgress(size: 30.0)
+                            )
+                        ),
+                    ]
+                  )
+                ),
               ),
             ),
           );
