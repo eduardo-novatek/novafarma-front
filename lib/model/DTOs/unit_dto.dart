@@ -1,8 +1,4 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
-import 'package:novafarma_front/model/globals/tools/date_time.dart';
-
-import 'customer_dto.dart';
-import 'medicine_dto.dart';
 
 class UnitDTO extends Deserializable<UnitDTO> {
   int? unitId;

@@ -90,7 +90,6 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     _nameController.dispose();
     _presentationContainerController.dispose();
     _presentationQuantityController.dispose();
-    //_presentationUnitNameController.dispose();
     _barCodeController.dispose();
     _lastAddDateController.dispose();
     _lastCostPriceController.dispose();
@@ -267,7 +266,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 5.0),
       child: Container(
-        width: double.infinity, // Para asegurar que el contenedor tome todo el ancho disponible
+        width: double.infinity, // Para asegurar que el contenedor tome tod-o el ancho disponible
         decoration: BoxDecoration(
           border: Border.all(
             style: BorderStyle.solid,
@@ -340,9 +339,11 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
                               isSelected: true, //! _isAdd!,
                               callback: (unit) {
                                 if (unit == defaultLastOption) _addUnit();
-                                setState(() {
-                                  _unitSelected  = unit!;
-                                });
+                                if (mounted) {
+                                  setState(() {
+                                    _unitSelected  = unit!;
+                                  });
+                                }
                                 // Callback function
                               },
                             ),
@@ -799,7 +800,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
   }
 
   Future<void> _addUnit() async {
-    final String? unit = await unitShowDialog(context: context, isAdd: true);
+    final String? unit = await unitShowDialog(context: context);
     if (unit != null) {
       await _updateUnits(false).then((_) {
         if (mounted) {
