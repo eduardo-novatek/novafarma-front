@@ -74,7 +74,7 @@ class _UnitDialogState extends State<_UnitDialog> {
           return Container(
             width: constraints.maxWidth * 0.2, // % del ancho disponible
             height: constraints.maxHeight * (_isAdd ? 0.26 : 0.3),
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 40),
             child: SingleChildScrollView(
               child: Form(
                 key: _formKey,
