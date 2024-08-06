@@ -185,6 +185,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
                 textForValidation: 'Ingrese un código de hasta 13 caracteres',
                 viewCharactersCount: false,
                 acceptEmpty: false,
+                initialFocus: true,
                 onFieldSubmitted: (p0) =>
                     FocusScope.of(context).requestFocus(_nameFocusNode),
               ),
@@ -319,14 +320,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'Unidad',
-                                style: TextStyle(fontSize: 11.5),
+                                style: TextStyle(fontSize: 12),
                               ),
-                              _buildRefreshUnitsButton(),
+                              //_buildRefreshUnitsButton(),
                             ],
                           ),
                           SingleChildScrollView(
@@ -408,6 +409,11 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
 
   Future<void> _submitForm() async {
     _changeStateLoading(true);
+
+    //
+    //TODO: si no existe la presentacion, persistirla
+    //
+
     await addOrUpdateMedicine(
         medicine: _buildMedicine(),
         isAdd: _isAdd!,
@@ -769,7 +775,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     }
   }
 
-  Widget _buildRefreshUnitsButton() {
+  /*Widget _buildRefreshUnitsButton() {
     return SizedBox(
       width: 30,
       height: 30,
@@ -797,7 +803,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
         ),
       ),
     );
-  }
+  }*/
 
   Future<void> _addUnit() async {
     final String? unit = await unitShowDialog(context: context);

@@ -13,7 +13,7 @@ import '../../model/globals/tools/open_dialog.dart';
 
 ///Permite el alta de una nueva unidad de medida. Devuelve el nombre de la
 ///nueva unidad persistida o null si ocurrió un error
-Future<String> unitShowDialog(
+Future<String?> unitShowDialog(
     {UnitDTO? unitDTO, required BuildContext context,}
 ) async {
 
@@ -73,7 +73,7 @@ class _UnitDialogState extends State<_UnitDialog> {
         builder: (context, constraints) {
           return Container(
             width: constraints.maxWidth * 0.2, // % del ancho disponible
-            height: constraints.maxHeight * (_isAdd ? 0.26 : 0.3),
+            height: constraints.maxHeight * (_isAdd ? 0.24 : 0.3),
             padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 40),
             child: SingleChildScrollView(
               child: Form(
