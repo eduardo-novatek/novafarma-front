@@ -28,7 +28,7 @@ Future<String?> unitShowDialog(
         );
       }
   ).then((value) async {
-    unit = value;
+    unit = value as String?;
   });
   return Future.value(unit);
 }
@@ -145,7 +145,7 @@ class _UnitDialogState extends State<_UnitDialog> {
                                   child: ElevatedButton(
                                     child: const Text("Cancelar"),
                                     onPressed: () {
-                                      Navigator.of(context).pop(false);
+                                      Navigator.of(context).pop(null);
                                     },
                                   ),
                                 ),

@@ -182,7 +182,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
     if (!_formKey.currentState!.validate()) return false;
 
     try {
-      if (await existUserName(userName: userName)) {
+      if (await userNameExist(userName: userName)) {
         if (context.mounted) {
           FloatingMessage.show(
               context: context,

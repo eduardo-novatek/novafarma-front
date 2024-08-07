@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../constants.dart' show socket, timeOutSecondsResponse, uriUserNameExist;
 
-Future<bool> existUserName({required String userName}) async {
+Future<bool> userNameExist({required String userName}) async {
   String uri = uriUserNameExist;
   final url = Uri.http(socket,"$uri/$userName");
   try {

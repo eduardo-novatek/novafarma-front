@@ -79,6 +79,13 @@ const String uriVoucherFindVoucherItems = "/voucher/findVoucherItems";
 const String uriDateAuthorizationSale = "controlledMedication/dateAuthorizationSale";
 const String uriControlledMedicationAdd = "/controlledMedication/add";
 
+//Presentations
+const String uriPresentationGetId = "/presentation/getId";
+const String uriPresentationFindName = "presentation/findName";
+const String uriPresentationFindAll = "presentation/findAll";
+const String uriPresentationAdd = "presentation/add";
+const String uriPresentationUpdate = "presentation/update";
+
 //Units
 const String uriUnitFindAll = "/unit/findAll";
 const String uriUnitAdd = "/unit/add";

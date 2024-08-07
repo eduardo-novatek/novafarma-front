@@ -6,17 +6,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
+import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption, defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
+import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
+import 'package:novafarma_front/model/globals/requests/get_presentation_id.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/medicine_dto1.dart';
+import '../../model/DTOs/presentation_dto_1.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data.dart';
@@ -38,10 +42,10 @@ class AddOrUpdateMedicineScreen extends StatefulWidget {
   });
 
   @override
-  State<AddOrUpdateMedicineScreen> createState() => _AddOrUpdateCustomerScreen();
+  State<AddOrUpdateMedicineScreen> createState() => _AddOrUpdateMedicineScreen();
 }
 
-class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
+class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   final _formKey = GlobalKey<FormState>();
   final _formBarCodeKey = GlobalKey<FormState>();
   final _formNameKey = GlobalKey<FormState>();
@@ -173,6 +177,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min, // Ajusta el tamaño vertical al contenido
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Form(
               key: _formBarCodeKey,
@@ -231,19 +236,24 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
               onFieldSubmitted: (p0) =>
                   FocusScope.of(context).requestFocus(_currentStockFocusNode),
             ),
-            CreateTextFormField(
-              label: 'Stock',
-              controller: _currentStockController,
-              focusNode: _currentStockFocusNode,
-              dataType: DataTypeEnum.number,
-              acceptEmpty: false,
-              minValueForValidation: -9999,
-              maxValueForValidation: 99999,
-              textForValidation: 'Ingrese un stock de hasta 5 dígitos incluído el signo',
-              viewCharactersCount: false,
-              onFieldSubmitted: (p0) =>
-                  FocusScope.of(context).requestFocus(_controlledFocusNode),
-            ),
+            _isAdd != null && _isAdd! //Si es un alta, permite la edicion del Stock
+              ? CreateTextFormField(
+                  label: 'Stock',
+                  controller: _currentStockController,
+                  focusNode: _currentStockFocusNode,
+                  dataType: DataTypeEnum.number,
+                  acceptEmpty: false,
+                  minValueForValidation: -9999,
+                  maxValueForValidation: 99999,
+                  textForValidation: 'Ingrese un stock de hasta 5 dígitos incluído el signo',
+                  viewCharactersCount: false,
+                  onFieldSubmitted: (p0) =>
+                      FocusScope.of(context).requestFocus(_controlledFocusNode),
+                )
+              : Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text('Stock: ${_currentStockController.text}'),
+              ),
             Row(
               children: [
                 const Text('Controlado '),
@@ -385,7 +395,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           ElevatedButton(
-            onPressed: _isAdd == null ? null : () async {
+            onPressed: _disableAcceptButton() ? null : () async {
               if (! _formKey.currentState!.validate()) return;
               if (await _confirm() == 1) {
                 _submitForm();
@@ -407,20 +417,60 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
     );
   }
 
+  bool _disableAcceptButton() =>
+      _isAdd == null
+          || _unitSelected == defaultFirstOption
+          || _unitSelected == defaultLastOption;
+
   Future<void> _submitForm() async {
     _changeStateLoading(true);
 
-    //
-    //TODO: si no existe la presentacion, persistirla
-    //
+    PresentationDTO presentationDTO = PresentationDTO(
+        name: _presentationContainerController.text.trim(),
+        quantity: int.parse(_presentationQuantityController.text),
+        unitName: _unitSelected
+    );
 
-    await addOrUpdateMedicine(
+    //Actualiza la var. publica con el id de la presentacion ingresada
+    _presentationId = await getPresentationId(presentationDTO);
+
+    if (_presentationId == 0) {
+      try {
+        PresentationDTO1 presentationDTO1 = PresentationDTO1(
+            name: _presentationContainerController.text.trim(),
+            quantity: int.parse(_presentationQuantityController.text),
+            unit: UnitDTO1(unitId: _getSelectedUnitId())
+        );
+
+        //Actualiza la var. publica con el id de la nueva presentacion agregada
+        _presentationId = await addOrUpdatePresentation(
+          presentation: presentationDTO1,
+          isAdd: true,
+          context: context,
+        );
+        if (kDebugMode) print('Presentación agregada con éxito (id=$_presentationId)');
+
+      } catch (error) {
+        if (kDebugMode) print(error);
+        _changeStateLoading(false);
+        return;
+      }
+    }
+    await _addOrUpdateMedicine();
+    _changeStateLoading(false);
+  }
+
+  //Devuelve el id de la unidad de medidad seleccionada
+  int? _getSelectedUnitId() => _unitList.firstWhere((element)
+    => element.name == _unitSelected).unitId;
+
+  Future<void> _addOrUpdateMedicine() async {
+     await addOrUpdateMedicine(
         medicine: _buildMedicine(),
         isAdd: _isAdd!,
         context: context
 
-    ).then((supplierId) {
-      _changeStateLoading(false);
+    ).then((medicineId) {
       String msg = 'Medicamento ${_isAdd! ? 'agregado' : 'actualizado'} con éxito';
       FloatingMessage.show(
           text: msg,
@@ -428,13 +478,13 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateMedicineScreen> {
           context: context
       );
       _initialize(initNameAndPresentation: true);
-      FocusScope.of(context).requestFocus(_nameFocusNode);
-      if (kDebugMode) print('$msg (id: $supplierId)');
+      FocusScope.of(context).requestFocus(_barCodeFocusNode);
+      if (kDebugMode) print('$msg (id: $medicineId)');
 
       // Se captura el error para evitar el error en consola. Este se manejó en
       // addOrUpdateCustomer
     }).onError((error, stackTrace) {
-      _changeStateLoading(false);
+      if (kDebugMode) print(error);
     });
   }
 
