@@ -486,13 +486,10 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       // Se captura el error para evitar el error en consola. Este se manejó en
       // addOrUpdateCustomer
     }).onError((error, stackTrace) {
-      if (kDebugMode) print(error);
     });
   }
 
   MedicineDTO1 _buildMedicine() {
-    print(_medicineId);
-
     return MedicineDTO1(
       medicineId: _medicineId == 0 ? null : _medicineId,
       userId: userLogged['userId'],
