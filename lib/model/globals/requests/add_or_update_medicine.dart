@@ -37,7 +37,8 @@ Future<int?> addOrUpdateMedicine({
     FloatingMessage.show(
         context: context,
         text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
+        messageTypeEnum: MessageTypeEnum.warning,
+        secondsDelay: error is ErrorObject ? 8 : 5
     );
     if (kDebugMode) print(msg);
     return Future.error(0);

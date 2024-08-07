@@ -9,7 +9,8 @@ import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption, defaultLastOption, uriUnitFindAll;
+import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption,
+  defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
@@ -21,6 +22,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto_1.dart';
+import '../../model/globals/publics.dart' show userLogged;
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data.dart';
@@ -489,8 +491,11 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   }
 
   MedicineDTO1 _buildMedicine() {
+    print(_medicineId);
+
     return MedicineDTO1(
       medicineId: _medicineId == 0 ? null : _medicineId,
+      userId: userLogged['userId'],
       barCode: _barCodeController.text.trim(),
       name: _nameController.text.trim(),
       presentation: _buildPresentation(),
