@@ -70,6 +70,7 @@ const String uriSupplierDelete = "/supplier/delete";
 const String uriMedicineFindBarCode = "/medicine/findBarCode";
 const String uriMedicineAdd = "/medicine/add";
 const String uriMedicineUpdate = "/medicine/update";
+const String uriMedicineFindNamePage ="/medicine/findNamePage";
 
 //Voucher
 const String uriVoucherAdd = "/voucher/add";

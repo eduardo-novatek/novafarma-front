@@ -3,7 +3,7 @@ import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
 import '../constants.dart' show uriPresentationGetId;
 
-Future<int> getPresentationId(PresentationDTO presentation) async {
+Future<int> fetchPresentationId(PresentationDTO presentation) async {
   int presentationId = 0;
   await fetchData<PresentationDTO>(
     uri: uriPresentationGetId,

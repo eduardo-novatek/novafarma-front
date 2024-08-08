@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto3.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
@@ -15,7 +16,7 @@ import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
-import 'package:novafarma_front/model/globals/requests/get_presentation_id.dart';
+import 'package:novafarma_front/model/globals/requests/fetch_presentation_id.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -27,6 +28,7 @@ import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/floating_message.dart';
+import '../dialogs/medication_and_presentation_list_dialog.dart';
 import '../dialogs/unit_show_dialog.dart';
 
 class AddOrUpdateMedicineScreen extends StatefulWidget {
@@ -85,7 +87,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   @override
   void initState() {
     super.initState();
-    _updateUnits(true);
+    _loadUnits(true);
     _createListeners();
     _initialize(initNameAndPresentation: true);
   }
@@ -434,7 +436,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     );
 
     //Actualiza la var. publica con el id de la presentacion ingresada
-    _presentationId = await getPresentationId(presentationDTO);
+    _presentationId = await fetchPresentationId(presentationDTO);
 
     if (_presentationId == 0) {
       try {
@@ -538,7 +540,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
   void _createListeners() {
     _barCodeListener();
-    //_nameListener();
+    _nameListener();
   }
 
   void _barCodeListener() {
@@ -571,24 +573,21 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       // Pierde foco
       if (!_nameFocusNode.hasFocus) {
         if (_nameController.text.trim().isEmpty) {
-          FocusScope.of(context).requestFocus(_nameFocusNode);
+          //FocusScope.of(context).requestFocus(_nameFocusNode);
           return;
         }
-        if (! _formNameKey.currentState!.validate()) {
+        /*if (! _formNameKey.currentState!.validate()) {
           FocusScope.of(context).requestFocus(_nameFocusNode);
           return;
-        }
-        await _isRegisteredMedicine()
-          .then((registered) {
-            if (registered != null) {
-              _isAdd = ! registered;
-            }
-            return null;
-          });
+        }*/
+        MedicineDTO3? medicine = await medicineAndPresentationListDialog(
+          medicineName: _nameController.text.trim(),
+          context: context
+        );
 
-        // Recibe foco
-      } else if (_nameFocusNode.hasFocus) {
-        _initialize(initNameAndPresentation: false);
+        if (medicine != null) {
+          _updatePresentationFields(medicine);
+        }
       }
     });
   }
@@ -659,13 +658,14 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     return Future.value(registered);
   }
 
+  /*
   /// true/false si el medicamento (nombre+presentacion) ya existe/no existe;
   /// null si se lanzó un error.
   Future<bool?> _isRegisteredMedicine() async {
     bool? registered = false;
     List<MedicineDTO1> medicineList = [];
 
-   /* _changeStateLoading(true);
+    _changeStateLoading(true);
     try {
       await fetchSupplierList(
           supplierList: medicineList,
@@ -737,8 +737,20 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       FocusScope.of(context).requestFocus(_nameFocusNode);
       FocusScope.of(context).addListener(() {_nameFocusNode;});
     }
-*/
+
     return Future.value(registered);
+  }
+*/
+
+  void _updatePresentationFields(MedicineDTO3 medicine) {
+    _nameController.value = TextEditingValue(text: medicine.name!);
+    _presentationContainerController.value = TextEditingValue(
+        text: medicine.presentation!.name!);
+    _presentationQuantityController.value = TextEditingValue(
+        text: medicine.presentation!.quantity!.toString());
+    setState(() {
+      _unitSelected = medicine.presentation!.unitName!;
+    });
   }
 
   void _updateFields(MedicineDTO1 medicine) {
@@ -789,7 +801,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     widget.onBlockedStateChange!(isLoading);
   }
 
-  Future<void> _updateUnits(bool isInitState) async {
+  Future<void> _loadUnits(bool isInitState) async {
     if (isInitState) {
       setState(() {
         _isLoading = true;
@@ -860,7 +872,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   Future<void> _addUnit() async {
     final String? unit = await unitShowDialog(context: context);
     if (unit != null) {
-      await _updateUnits(false).then((_) {
+      await _loadUnits(false).then((_) {
         if (mounted) {
           setState(() {
             _unitSelected = unit;
