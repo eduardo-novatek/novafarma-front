@@ -28,7 +28,7 @@ import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/floating_message.dart';
-import '../dialogs/medication_and_presentation_list_dialog.dart';
+import '../dialogs/medicine_and_presentation_list_dialog.dart';
 import '../dialogs/unit_show_dialog.dart';
 
 class AddOrUpdateMedicineScreen extends StatefulWidget {

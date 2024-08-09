@@ -76,92 +76,50 @@ class _MedicineDialogState extends State<_MedicineDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 8.0,),
-            Expanded(
-              child: ListView.builder(
-                itemCount: medicines.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: medicines[index].controlled!
-                        ? controlledIcon()
-                        : const SizedBox.shrink(),
-                    title: Text('${medicines[index].name} '
-                        '${medicines[index].presentation!.name} '
-                        '${medicines[index].presentation!.quantity} '
-                        '${medicines[index].presentation!.unitName}'
-                    ),
-                    onTap: () => Navigator.of(context).pop(medicines[index]),
-                  );
-                },
-              )
-
-            ),
-            const Divider(),
-            _buildButtonsPage(context),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: ElevatedButton(
-                onPressed: () =>Navigator.of(context).pop(null),
-                child: const Text('Cancelar'),
-              ),
-            ),
+            _loading
+              ? const Expanded(child: Center(child: CircularProgressIndicator()))
+              : Flexible(child: _buildColumn(context)),
           ]
         ),
       ),
     );
-    /*return Dialog(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero, // Esquinas rectas
-      ),
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.3, // 30% del ancho de la pantalla
-        height: MediaQuery.of(context).size.height * 0.5, // 50% del alto de la pantalla
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8.0,),
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(), // Permitir desplazamiento siempre
-                itemCount: medicines.length,
-                itemBuilder: (context, index) {
-                  final medicine = medicines[index];
-                  return ListTile(
-                    title: Text(
-                      '${medicine.name} '
-                      '${medicine.presentation!.name} '
-                      '${medicine.presentation!.quantity} '
-                       '${medicine.presentation!.unitName}'
-                    ),
-                    onTap: () {
-                      onSelect(MedicineDTO3(
-                        medicineId: medicine.medicineId,
-                        name: medicine.name,
-                        presentation: medicine.presentation,
-                        controlled: medicine.controlled
-                      )); //devuelve el índice seleccionado
-                      Navigator.of(context).pop();
-                    },
-                  );
-                },
-              ),
-            ),
-            const Divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  onSelect(null);
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancelar'),
-              ),
-            ),
-          ],
+  }
+
+  Column _buildColumn(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 8.0,),
+        Flexible(
+          child: ListView.builder(
+            itemCount: medicines.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: medicines[index].controlled!
+                    ? controlledIcon()
+                    : const SizedBox.shrink(),
+                title: Text('${medicines[index].name} '
+                    '${medicines[index].presentation!.name} '
+                    '${medicines[index].presentation!.quantity} '
+                    '${medicines[index].presentation!.unitName}'
+                ),
+                onTap: () => Navigator.of(context).pop(medicines[index]),
+              );
+            },
+          )
+
         ),
-      ),
-    );*/
+        const Divider(),
+        _buildButtonsPage(context),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0),
+          child: ElevatedButton(
+            onPressed: () =>Navigator.of(context).pop(null),
+            child: const Text('Cancelar'),
+          ),
+        )
+      ]
+    );
   }
 
   Widget _buildButtonsPage(BuildContext context) {
@@ -182,10 +140,14 @@ class _MedicineDialogState extends State<_MedicineDialog> {
     setLoading(true);
     await fetchDataPageable<MedicineDTO3>(
         uri: '$uriMedicineFindNamePage/${widget.medicineName}'
+            '/true' //isLike = true (busqueda con LIKE)
             '/${_metadata['pageNumber']!}'
             '/$sizePageMedicineAndPresentationList',
         classObject: MedicineDTO3.empty(),
       ).then((pageObject) {
+          if (pageObject.totalElements == 0) {
+            Navigator.of(context).pop(null);
+          }
           medicines.clear();
           medicines.addAll(pageObject.content as Iterable<MedicineDTO3>);
           _metadata['pageNumber'] = pageObject.pageNumber;
