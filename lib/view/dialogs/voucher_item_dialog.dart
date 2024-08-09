@@ -321,10 +321,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   Widget _controlledIcon() {
     return _voucherItem.controlled != null &&_voucherItem.controlled!
-        ? const Tooltip(
-            message: 'Medicamento controlado',
-            child: Icon(Icons.copyright, color: Colors.red,)
-          )
+        ? _controlledIcon()
         : const SizedBox.shrink();
   }
 

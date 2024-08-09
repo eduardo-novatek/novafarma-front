@@ -751,6 +751,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     setState(() {
       _unitSelected = medicine.presentation!.unitName!;
     });
+    _controlled = medicine.controlled;
   }
 
   void _updateFields(MedicineDTO1 medicine) {

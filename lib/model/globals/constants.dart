@@ -8,6 +8,7 @@ const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
 const int sizePageVoucherListOfCustomer = 8;
 const int sizePageVoucherListOfSupplier = 8;
+const int sizePageMedicineAndPresentationList = 10;
 
 const String defaultFirstOption = "Seleccione...";
 const String defaultLastOption = "Nuevo...";

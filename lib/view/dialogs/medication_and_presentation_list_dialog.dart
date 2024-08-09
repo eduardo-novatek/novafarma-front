@@ -1,6 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto3.dart';
+import 'package:novafarma_front/model/globals/controlled_icon.dart';
+
+import '../../model/enums/message_type_enum.dart';
+import '../../model/globals/constants.dart' show sizePageMedicineAndPresentationList, uriMedicineFindNamePage;
+import '../../model/globals/tools/fetch_data_pageable.dart';
+import '../../model/globals/tools/floating_message.dart';
+import '../../model/globals/tools/pagination_bar.dart';
+import '../../model/objects/error_object.dart';
 
 ///Dado el nombre de un medicamento, carga una lista de medicamentos que
 ///coincida parcialmente en su nombre, y cada uno con sus diferentes presentaciones.
@@ -8,35 +16,53 @@ import 'package:novafarma_front/model/DTOs/medicine_dto3.dart';
 Future<MedicineDTO3?> medicineAndPresentationListDialog(
     {required String medicineName, required BuildContext context,}) async {
 
-  MedicineDTO3? medicineSelected;
-
-  await showDialog(
+  MedicineDTO3? medicineSelected = await showDialog(
       context: context,
       barrierDismissible: false, //modal
       builder: (BuildContext context) {
         return PopScope( //Evita salida con flecha atras del navegador
           canPop: false,
-          child: _MedicineDialog(
-            medicineName: medicineName,
-            onSelect: (medicine) => medicineSelected = medicine
-          ),
+          child: _MedicineDialog(medicineName: medicineName),
         );
       }
-  ).then((value) async {
-    medicineSelected = value as MedicineDTO3?;
-  });
+  );
   return Future.value(medicineSelected);
 }
 
-class _MedicineDialog extends StatelessWidget {
-  final List<MedicineDTO3> medicines = [];
-  final Function(MedicineDTO3?) onSelect;
+class _MedicineDialog extends StatefulWidget {
+  //final Function(MedicineDTO3?) onSelect;
   final String medicineName;
 
-  _MedicineDialog({
+  const _MedicineDialog({
     required this.medicineName,
-    required this.onSelect,
+    //required this.onSelect,
   });
+
+  @override
+  State<_MedicineDialog> createState() => _MedicineDialogState();
+}
+
+class _MedicineDialogState extends State<_MedicineDialog> {
+  final List<MedicineDTO3> medicines = [];
+
+  bool _loading = true;
+
+  final Map<String, int> _metadata = {
+    'pageNumber': 0,
+    'totalPages': 0,
+    'totalElements': 0,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicines(context);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,59 +70,43 @@ class _MedicineDialog extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.zero, // Esquinas rectas
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 8.0,),
-          Expanded(
-            child: FutureBuilder<List<MedicineDTO3>>(
-              future: _loadMedicines(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else if (snapshot.hasData) {
-                  List<MedicineDTO3> data = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: data.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          '${data[index].name!} '
-                          '${data[index].presentation!.name} '
-                          '${data[index].presentation!.quantity} '
-                          '${data[index].presentation!.unitName}',
-                        ),
-                        onTap: () => onSelect(
-                          MedicineDTO3(
-                            medicineId: data[index].medicineId,
-                            name: data[index].name,
-                            presentation: data[index].presentation,
-                            controlled: data[index].controlled
-                          )
-                        ),
-                      );
-                    },
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8.0,),
+            Expanded(
+              child: ListView.builder(
+                itemCount: medicines.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: medicines[index].controlled!
+                        ? controlledIcon()
+                        : const SizedBox.shrink(),
+                    title: Text('${medicines[index].name} '
+                        '${medicines[index].presentation!.name} '
+                        '${medicines[index].presentation!.quantity} '
+                        '${medicines[index].presentation!.unitName}'
+                    ),
+                    onTap: () => Navigator.of(context).pop(medicines[index]),
                   );
-                } else {
-                  return const Text('Sin datos');
-                }
-              },
+                },
+              )
+
             ),
-          ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: ElevatedButton(
-              onPressed: () {
-                onSelect(null);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancelar'),
+            const Divider(),
+            _buildButtonsPage(context),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: ElevatedButton(
+                onPressed: () =>Navigator.of(context).pop(null),
+                child: const Text('Cancelar'),
+              ),
             ),
-          ),
-        ]
+          ]
+        ),
       ),
     );
     /*return Dialog(
@@ -154,11 +164,57 @@ class _MedicineDialog extends StatelessWidget {
     );*/
   }
 
-  ///Carga la lista de medicamentos segun el nombre ingresado
-  Future<List<MedicineDTO3>> _loadMedicines() async {
-    List<MedicineDTO3> medicines = [];
-
-    return medicines;
+  Widget _buildButtonsPage(BuildContext context) {
+    return _metadata['totalPages'] != 0
+      ? PaginationBar(
+          totalPages: _metadata['totalPages']!,
+          initialPage: _metadata['pageNumber']! + 1,
+          onPageChanged: (page) {
+              _metadata['pageNumber'] = page - 1;
+              _loadMedicines(context);
+          },
+        )
+      : const SizedBox.shrink();
   }
 
+  ///Carga la lista de medicamentos segun el nombre ingresado
+  Future<void> _loadMedicines(BuildContext context) async {
+    setLoading(true);
+    await fetchDataPageable<MedicineDTO3>(
+        uri: '$uriMedicineFindNamePage/${widget.medicineName}'
+            '/${_metadata['pageNumber']!}'
+            '/$sizePageMedicineAndPresentationList',
+        classObject: MedicineDTO3.empty(),
+      ).then((pageObject) {
+          medicines.clear();
+          medicines.addAll(pageObject.content as Iterable<MedicineDTO3>);
+          _metadata['pageNumber'] = pageObject.pageNumber;
+          _metadata['totalPages'] = pageObject.totalPages;
+          _metadata['totalElements'] = pageObject.totalElements;
+      }).onError((error, stackTrace) {
+        String? msg;
+        if (error is ErrorObject) {
+          msg = error.message;
+        } else {
+          msg = error.toString().contains('XMLHttpRequest error')
+              ? 'Error de conexión'
+              : error.toString();
+        }
+        if (msg != null) {
+          FloatingMessage.show(
+            context: context,
+            text: msg,
+            messageTypeEnum: MessageTypeEnum.error,
+          );
+          if (kDebugMode) print(error);
+        }
+      });
+    setLoading(false);
+  }
+
+  void setLoading(bool loading) {
+    setState(() {
+      _loading = loading;
+    });
+  }
 }
