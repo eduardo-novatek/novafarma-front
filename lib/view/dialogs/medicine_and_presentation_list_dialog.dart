@@ -147,6 +147,7 @@ class _MedicineDialogState extends State<_MedicineDialog> {
       ).then((pageObject) {
           if (pageObject.totalElements == 0) {
             Navigator.of(context).pop(null);
+            return;
           }
           medicines.clear();
           medicines.addAll(pageObject.content as Iterable<MedicineDTO3>);

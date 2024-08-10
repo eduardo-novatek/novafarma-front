@@ -572,19 +572,11 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     _nameFocusNode.addListener(() async {
       // Pierde foco
       if (!_nameFocusNode.hasFocus) {
-        if (_nameController.text.trim().isEmpty) {
-          //FocusScope.of(context).requestFocus(_nameFocusNode);
-          return;
-        }
-        /*if (! _formNameKey.currentState!.validate()) {
-          FocusScope.of(context).requestFocus(_nameFocusNode);
-          return;
-        }*/
+        if (_nameController.text.trim().isEmpty) return;
         MedicineDTO3? medicine = await medicineAndPresentationListDialog(
           medicineName: _nameController.text.trim(),
           context: context
         );
-
         if (medicine != null) {
           _updatePresentationFields(medicine);
         }
