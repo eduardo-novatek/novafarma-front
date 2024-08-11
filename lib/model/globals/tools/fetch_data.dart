@@ -31,6 +31,7 @@ Future<List<Object>> fetchData <T extends Deserializable<T>>({
           body: json.encode(body),
           headers:{
             "Content-Type": "application/json; charset=UTF-8",
+            'Accept': 'application/json; charset=utf-8'
           }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
@@ -38,14 +39,20 @@ Future<List<Object>> fetchData <T extends Deserializable<T>>({
       response = await http.put(
           url,
           body: json.encode(body),
-          headers: {"Content-Type": "application/json; charset=UTF-8",}
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            'Accept': 'application/json; charset=utf-8',
+          }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else if (requestType == RequestTypeEnum.patch) {
       response = await http.patch(
           url,
           body: json.encode(body),
-          headers: {"Content-Type": "application/json; charset=UTF-8",}
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            'Accept': 'application/json; charset=utf-8'
+          }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else {

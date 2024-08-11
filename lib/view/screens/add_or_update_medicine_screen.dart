@@ -52,7 +52,6 @@ class AddOrUpdateMedicineScreen extends StatefulWidget {
 class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   final _formKey = GlobalKey<FormState>();
   final _formBarCodeKey = GlobalKey<FormState>();
-  final _formNameKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
   final _presentationContainerController = TextEditingController();
@@ -195,24 +194,22 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                 viewCharactersCount: false,
                 acceptEmpty: false,
                 initialFocus: true,
-                onFieldSubmitted: (p0) =>
+                onEditingComplete: (p0) =>
                     FocusScope.of(context).requestFocus(_nameFocusNode),
               ),
             ),
-            Form(
-              key: _formNameKey,
-              child: CreateTextFormField(
-                label: 'Nombre',
-                controller: _nameController,
-                focusNode: _nameFocusNode,
-                dataType: DataTypeEnum.text,
-                maxValueForValidation: 50,
-                viewCharactersCount: false,
-                textForValidation: 'Ingrese un nombre de hasta 50 caracteres',
-                acceptEmpty: false,
-                onFieldSubmitted: (p0) =>
-                    FocusScope.of(context).requestFocus(_presentationContainerFocusNode),
-              ),
+            CreateTextFormField(
+              label: 'Nombre',
+              controller: _nameController,
+              focusNode: _nameFocusNode,
+              dataType: DataTypeEnum.text,
+              maxValueForValidation: 50,
+              viewCharactersCount: false,
+              textForValidation: 'Ingrese un nombre de hasta 50 caracteres',
+              acceptEmpty: false,
+              onEditingComplete: (p0) async {
+                await _searchMedicineName();
+              }
             ),
             _buildFormPresentation(),
             CreateTextFormField(
@@ -225,7 +222,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               textForValidation: 'Ingrese un precio de costo de hasta 6 dígitos',
               viewCharactersCount: false,
               acceptEmpty: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_lastSalePriceFocusNode),
             ),
             CreateTextFormField(
@@ -237,7 +234,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               maxValueForValidation: 999999,
               textForValidation: 'Ingrese un precio de venta de hasta 6 dígitos',
               viewCharactersCount: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_currentStockFocusNode),
             ),
             _isAdd != null && _isAdd! //Si es un alta, permite la edicion del Stock
@@ -251,7 +248,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                   maxValueForValidation: 99999,
                   textForValidation: 'Ingrese un stock de hasta 5 dígitos incluído el signo',
                   viewCharactersCount: false,
-                  onFieldSubmitted: (p0) =>
+                  onEditingComplete: (p0) =>
                       FocusScope.of(context).requestFocus(_controlledFocusNode),
                 )
               : Padding(
@@ -275,6 +272,20 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _searchMedicineName() async {
+    if (_nameController.text.trim().isEmpty) return;
+    _changeStateLoading(true);
+    MedicineDTO3? medicine = await medicineAndPresentationListDialog(
+        medicineName: _nameController.text.trim(),
+        context: context
+    );
+    _changeStateLoading(false);
+    if (medicine != null) {
+      _updatePresentationFields(medicine);
+    }
+    FocusScope.of(context).requestFocus(_presentationContainerFocusNode);
   }
 
   Widget _buildFormPresentation() {
@@ -307,7 +318,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                       viewCharactersCount: false,
                       textForValidation: 'Requerido',
                       acceptEmpty: false,
-                      onFieldSubmitted: (p0) =>
+                      onEditingComplete: (p0) =>
                           FocusScope.of(context).requestFocus(_presentationQuantityFocusNode),
                     ),
                   ),
@@ -400,7 +411,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         children: [
           ElevatedButton(
             onPressed: _disableAcceptButton() ? null : () async {
-              if (! _formKey.currentState!.validate()) return;
+              if (! _formKey.currentState!.validate()) return; //Valida el resto del formulario
               if (await _confirm() == 1) {
                 _submitForm();
               }
@@ -423,6 +434,8 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
   bool _disableAcceptButton() =>
       _isAdd == null
+          || _presentationContainerController.text.trim().isEmpty
+          || _presentationQuantityController.text.trim().isEmpty
           || _unitSelected == defaultFirstOption
           || _unitSelected == defaultLastOption;
 
@@ -540,7 +553,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
   void _createListeners() {
     _barCodeListener();
-    _nameListener();
+    //_nameListener();
   }
 
   void _barCodeListener() {
@@ -573,10 +586,12 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       // Pierde foco
       if (!_nameFocusNode.hasFocus) {
         if (_nameController.text.trim().isEmpty) return;
+        _changeStateLoading(true);
         MedicineDTO3? medicine = await medicineAndPresentationListDialog(
           medicineName: _nameController.text.trim(),
           context: context
         );
+        _changeStateLoading(false);
         if (medicine != null) {
           _updatePresentationFields(medicine);
         }
@@ -802,7 +817,6 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     } else {
       _changeStateLoading(true);
     }
-
     await fetchData<UnitDTO>(
       uri: uriUnitFindAll,
       classObject: UnitDTO.empty(),

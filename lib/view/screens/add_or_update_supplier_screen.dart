@@ -170,7 +170,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
                 viewCharactersCount: false,
                 textForValidation: 'Ingrese un nombre de hasta 30 caracteres',
                 acceptEmpty: false,
-                onFieldSubmitted: (p0) =>
+                onEditingComplete: (p0) =>
                     FocusScope.of(context).requestFocus(_telephone1FocusNode),
               ),
             ),
@@ -183,7 +183,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 10,
               textForValidation: 'El teléfono debe contener entre 8 y 10 dígitos',
               acceptEmpty: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_telephone2FocusNode),
             ),
             CreateTextFormField(
@@ -194,7 +194,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 10,
               textForValidation: 'Ingrese un teléfono de hasta 10 dígitos',
               acceptEmpty: true,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_addressFocusNode),
             ),
             CreateTextFormField(
@@ -206,7 +206,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 70,
               textForValidation: 'Ingrese una dirección de hasta 70 caracteres',
               viewCharactersCount: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
             ),
             CreateTextFormField(
@@ -218,7 +218,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 60,
               textForValidation: 'Ingrese un email de hasta 60 caracteres',
               viewCharactersCount: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_notesFocusNode),
             ),
             CreateTextFormField(

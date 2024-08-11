@@ -1,11 +1,11 @@
 class PageObject<T> {
-  late final List<T> content;
-  late final int pageNumber;  //number
-  late final int pageSize;    //size
-  late final int totalPages;
-  late final int totalElements;
-  late final bool first;
-  late final bool last;
+  List<T> content;
+  int pageNumber;  //number
+  int pageSize;    //size
+  int totalPages;
+  int totalElements;
+  bool first;
+  bool last;
 
   PageObject.empty()
       : content = [],

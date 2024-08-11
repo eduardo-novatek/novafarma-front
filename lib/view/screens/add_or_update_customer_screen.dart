@@ -170,7 +170,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
                 textForValidation: 'Ingrese un documento válido',
                 acceptEmpty: false,
                 initialFocus: true,
-                onFieldSubmitted: (p0) =>
+                onEditingComplete: (p0) =>
                     FocusScope.of(context).requestFocus(_dateFocusNode),
               ),
             ),
@@ -181,7 +181,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
               dataType: DataTypeEnum.date,
               textForValidation: 'Ingrese una fecha válida',
               acceptEmpty: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                 FocusScope.of(context).requestFocus(_lastnameFocusNode),
             ),
             CreateTextFormField(
@@ -193,7 +193,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
               viewCharactersCount: false,
               textForValidation: 'Ingrese un apellido de hasta 25 caracteres',
               acceptEmpty: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_nameFocusNode),
             ),
             CreateTextFormField(
@@ -205,7 +205,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
               viewCharactersCount: false,
               textForValidation: 'Ingrese un nombre de hasta 25 caracteres',
               acceptEmpty: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_paymentNumberFocusNode),
             ),
             CreateTextFormField(
@@ -215,7 +215,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
               dataType: DataTypeEnum.number,
               maxValueForValidation: 9999999,
               acceptEmpty: false,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_telephoneFocusNode),
             ),
             CreateTextFormField(
@@ -226,7 +226,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
               maxValueForValidation: 50,
               textForValidation: 'Ingrese un teléfono de hasta 50 dígitos',
               acceptEmpty: true,
-              onFieldSubmitted: (p0) =>
+              onEditingComplete: (p0) =>
                   FocusScope.of(context).requestFocus(_notesFocusNode),
             ),
             CreateTextFormField(

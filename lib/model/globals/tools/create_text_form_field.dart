@@ -21,7 +21,7 @@ class CreateTextFormField extends StatefulWidget {
   final TextStyle? textStyle;
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
   final Function(String)? onChange;
-  final Function(String)? onFieldSubmitted;
+  final Function(String)? onEditingComplete;
 
   const CreateTextFormField({
     super.key,
@@ -39,7 +39,7 @@ class CreateTextFormField extends StatefulWidget {
     this.minValueForValidation,
     this.maxValueForValidation,
     this.onChange,
-    this.onFieldSubmitted,
+    this.onEditingComplete,
     this.focusNode,
     this.textStyle,
   });
@@ -95,7 +95,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
            if (widget.onChange != null) widget.onChange!(value);
           },
           onFieldSubmitted: (value) {
-            if (widget.onFieldSubmitted != null) widget.onFieldSubmitted!(value);
+            if (widget.onEditingComplete != null) widget.onEditingComplete!(value);
           },
           validator: (String? value) {
 
