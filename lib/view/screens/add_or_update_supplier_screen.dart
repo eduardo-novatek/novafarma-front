@@ -11,7 +11,7 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show uriCustomerFindPaymentNumber, uriSupplierFindName;
 import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 

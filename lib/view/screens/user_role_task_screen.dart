@@ -7,7 +7,7 @@ import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
@@ -169,7 +169,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     });
 
     try {
-      fetchData<RoleDTO>(
+      fetchDataObject<RoleDTO>(
           uri: uriRoleFindAll,
           classObject: RoleDTO.empty(),
           requestType: RequestTypeEnum.get)
@@ -204,7 +204,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     });
 
     try {
-      fetchData<UserDTO>(
+      fetchDataObject<UserDTO>(
           uri: uriUserFindAll,
           classObject: UserDTO.empty(),
           requestType: RequestTypeEnum.get
@@ -272,7 +272,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
         if (newUser != null) {
           try {
-            fetchData(
+            fetchDataObject(
                 uri: uriUserAdd,
                 classObject: newUser,
                 requestType: RequestTypeEnum.post,
@@ -311,7 +311,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   Future<void> _addRoles() async {
     try {
-      fetchData(
+      fetchDataObject(
         uri: uriRoleAdd,
         classObject: RoleDTO.empty(),
         requestType: RequestTypeEnum.post,

@@ -8,7 +8,7 @@ import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriUnitAdd, uriUnitUpdate;
 import '../tools/floating_message.dart';
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id de la unidad de medida persistida o id=0 si hubo un error
 Future<int?> addOrUpdateUnit({
@@ -17,7 +17,7 @@ Future<int?> addOrUpdateUnit({
   required BuildContext context}) async {
 
   int id = 0; //id de la unidad persistida
-  await fetchData<UnitDTO>(
+  await fetchDataObject<UnitDTO>(
       uri: isAdd ? uriUnitAdd : uriUnitUpdate,
       classObject: UnitDTO.empty(),
       requestType: isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch,

@@ -2,14 +2,14 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../DTOs/supplier_dto.dart';
 import '../constants.dart' show uriSupplierFindAll;
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 Future<void> fetchSupplierList({
   required List<SupplierDTO> supplierList,
   String uri = uriSupplierFindAll,
 }) async {
   supplierList.clear();
-  await fetchData<SupplierDTO>(
+  await fetchDataObject<SupplierDTO>(
     uri: uri,
     classObject: SupplierDTO.empty(),
   ).then((data) {

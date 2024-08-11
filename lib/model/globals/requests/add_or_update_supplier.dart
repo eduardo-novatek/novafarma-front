@@ -8,7 +8,7 @@ import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriSupplierAdd, uriSupplierUpdate;
 import '../tools/floating_message.dart';
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id del proveedor persistido o id=0 si hubo un error
 Future<int?> addOrUpdateSupplier({
@@ -17,7 +17,7 @@ Future<int?> addOrUpdateSupplier({
   required BuildContext context}) async {
 
   int id = 0; //id del proveedor persistido
-  await fetchData<SupplierDTO>(
+  await fetchDataObject<SupplierDTO>(
       uri: isAdd ? uriSupplierAdd : uriSupplierUpdate,
       classObject: SupplierDTO.empty(),
       requestType: isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch,

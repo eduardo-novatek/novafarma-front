@@ -84,6 +84,7 @@ const String uriControlledMedicationAdd = "/controlledMedication/add";
 //Presentations
 const String uriPresentationGetId = "/presentation/getId";
 const String uriPresentationFindName = "presentation/findName";
+const String uriPresentationFindNameOnly = "presentation/findNameOnly";
 const String uriPresentationFindAll = "presentation/findAll";
 const String uriPresentationAdd = "presentation/add";
 const String uriPresentationUpdate = "presentation/update";

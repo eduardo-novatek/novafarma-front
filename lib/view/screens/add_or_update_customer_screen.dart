@@ -13,7 +13,7 @@ import 'package:novafarma_front/model/globals/constants.dart' show
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -311,7 +311,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     bool warning = false;
     String msgError = 'Error indeterminado';
 
-    await fetchData(
+    await fetchDataObject(
         uri: '$uriCustomerFindPaymentNumber/'
             '${int.parse(_paymentNumberController.text.trim())}',
         classObject: CustomerDTO1.empty()

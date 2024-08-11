@@ -9,12 +9,12 @@ import 'package:novafarma_front/model/globals/tools/numberFormats.dart';
 
 import '../../model/DTOs/voucher_item_dto_2.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/tools/fetch_data.dart';
+import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/error_object.dart';
 import '../../model/globals/constants.dart' show sizePageVoucherListOfCustomer,
   uriCustomerFindVouchersPage, uriVoucherFindVoucherItems;
-import '../../model/globals/tools/fetch_data_pageable.dart';
+import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/floating_message.dart';
 
 class VouchersFromCustomerDialog extends StatefulWidget {
@@ -231,7 +231,7 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
 
   Future<void> _loadDataPageable() async {
     _setLoading(true);
-    await fetchDataPageable(
+    await fetchDataObjectPageable(
       uri: '$uriCustomerFindVouchersPage'
           '/${widget.customerId}'
           '/${_metadata['pageNumber']!}'
@@ -292,7 +292,7 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
       _voucherLoading[voucherId] = true;
     });
 
-    await fetchData(
+    await fetchDataObject(
       uri: '$uriVoucherFindVoucherItems/$voucherId',
       classObject: VoucherItemDTO2.empty(),
     ).then((dataList) {

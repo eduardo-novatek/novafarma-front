@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data_pageable.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data_object_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -12,7 +12,7 @@ import '../../model/DTOs/voucher_dto_1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show uriSupplierDelete, uriSupplierFindAll, uriSupplierFindVouchers;
-import '../../model/globals/tools/fetch_data.dart';
+import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/open_dialog.dart';
 import '../dialogs/vouchers_from_supplier_dialog.dart';
 
@@ -190,7 +190,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
 
   Future<void> _loadData() async {
     _toggleLoading();
-    await fetchData<SupplierDTO>(
+    await fetchDataObject<SupplierDTO>(
       uri: uriSupplierFindAll,
       classObject: SupplierDTO.empty(),
     ).then((data) {
@@ -353,7 +353,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
   Future<void> _vouchersSupplier(int index) async {
     _toggleLoading();
     //Verifico la existencia de por lo menos un voucher
-    await fetchDataPageable(
+    await fetchDataObjectPageable(
         uri: '$uriSupplierFindVouchers/${_supplierList[index].supplierId}/0/1',
         classObject: VoucherDTO1.empty(),
     ).then((pageObject) {
@@ -413,7 +413,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     if (option == 1) {
       _toggleLoading();
       try {
-        await fetchData<SupplierDTO>(
+        await fetchDataObject<SupplierDTO>(
           uri: '$uriSupplierDelete/${supplierSelected.supplierId}/true',
           classObject: SupplierDTO.empty(),
         );

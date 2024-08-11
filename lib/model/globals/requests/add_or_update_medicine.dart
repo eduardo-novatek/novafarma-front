@@ -9,7 +9,7 @@ import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriMedicineAdd, uriMedicineUpdate, uriSupplierAdd, uriSupplierUpdate;
 import '../tools/floating_message.dart';
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id del proveedor persistido o id=0 si hubo un error
 Future<int?> addOrUpdateMedicine({
@@ -18,7 +18,7 @@ Future<int?> addOrUpdateMedicine({
   required BuildContext context}) async {
 
   int id = 0; //id del medicamento persistido
-  await fetchData<MedicineDTO1>(
+  await fetchDataObject<MedicineDTO1>(
       uri: isAdd ? uriMedicineAdd : uriMedicineUpdate,
       classObject: MedicineDTO1.empty(),
       requestType: isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch,

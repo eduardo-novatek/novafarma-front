@@ -22,7 +22,7 @@ import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
 import '../../model/globals/publics.dart';
-import '../../model/globals/tools/fetch_data.dart';
+import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
     defaultFirstOption, uriVoucherAdd;
@@ -461,7 +461,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
       _changeStateSaved(true);
     });
     try {
-      await fetchData<VoucherDTO>(
+      await fetchDataObject<VoucherDTO>(
           uri: uriVoucherAdd,
           classObject: VoucherDTO.empty(),
           requestType: RequestTypeEnum.post,

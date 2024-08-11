@@ -11,7 +11,7 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 
 ///Devuelve una lista de objetos de la base de datos, obtenidos por paginación.
 ///Envía solo solicitudes get.
-Future<PageObject> fetchDataPageable <T extends Deserializable<T>>({
+Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
   required String uri,
   required T classObject,
 }) async {

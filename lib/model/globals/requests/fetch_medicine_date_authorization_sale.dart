@@ -2,7 +2,7 @@ import 'package:novafarma_front/model/globals/tools/date_time.dart' show strToDa
 
 import '../../DTOs/date_authorization_sale_dto.dart';
 import '../constants.dart' show uriDateAuthorizationSale;
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 Future<DateTime?> fetchMedicineDateAuthorizationSale({
   required int customerId,
@@ -11,7 +11,7 @@ Future<DateTime?> fetchMedicineDateAuthorizationSale({
 
   Future<DateTime?> date = Future.value();
 
-  await fetchData<DateAuthorizationSaleDTO>(
+  await fetchDataObject<DateAuthorizationSaleDTO>(
     uri: '$uriDateAuthorizationSale/$customerId/$medicineId',
     classObject: DateAuthorizationSaleDTO.empty(),
 

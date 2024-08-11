@@ -14,8 +14,8 @@ import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show sizePageCustomerList, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindControlledMedications, uriCustomerFindLastnameName, uriCustomerFindVouchersPage;
 import '../../model/globals/tools/date_time.dart' show dateToStr;
-import '../../model/globals/tools/fetch_data.dart';
-import '../../model/globals/tools/fetch_data_pageable.dart';
+import '../../model/globals/tools/fetch_data_object.dart';
+import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 import '../dialogs/vouchers_from_customer_dialog.dart';
@@ -248,7 +248,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   Future<void> _loadDataPageable() async {
     _toggleLoading();
-    await fetchDataPageable<CustomerDTO1>(
+    await fetchDataObjectPageable<CustomerDTO1>(
       uri: '$uriCustomerFindAllPage/${_metadata['pageNumber']!}/$sizePageCustomerList',
       classObject: CustomerDTO1.empty(),
     ).then((pageObject) {
@@ -304,7 +304,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       return;
     }
     _toggleLoading();
-    await fetchData<CustomerDTO1>(
+    await fetchDataObject<CustomerDTO1>(
       uri: '$uriCustomerFindLastnameName/${_lastnameFilterController.text.trim()}',
       classObject: CustomerDTO1.empty(),
     ).then((customersFiltered) {
@@ -488,7 +488,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   Future<void> _vouchersCustomer(int index) async {
     _toggleLoading();
     //Verifico la existencia de por lo menos un voucher
-    await fetchDataPageable(
+    await fetchDataObjectPageable(
         uri: '$uriCustomerFindVouchersPage/${_customerList[index].customerId}/0/1',
         classObject: VoucherDTO1.empty(),
     ).then((pageObject) {
@@ -535,7 +535,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   Future<void> _controlledMedications(int index) async {
     _toggleLoading();
-    await fetchData(
+    await fetchDataObject(
       uri: '$uriCustomerFindControlledMedications/${_customerList[index].customerId}',
       classObject: ControlledMedicationDTO1.empty(),
     ).then((value) {
@@ -596,7 +596,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     if (option == 1) {
       _toggleLoading();
       try {
-        await fetchData<CustomerDTO1>(
+        await fetchDataObject<CustomerDTO1>(
           uri: '$uriCustomerDelete/${customerSelected.customerId}',
           classObject: CustomerDTO1.empty(),
         );

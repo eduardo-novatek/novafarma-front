@@ -9,7 +9,7 @@ import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriPresentationAdd, uriPresentationUpdate;
 import '../tools/floating_message.dart';
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id de la presentacion persistida o id=0 si hubo un error
 Future<int> addOrUpdatePresentation({
@@ -19,7 +19,7 @@ Future<int> addOrUpdatePresentation({
 
   int id = 0; //id del objeto persistido
 
-  await fetchData<PresentationDTO1>(
+  await fetchDataObject<PresentationDTO1>(
       uri: isAdd ? uriPresentationAdd : uriPresentationUpdate,
       classObject: PresentationDTO1.empty(),
       requestType: isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch,

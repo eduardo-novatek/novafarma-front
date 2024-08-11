@@ -8,7 +8,7 @@ import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriCustomerAdd, uriCustomerUpdate;
 import '../tools/floating_message.dart';
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id del cliente persistido o id=0 si hubo un error
 Future<int?> addOrUpdateCustomer({
@@ -18,7 +18,7 @@ Future<int?> addOrUpdateCustomer({
 
   int id = 0; //id del cliente persistido
 
-  await fetchData(
+  await fetchDataObject(
       uri: isAdd ? uriCustomerAdd : uriCustomerUpdate,
       classObject: customer,
       requestType: isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch,

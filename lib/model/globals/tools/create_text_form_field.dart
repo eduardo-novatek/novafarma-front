@@ -8,8 +8,8 @@ class CreateTextFormField extends StatefulWidget {
   final bool validate;
   final bool acceptEmpty;
   final String label;
-  final int? minValueForValidation;  //si es texto, es el largo minimo. Si es numero, es el valor minimo,...
-  final int? maxValueForValidation;
+  final double? minValueForValidation;  //si es texto, es el largo minimo. Si es numero, es el valor minimo,...
+  final double? maxValueForValidation;
   final String textForValidation; //texto de validacion si esta ocurre
   final DataTypeEnum dataType;
   final bool? viewCharactersCount; //Mostrar contador de caracteres
@@ -228,7 +228,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                     || widget.dataType == DataTypeEnum.password
                       || widget.dataType == DataTypeEnum.email)
                 && widget.maxValueForValidation != null
-                    ? widget.maxValueForValidation
+                    ? widget.maxValueForValidation?.toInt()
                     : null;
     }
 

@@ -7,7 +7,7 @@ import '../../enums/message_type_enum.dart';
 import '../../objects/error_object.dart';
 import '../constants.dart' show sizePageMedicineAndPresentationList,
   uriMedicineFindNamePage;
-import '../tools/fetch_data_pageable.dart';
+import '../tools/fetch_data_object_pageable.dart';
 import '../tools/floating_message.dart';
 
 ///Partiendo desde la pagina definida en pageObject.pageNumber, actualiza el
@@ -21,7 +21,7 @@ Future<void> fetchMedicineByNameList({
   required BuildContext context
 }) async {
 
-  await fetchDataPageable<MedicineDTO3>(
+  await fetchDataObjectPageable<MedicineDTO3>(
     uri: '$uriMedicineFindNamePage'
         '/$medicineName'
         '/$isLike'

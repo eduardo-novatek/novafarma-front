@@ -26,9 +26,10 @@ import '../../model/DTOs/presentation_dto_1.dart';
 import '../../model/globals/publics.dart' show userLogged;
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
-import '../../model/globals/tools/fetch_data.dart';
+import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/medicine_and_presentation_list_dialog.dart';
+import '../dialogs/presentation_container_name_list_dialog.dart';
 import '../dialogs/unit_show_dialog.dart';
 
 class AddOrUpdateMedicineScreen extends StatefulWidget {
@@ -218,7 +219,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               focusNode: _lastCostPriceFocusNode,
               dataType: DataTypeEnum.number,
               minValueForValidation: 0,
-              maxValueForValidation: 999999,
+              maxValueForValidation: 999999.99,
               textForValidation: 'Ingrese un precio de costo de hasta 6 dígitos',
               viewCharactersCount: false,
               acceptEmpty: false,
@@ -231,7 +232,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               focusNode: _lastSalePriceFocusNode,
               dataType: DataTypeEnum.number,
               minValueForValidation: 0,
-              maxValueForValidation: 999999,
+              maxValueForValidation: 999999.99,
               textForValidation: 'Ingrese un precio de venta de hasta 6 dígitos',
               viewCharactersCount: false,
               onEditingComplete: (p0) =>
@@ -244,9 +245,9 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                   focusNode: _currentStockFocusNode,
                   dataType: DataTypeEnum.number,
                   acceptEmpty: false,
-                  minValueForValidation: -9999,
-                  maxValueForValidation: 99999,
-                  textForValidation: 'Ingrese un stock de hasta 5 dígitos incluído el signo',
+                  minValueForValidation: 0.001,
+                  maxValueForValidation: 99999.99,
+                  textForValidation: 'Ingrese un stock de hasta 5 dígitos',
                   viewCharactersCount: false,
                   onEditingComplete: (p0) =>
                       FocusScope.of(context).requestFocus(_controlledFocusNode),
@@ -288,6 +289,22 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     FocusScope.of(context).requestFocus(_presentationContainerFocusNode);
   }
 
+  Future<void> _searchPresentationContainerName() async {
+    if (_presentationContainerController.text.trim().isEmpty) return;
+    _changeStateLoading(true);
+    String? containerSelected = await presentationContainerNameListDialog(
+        presentationContainerName: _presentationContainerController.text.trim(),
+        context: context,
+    );
+    _changeStateLoading(false);
+    if (containerSelected != null) {
+      _presentationContainerController.value = TextEditingValue(
+          text: containerSelected
+      );
+    }
+    FocusScope.of(context).requestFocus(_presentationQuantityFocusNode);
+  }
+
   Widget _buildFormPresentation() {
     return Padding(
       padding: const EdgeInsets.only(top: 15.0, bottom: 5.0),
@@ -318,8 +335,8 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                       viewCharactersCount: false,
                       textForValidation: 'Requerido',
                       acceptEmpty: false,
-                      onEditingComplete: (p0) =>
-                          FocusScope.of(context).requestFocus(_presentationQuantityFocusNode),
+                      onEditingComplete: (p0) async =>
+                          await _searchPresentationContainerName()
                     ),
                   ),
                   const Spacer(),
@@ -553,7 +570,6 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
   void _createListeners() {
     _barCodeListener();
-    //_nameListener();
   }
 
   void _barCodeListener() {
@@ -577,24 +593,6 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         // Recibe foco
       } else if (_barCodeFocusNode.hasFocus) {
         _initialize(initNameAndPresentation: true);
-      }
-    });
-  }
-
-  void _nameListener() {
-    _nameFocusNode.addListener(() async {
-      // Pierde foco
-      if (!_nameFocusNode.hasFocus) {
-        if (_nameController.text.trim().isEmpty) return;
-        _changeStateLoading(true);
-        MedicineDTO3? medicine = await medicineAndPresentationListDialog(
-          medicineName: _nameController.text.trim(),
-          context: context
-        );
-        _changeStateLoading(false);
-        if (medicine != null) {
-          _updatePresentationFields(medicine);
-        }
       }
     });
   }
@@ -817,7 +815,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     } else {
       _changeStateLoading(true);
     }
-    await fetchData<UnitDTO>(
+    await fetchDataObject<UnitDTO>(
       uri: uriUnitFindAll,
       classObject: UnitDTO.empty(),
     ).then((data) {

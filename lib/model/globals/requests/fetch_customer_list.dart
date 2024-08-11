@@ -3,7 +3,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../DTOs/customer_dto1.dart';
 import '../constants.dart' show uriCustomerFindDocument, uriCustomerFindLastnameName;
-import '../tools/fetch_data.dart';
+import '../tools/fetch_data_object.dart';
 
 /// searchByDocument: true=buscar por documento. false=buscar por apellido
 Future<void> fetchCustomerList({
@@ -12,7 +12,7 @@ Future<void> fetchCustomerList({
   required String value
 }) async {
 
-  await fetchData<CustomerDTO1>(
+  await fetchDataObject<CustomerDTO1>(
     uri: searchByDocument
         ? '$uriCustomerFindDocument/$value'
         : '$uriCustomerFindLastnameName/$value',
