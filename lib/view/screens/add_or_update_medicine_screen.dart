@@ -18,6 +18,7 @@ import 'package:novafarma_front/model/globals/requests/add_or_update_presentatio
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_presentation_id.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -278,15 +279,16 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   Future<void> _searchMedicineName() async {
     if (_nameController.text.trim().isEmpty) return;
     _changeStateLoading(true);
-    MedicineDTO3? medicine = await medicineAndPresentationListDialog(
+    await medicineAndPresentationListDialog(
         medicineName: _nameController.text.trim(),
         context: context
-    );
-    _changeStateLoading(false);
-    if (medicine != null) {
-      _updatePresentationFields(medicine);
-    }
-    FocusScope.of(context).requestFocus(_presentationContainerFocusNode);
+    ).then((medicine) {
+      _changeStateLoading(false);
+      if (medicine != null) _updatePresentationFields(medicine);
+      FocusScope.of(context).requestFocus(_presentationContainerFocusNode);
+    }).onError((error, stackTrace) {
+      if (kDebugMode) print(error);
+    });
   }
 
   Future<void> _searchPresentationContainerName() async {
@@ -369,7 +371,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                                 'Unidad',
                                 style: TextStyle(fontSize: 12),
                               ),
-                              //_buildRefreshUnitsButton(),
+                              //_buildRefshUnitsButtreon(),
                             ],
                           ),
                           SingleChildScrollView(
@@ -465,8 +467,12 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         unitName: _unitSelected
     );
 
-    //Actualiza la var. publica con el id de la presentacion ingresada
-    _presentationId = await fetchPresentationId(presentationDTO);
+    try {
+      //Actualiza la var. publica con el id de la presentacion ingresada
+      _presentationId = await fetchPresentationId(presentationDTO);
+    } catch (e) {
+      return;
+    }
 
     if (_presentationId == 0) {
       try {
@@ -485,11 +491,39 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         if (kDebugMode) print('Presentación agregada con éxito (id=$_presentationId)');
 
       } catch (error) {
-        if (kDebugMode) print(error);
+        if (error is ErrorObject) {
+          if (error.message != null &&
+              error.message!.contains("NO EXISTE UNA UNIDAD DE MEDIDA")) {
+
+            String msg = 'La unidad de medida $_unitSelected fué eliminada por '
+                'otro usuario.\nLa lista ha sido actualizada.';
+
+            FloatingMessage.show(
+                context: context,
+                text: msg,
+                messageTypeEnum: MessageTypeEnum.warning,
+                secondsDelay: 8
+            );
+            _loadUnits(false);
+            setState(() {
+              _unitSelected = defaultFirstOption;
+            });
+            if (kDebugMode) print (msg);
+          }
+        } else {
+          if (error.toString().contains('XMLHttpRequest error')) {
+            FloatingMessage.show(
+                context: context,
+                text: 'Error de conexión',
+                messageTypeEnum: MessageTypeEnum.error,
+            );
+          }
+        }
         _changeStateLoading(false);
         return;
       }
     }
+
     await _addOrUpdateMedicine();
     _changeStateLoading(false);
   }
@@ -517,8 +551,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
       // Se captura el error para evitar el error en consola. Este se manejó en
       // addOrUpdateCustomer
-    }).onError((error, stackTrace) {
-    });
+    }).onError((error, stackTrace) => null);
   }
 
   MedicineDTO1 _buildMedicine() {
@@ -753,12 +786,38 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         text: medicine.presentation!.name!);
     _presentationQuantityController.value = TextEditingValue(
         text: medicine.presentation!.quantity!.toString());
-    setState(() {
-      _unitSelected = medicine.presentation!.unitName!;
-    });
+    _updateUnitSelected(medicine.presentation!.unitName!);
     _controlled = medicine.controlled;
   }
 
+  Future<void> _updateUnitSelected(String unitName) async {
+    //Antes de actualizar la var. _unitSelected, chequea que la unidad de medida
+    //exista en la lista. Si no existe, refresca las unidades.
+    if (! _unitExistInList(unitName)) {
+      await _loadUnits(false);
+      if (! _unitExistInList(unitName)) {
+        message(
+            message: 'La unidad de medida $unitName '
+                'no existe o no se pudo cargar.\n'
+                'Contacte al administrador del sistema.',
+            context: context
+        );
+        return Future.value();
+      }
+    }
+    //La unidad de medida existe en la lista, actualizo la variable.
+    setState(() {
+      _unitSelected = unitName;
+    });
+  }
+
+  bool _unitExistInList(String unitName) {
+    UnitDTO unit = _unitList.firstWhere(
+      (e) => e.name ==unitName,
+      orElse: () => UnitDTO.empty(),
+    );
+    return unit.name != null;
+  }
   void _updateFields(MedicineDTO1 medicine) {
     _medicineId = medicine.medicineId!;
     _presentationId = medicine.presentation!.presentationId!;
@@ -776,9 +835,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     _currentStockController.value = TextEditingValue(
         text: medicine.currentStock!.toString());
     _controlled = medicine.controlled!;
-    setState(() {
-      _unitSelected = medicine.presentation!.unitName!;
-    });
+    _updateUnitSelected(medicine.presentation!.unitName!);
   }
 
   void _initialize({required bool initNameAndPresentation}) {

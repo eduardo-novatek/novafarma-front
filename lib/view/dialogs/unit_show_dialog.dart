@@ -110,6 +110,7 @@ class _UnitDialogState extends State<_UnitDialog> {
                               dataType: DataTypeEnum.text,
                               maxValueForValidation: 4,
                               viewCharactersCount: false,
+                              initialFocus: true,
                               textForValidation: 'Requerido',
                               acceptEmpty: false,
                             ),

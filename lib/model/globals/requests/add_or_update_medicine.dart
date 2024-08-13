@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/message_type_enum.dart';
@@ -11,7 +12,7 @@ import '../constants.dart' show uriMedicineAdd, uriMedicineUpdate, uriSupplierAd
 import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 
-///Devuelve el id del proveedor persistido o id=0 si hubo un error
+///Devuelve el id del medicamento persistido o id=0 si hubo un error
 Future<int?> addOrUpdateMedicine({
   required MedicineDTO1 medicine,
   required bool isAdd,
@@ -31,15 +32,17 @@ Future<int?> addOrUpdateMedicine({
     String msg = '';
     if (error is ErrorObject) {
       msg = error.message ?? 'Error ${error.statusCode}';
+      FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.warning,
+          secondsDelay: 8
+      );
     } else {
-      msg = 'Error desconocido: ${error.toString()}';
+      msg = error!.toString();
+      genericError(error, context);
     }
-    FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning,
-        secondsDelay: error is ErrorObject ? 8 : 5
-    );
+
     if (kDebugMode) print(msg);
     return Future.error(0);
   });

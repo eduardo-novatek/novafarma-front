@@ -7,6 +7,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriUnitAdd, uriUnitUpdate;
+import '../generic_error.dart';
 import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 
@@ -30,14 +31,15 @@ Future<int?> addOrUpdateUnit({
     String msg = '';
     if (error is ErrorObject) {
       msg = error.message ?? 'Error ${error.statusCode}';
+      FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.warning
+      );
     } else {
-      msg = 'Error desconocido: ${error.toString()}';
+      msg = error!.toString();
+      genericError(error, context, isFloatingMessage: true);
     }
-    FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
-    );
     if (kDebugMode) print(msg);
     return Future.error(0);
   });

@@ -35,15 +35,10 @@ Future<int> addOrUpdatePresentation({
     if (error is ErrorObject) {
       msg = error.message ?? 'Error ${error.statusCode}';
     } else {
-      msg = 'Error desconocido: ${error.toString()}';
+      msg = error.toString();
     }
-    FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
-    );
     if (kDebugMode) print(msg);
-    return Future.error(0);
+    return Future.error(error!);
   });
   return Future.value(id);
 }
