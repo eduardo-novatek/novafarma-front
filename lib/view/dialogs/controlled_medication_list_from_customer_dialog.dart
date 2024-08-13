@@ -99,7 +99,10 @@ class ControlledMedicationListFromCustomerDialog extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Última venta: ${dateToStr(medication.lastSaleDate)}'),
+        Text('Última venta: ${medication.lastSaleDate != null
+          ? dateToStr(medication.lastSaleDate)
+          : 'Pendiente'}'
+        ),
         Text('Frecuencia: ${medication.frequencyDays} ${_writeDays(medication.frequencyDays!)}'),
         Text('Tolerancia: ${medication.toleranceDays} ${_writeDays(medication.toleranceDays!)}'),
         _viewNextDate(

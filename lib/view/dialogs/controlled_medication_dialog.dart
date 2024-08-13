@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 
 import '../../model/enums/data_type_enum.dart';
@@ -85,7 +86,11 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                 ),
                 const SizedBox(height: 20),
                 Text('Paciente: ${widget.controlledMedication!.customerName}'),
-                Text('Medicamento: ${widget.controlledMedication!.medicine?.name}'),
+                Text('Medicamento: ${widget.controlledMedication!.medicine?.name} '
+                    '${widget.controlledMedication!.medicine?.presentation?.name} '
+                    '${widget.controlledMedication!.medicine?.presentation?.quantity} '
+                    '${widget.controlledMedication!.medicine?.presentation?.unitName} '
+                ),
                 widget.controlledMedication!.lastSaleDate != null
                   ? Text('Ultima venta: ${widget.controlledMedication!.lastSaleDate}')
                   : const SizedBox.shrink(),
@@ -148,9 +153,7 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                       ElevatedButton(
                         child: const Text("Cancelar"),
                         onPressed: () {
-                          widget.controlledMedication = null;
-                          //Devuelve false, con lo cual el objeto controlledMedication está inicializado
-                          Navigator.of(context).pop(false);
+                          _cancel(context);
                         },
                       ),
                     ],
@@ -164,36 +167,64 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
     );
   }
 
+  void _cancel(BuildContext context) {
+     widget.controlledMedication = null;
+    //Devuelve false, con lo cual el objeto controlledMedication está inicializado
+    Navigator.of(context).pop(false);
+  }
+
   void _updateControlledMedication() {
     widget.controlledMedication!.frequencyDays = int.parse(_frequencyDaysController.text);
     widget.controlledMedication!.toleranceDays = int.parse(_toleranceDaysController.text);
   }
 
   _addListeners() {
-    _frequenceDaysListener();
+    _frequencyDaysListener();
     _toleranceDaysListener();
+  }
+
+  void _frequencyDaysListener() {
+    _frequencyDaysFocusNode.addListener(() {
+      if (_frequencyDaysFocusNode.hasFocus) {
+        HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+        _frequencyDaysController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _frequencyDaysController.text.length
+        );
+        _frequencyDaysController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _frequencyDaysController.text.length
+        );
+      } else {
+        HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+      }
+    });
   }
 
   void _toleranceDaysListener() {
     _toleranceDaysFocusNode.addListener(() {
       if (_toleranceDaysFocusNode.hasFocus) {
+        HardwareKeyboard.instance.addHandler(_handleKeyEvent);
         _toleranceDaysController.selection = TextSelection(
             baseOffset: 0,
             extentOffset: _toleranceDaysController.text.length
         );
+        _toleranceDaysController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _toleranceDaysController.text.length
+        );
+      } else {
+        HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
       }
     });
   }
 
-  void _frequenceDaysListener() {
-    _frequencyDaysFocusNode.addListener(() {
-      if (_frequencyDaysFocusNode.hasFocus) {
-        _frequencyDaysController.selection = TextSelection(
-            baseOffset: 0,
-            extentOffset: _frequencyDaysController.text.length
-        );
-      }
-    });
+  bool _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+      _cancel(context);
+      return true;  // Evento manejado
+    }
+    return false;  // Evento no manejado
   }
 
 }

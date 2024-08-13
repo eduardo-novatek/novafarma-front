@@ -4,6 +4,7 @@ import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/capitalize_first_letter.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -14,10 +15,11 @@ import '../constants.dart' show uriControlledMedicationAdd;
 import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 
-Future<void> addControlledMedication({
+Future<bool> addControlledMedication({
   required ControlledMedicationDTO controlledMedication,
   required BuildContext context}) async {
 
+  bool ok = true;
   await fetchDataObject(
       uri: uriControlledMedicationAdd,
       classObject: controlledMedication,
@@ -31,6 +33,7 @@ Future<void> addControlledMedication({
     }
 
   }).onError((error, stackTrace) {
+    ok = false;
     String msg = '';
     if (error is ErrorObject) {
       if (error.statusCode == HttpStatus.notFound) {
@@ -48,15 +51,17 @@ Future<void> addControlledMedication({
       } else { //InternalServerError
         msg = 'InternalServerError: $error';
       }
+      FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.warning
+      );
 
     } else {
-      msg = 'Error desconocido: ${error.toString()}';
+      genericError(error!, context, isFloatingMessage: true);
+      msg = error.toString();
     }
-    FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
-    );
     if (kDebugMode) print(msg);
   });
+  return Future.value(ok);
 }

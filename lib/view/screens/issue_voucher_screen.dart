@@ -8,6 +8,7 @@ import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -423,11 +424,12 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                 } catch(e) {
                   if (kDebugMode) print(e);
                   if (mounted) {
-                    FloatingMessage.show(
+                    /*FloatingMessage.show(
                         context: context,
                         text: 'Error guardando comprobante',
                         messageTypeEnum: MessageTypeEnum.error
-                    );
+                    );*/
+                    genericError(e, context, isFloatingMessage: true);
                   }
                 }
               },

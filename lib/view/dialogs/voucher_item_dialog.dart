@@ -12,6 +12,7 @@ import 'package:novafarma_front/model/DTOs/medicine_dto2.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_controlled_medication.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_date_authorization_sale.dart';
@@ -22,8 +23,10 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import '../../model/DTOs/controlled_medication_dto.dart';
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/medicine_dto.dart';
+import '../../model/DTOs/medicine_dto3.dart';
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
+import '../../model/globals/controlled_icon.dart';
 import '../../model/globals/tools/message.dart';
 import '../../model/globals/tools/create_text_form_field.dart';
 import 'controlled_medication_dialog.dart';
@@ -72,7 +75,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   //Carga el medicamento buscado por codigo
   MedicineDTO1 _medicine = MedicineDTO1.empty();
   //Carga el medicamento para el objeto _controlledMedication (toma los datos de _medicine)
-  MedicineDTO2 _medicine2 = MedicineDTO2.empty();
+  //MedicineDTO2 _medicine2 = MedicineDTO2.empty();
+  MedicineDTO3 _medicine3 = MedicineDTO3.empty();
 
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
@@ -137,6 +141,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                                 label: 'Código',
                                 dataType: DataTypeEnum.text,
                                 initialFocus: true,
+                                onEditingComplete: (value) async {
+                                  if (await _barCodeOk()) {
+                                    _quantityFocusNode.requestFocus();
+                                  } else {
+                                    _barCodeFocusNode.requestFocus();
+                                  }
+                                },
                               )
                             : Text('Çódigo: ${widget.modifyVoucherItem?.barCode}'),
 
@@ -176,6 +187,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                             } else if (widget.onModify != null) {
                               _modifyVoucherItem();
                             }
+                            _barCodeFocusNode.requestFocus();
                           });
                         },
                       ),
@@ -304,7 +316,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   Widget _modifyMedicineName() {
     return Row (
       children: [
-        _controlledIcon(),
+        _createControlledIcon(),
         Text(widget.modifyVoucherItem!.medicineName!),
       ],
     );
@@ -313,15 +325,15 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   Widget _addMedicineName() {
     return Row (
       children: [
-        _controlledIcon(),
+        _createControlledIcon(),
         Text(_voucherItem.medicineName ?? ''),
       ],
     );
   }
 
-  Widget _controlledIcon() {
-    return _voucherItem.controlled != null &&_voucherItem.controlled!
-        ? _controlledIcon()
+  Widget _createControlledIcon() {
+    return _voucherItem.controlled != null && _voucherItem.controlled!
+        ? controlledIcon()
         : const SizedBox.shrink();
   }
 
@@ -337,12 +349,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           baseOffset: 0,
           extentOffset: _barCodeController.text.length
       );
+      _initialize(initializeCodeBar: true);
     } else {
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     }
 
     //Da tiempo a ejecutar evento onChange de los botones del Dialog
-    Future.delayed(const Duration(milliseconds: 100), () async {
+    /*Future.delayed(const Duration(milliseconds: 100), () async {
       if (!_focusEnabled || _barCodeFocusNode.hasFocus) {
         _setBarCodeValidated(true);
         return;
@@ -403,36 +416,28 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
             );
             _barCodeFocusNode.requestFocus();
           }
-
-        /*} else {
-          _setBarCodeValidated(false);
-          _initialize(initializeCodeBar: false);
-          await message(context: context, message: 'Artículo no encontrado');
-          _barCodeFocusNode.requestFocus();
-
-          */
         }
       }).onError((error, stackTrace) {
         _barCodeFindError(error);
       });
-    });
+    });*/
   }
 
   Future<void> _barCodeFindError(Object? error) async {
-    if (kDebugMode) print(error.toString());
-
     if (error is ErrorObject) {
-    if (error.statusCode == HttpStatus.notFound) {
-      _setBarCodeValidated(false);
-      _initialize(initializeCodeBar: false);
-      await message(context: context, message: 'Artículo no encontrado');
-      _barCodeFocusNode.requestFocus();
-
+      if (error.statusCode == HttpStatus.notFound) {
+        _setBarCodeValidated(false);
+        _initialize(initializeCodeBar: false);
+        await message(context: context, message: 'Artículo no encontrado');
+      } else {
+        _setBarCodeValidated(false);
+        if (mounted) _showMessageConnectionError(context: context);
+        //if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
+      }
+      if (kDebugMode) print(error.toString());
     } else {
-      _setBarCodeValidated(false);
-      if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
+      genericError(error!, context, isFloatingMessage: true);
     }
-  }
 
   }
 
@@ -455,32 +460,29 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         msg = _obtainMessageError(error) ?? msg;
         if (error.statusCode == HttpStatus.notFound && error.message!.contains(
             'NO POSEE UN REGISTRO DEL MEDICAMENTO CONTROLADO')) {
-          //Agrega el nuevo medicamento controlado
-          await _newControlledMedicationBox();
+          //Vincula el cliente con el medicamento controlado
+          validate = await _linkingCustomerToMedicationBox();
         } else {
           if (kDebugMode) print(msg);
           await message(message: msg, context: context);
+          validate = false;
         }
-        validate = false;
       }
-      return null;
     });
 
     //Si se produjo un error en fetchMedicineDateAuthorizationSale, salgo sin validar
     if (! validate) return Future.value((false, null));
-
     DateTime now = DateTime.now();
-
     //validate = primera venta || fecha <= now
     validate = true;
     if (fetchDate != null) {
       validate = (fetchDate.isBefore(now) || fetchDate.isAtSameMomentAs(now));
     }
-
     return Future.value((validate, fetchDate));
   }
 
-  Future<void> _newControlledMedicationBox() async {
+  Future<bool> _linkingCustomerToMedicationBox() async {
+    bool ok = true;
     _updateNewControlledMedication();
     await showDialog(
         context: context,
@@ -496,7 +498,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         }
     ).then((value) async {
       if (! value) {  //si canceló...
-        _initialize(initializeCodeBar: true);
+        ok = false;
       } else {
         ControlledMedicationDTO controlledMedication = ControlledMedicationDTO.empty();
         //Arma el json
@@ -511,12 +513,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         controlledMedication.lastSaleDate =
             _controlledMedication!.lastSaleDate;
 
-        await addControlledMedication(
-            controlledMedication: controlledMedication,
-            context: context
+        ok = await addControlledMedication(
+              controlledMedication: controlledMedication,
+              context: context
         );
       }
     });
+    return Future.value(ok);
   }
 
   String? _obtainMessageError(ErrorObject error) {
@@ -545,11 +548,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     //Si _controlledMedication es null, crea el objeto vacío
     _controlledMedication ??= ControlledMedicationDTO1.empty();
     _controlledMedication?.customerId =  widget.customerOrSupplierId;
-    //_controlledMedication?.medicine?.medicineId = _medicine.medicineId!;
-    //_controlledMedication?.medicine?.name = _medicine.name!;
-    _controlledMedication?.medicine = _medicine2;
+    _controlledMedication?.medicine = _medicine3;
     _controlledMedication?.customerName =
-      '${widget.customer!.name} ${widget.customer!.lastname}';
+      '${widget.customer!.lastname}, ${widget.customer!.name}';
     _controlledMedication?.lastSaleDate = null;
   }
 
@@ -679,7 +680,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   Future<Null> _showMessageConnectionError({
     required BuildContext context,
-    required bool isBarCode,
+    //required bool isBarCode,
   }) async {
     FloatingMessage.show(
       context: context,
@@ -687,13 +688,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       messageTypeEnum: MessageTypeEnum.error,
       allowFlow: true,
     );
-    /*await floatingMessage(
-      context: context,
-      text: "Error de conexión",
-      messageTypeEnum: MessageTypeEnum.error,
-      allowFlow: true,
-    );*/
-    if (context.mounted) _pushFocus(context: context, isBarCode: isBarCode);
+    //if (context.mounted) _pushFocus(context: context, isBarCode: isBarCode);
   }
 
   void _pushFocus({required BuildContext context, required bool isBarCode}) {
@@ -713,9 +708,75 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       _voucherItem = VoucherItemDTO.empty();
       if (initializeCodeBar) {
         _barCodeController.value = TextEditingValue.empty;
-        _pushFocus(context: context, isBarCode: true);
+        //_pushFocus(context: context, isBarCode: true);
       }
     });
+  }
+
+  Future<bool> _barCodeOk() async {
+    if (widget.barCodeList!.contains(_barCodeController.text.trim().toUpperCase())) {
+      _setBarCodeValidated(false);
+      await message(context: context, message:'El artículo ya está agregado al comprobante');
+      return Future.value(false);
+    }
+    bool ok = false;
+    _medicine = MedicineDTO1.empty();
+    //_medicine2 = MedicineDTO2.empty();
+    _medicine3 = MedicineDTO3.empty();
+
+    await fetchMedicineBarCode(
+    barCode: _barCodeController.text,
+    medicine: _medicine,
+    ).then((value) async {
+      if (_medicine.medicineId != null) {
+        /*_medicine2 = MedicineDTO2(
+            medicineId: _medicine.medicineId,
+            name: _medicine.name
+         */
+        _medicine3 = MedicineDTO3(
+            medicineId: _medicine.medicineId,
+            name: _medicine.name,
+            presentation: _medicine.presentation,
+            controlled: _medicine.controlled
+        );
+        if (_isSupplier() || _isAdjustmentStock() || _medicine.currentStock! > 0) {
+          (bool, DateTime?) result = (true, null);
+          if (! _isSupplier() && ! _isAdjustmentStock()) {
+            if (_medicine.controlled!) result = await _medicineControlledValidated();
+          }
+          if (result.$1) {
+            _updateVoucherItem();
+            ok = true;
+          } else {
+            if (result.$2 != null) {
+              await message(
+                context: context,
+                title: 'No autorizado',
+                message: '${_medicine.name} '
+                    '${_medicine.presentation!.name} '
+                    '${_medicine.presentation!.quantity} '
+                    '${_medicine.presentation!.unitName}'
+                    '\n\nPróxima fecha de retiro: ${dateToStr(result.$2!)}',
+              );
+            }
+          }
+
+        } else {
+          _setBarCodeValidated(false);
+          await message(
+              context: context,
+              title: 'Sin stock',
+              message:'${_medicine.name} '
+                  '${_medicine.presentation!.name} '
+                  '${_medicine.presentation!.quantity} '
+                  '${_medicine.presentation!.unitName}'
+          );
+        }
+      }
+    }).onError((error, stackTrace) {
+      _barCodeFindError(error);
+    });
+    return Future.value(ok);
   }
 
 }
