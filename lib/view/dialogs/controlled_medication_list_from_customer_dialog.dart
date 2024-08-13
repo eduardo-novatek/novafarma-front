@@ -76,7 +76,10 @@ class ControlledMedicationListFromCustomerDialog extends StatelessWidget {
                         ListTile(
                           leading: const Icon(Icons.medical_services, color: Colors.blue),
                           title: Text(
-                            medication.medicine?.name ?? 'Sin datos',
+                            '${medication.medicine!.name!} '
+                                '${medication.medicine!.presentation?.name} '
+                                '${medication.medicine!.presentation?.quantity} '
+                                '${medication.medicine!.presentation?.unitName}',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: _subTitle(medication),
