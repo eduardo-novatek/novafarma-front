@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
-import '../../DTOs/medicine_dto3.dart';
+import '../../DTOs/medicine_dto2.dart';
 import '../../enums/message_type_enum.dart';
 import '../../objects/error_object.dart';
 import '../constants.dart' show sizePageMedicineAndPresentationList,
@@ -15,25 +15,25 @@ import '../tools/floating_message.dart';
 Future<void> fetchMedicineByNameList({
   required String medicineName,
   //required List<MedicineDTO3> medicineList,
-  required PageObject<MedicineDTO3> pageObject,
+  required PageObject<MedicineDTO2> pageObject,
   required bool isLike, //true: busqueda es mediante LIKE, false: coincidencia desde la izquierda (mediante indice)
   //required int pageNumber,
   required BuildContext context
 }) async {
 
-  await fetchDataObjectPageable<MedicineDTO3>(
+  await fetchDataObjectPageable<MedicineDTO2>(
     uri: '$uriMedicineFindNamePage'
         '/$medicineName'
         '/$isLike'
         '/${pageObject.pageNumber}'
         '/$sizePageMedicineAndPresentationList',
-    classObject: MedicineDTO3.empty(),
+    classObject: MedicineDTO2.empty(),
 
   ).then((page) {
     if (page.totalElements == 0) return null;
     //Actualiza pageObject
     pageObject.content.clear();
-    pageObject.content.addAll(page.content as Iterable<MedicineDTO3>);
+    pageObject.content.addAll(page.content as Iterable<MedicineDTO2>);
     pageObject.pageNumber = page.pageNumber;
     pageObject.totalPages = page.totalPages;
     pageObject.totalElements = page.totalElements;

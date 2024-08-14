@@ -44,9 +44,6 @@ class CustomerBoxState extends State<CustomerBox> {
 
   bool _isLoading = false;
 
-  //guarda los datos del cliente encontrado ("JUAN PEREZ (12345678)")
-  //String? _customerFound;
-
   @override
   void initState() {
     super.initState();
@@ -75,7 +72,6 @@ class CustomerBoxState extends State<CustomerBox> {
                   child: buildCircularProgress(),
                 )
               : _buildSearchBox(),
-          //_customerFound != null
           widget.customerSelected != null
               ? Text(widget.customerSelected!, //_customerFound!
                   style: const TextStyle(fontSize: 14.0)
@@ -100,6 +96,11 @@ class CustomerBoxState extends State<CustomerBox> {
             acceptEmpty: true,
             textForValidation: 'Ingrese un documento válido, sin puntos ni guiones',
             viewCharactersCount: false,
+            onEditingComplete: () async {
+              //Captura salida con enter (la pérdida de foco con tab y clic
+              //la captura en el listener)
+              await _findByDocument();
+            },
           ),
           CreateTextFormField(
             controller: _lastnameController,
@@ -109,9 +110,34 @@ class CustomerBoxState extends State<CustomerBox> {
             maxValueForValidation: 25,
             acceptEmpty: true,
             viewCharactersCount: false,
+            onEditingComplete: () async {
+              //Captura salida con enter (la pérdida de foco con tab y clic
+              //la captura en el listener)
+              await _findByLastname();
+            },
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _findByLastname() async {
+    await _updateCustomerList(
+        isDocument: false,
+        value: _lastnameController.text
+    ).then((value) {
+      if (_customerList.isNotEmpty) {
+        if (_customerList.length == 1) {
+          _updateSelectedClient(0);
+        } else {
+          _clientSelection();
+        }
+      } else {
+        _notFound(viewMessage: true, isDocument: false);
+      }
+    }).onError((error, stackTrace) =>
+        _showMessageConnectionError(
+            context: context, error: error, isDocument: false)
     );
   }
 
@@ -160,60 +186,37 @@ class CustomerBoxState extends State<CustomerBox> {
 
   void _documentListener() {
     return _documentFocusNode.addListener(() async {
-      // perdida de foco;
       if (!_documentFocusNode.hasFocus) {
-        if (_documentController.text.trim().isNotEmpty) {
-          if (!_formKey.currentState!.validate()) return;
-          if (int.tryParse(_documentController.text.trim()) != null) {
-            await _updateCustomerList(
-                isDocument: true,
-                value: _documentController.text
-            ).then((value) {
-              if (_customerList.isNotEmpty) _updateSelectedClient(0);
-            }).onError((error, stackTrace) {
-              if (error.toString().contains(HttpStatus.notFound.toString())) {
-                _notFound(viewMessage: true, isDocument: true);
-              } else { //InternalServerError
-                _showMessageConnectionError(
-                    context: context, error: error, isDocument: true);
-              }
-            });
+        await _findByDocument();
+      }
+    });
+  }
 
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Atención',
-              content: 'Documento incorrecto',
-            ).view();
-            _pushFocus(context: context, isDocument: true);
-          }
-        }
+  Future<void> _findByDocument() async {
+    if (_documentController.text.trim().isEmpty ||
+        ! _formKey.currentState!.validate()) return Future.value();
+
+    await _updateCustomerList(
+        isDocument: true,
+        value: _documentController.text
+    ).then((value) {
+      if (_customerList.isNotEmpty) _updateSelectedClient(0);
+    }).onError((error, stackTrace) {
+      if (error.toString().contains(HttpStatus.notFound.toString())) {
+        _notFound(viewMessage: true, isDocument: true);
+      } else { //InternalServerError
+        _showMessageConnectionError(
+            context: context, error: error, isDocument: true);
       }
     });
   }
 
   void _lastnameListener() {
     _lastnameFocusNode.addListener(() async {
-      // perdida de foco
-      if (!_lastnameFocusNode.hasFocus) {
+      // perdida de foco con tab o clic (el enter se captura en el onEditing del campo)
+      if (! _lastnameFocusNode.hasFocus) {
         if (_lastnameController.text.trim().isNotEmpty) {
-          await _updateCustomerList(
-            isDocument: false,
-            value: _lastnameController.text
-          ).then((value) {
-            if (_customerList.isNotEmpty) {
-              if (_customerList.length == 1) {
-                _updateSelectedClient(0);
-              } else {
-                _clientSelection();
-              }
-            } else {
-              _notFound(viewMessage: true, isDocument: false);
-            }
-          }).onError((error, stackTrace) =>
-            _showMessageConnectionError(
-                context: context, error: error, isDocument: false)
-          );
+          await _findByLastname();
         }
       }
     });
@@ -239,11 +242,6 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   void _updateSelectedClient(int selectedIndex) {
-     /*_customerFound = '${_customerList[selectedIndex].name} '
-                      '${_customerList[selectedIndex].lastname} '
-                      '(${_customerList[selectedIndex].document})';
-      */
-
     //Llama a la funcion de usuario y pasa el Customer seleccionado
     widget.onSelectedChanged(
         CustomerDTO1(

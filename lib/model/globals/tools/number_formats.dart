@@ -1,4 +1,3 @@
-
 import 'package:intl/intl.dart';
 
 String formatDouble(double value) {

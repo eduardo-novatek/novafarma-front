@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/medicine_dto3.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto2.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
@@ -196,7 +196,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                 viewCharactersCount: false,
                 acceptEmpty: false,
                 initialFocus: true,
-                onEditingComplete: (p0) =>
+                onEditingComplete: () =>
                     FocusScope.of(context).requestFocus(_nameFocusNode),
               ),
             ),
@@ -209,7 +209,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               viewCharactersCount: false,
               textForValidation: 'Ingrese un nombre de hasta 50 caracteres',
               acceptEmpty: false,
-              onEditingComplete: (p0) async {
+              onEditingComplete: () async {
                 await _searchMedicineName();
               }
             ),
@@ -224,7 +224,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               textForValidation: 'Ingrese un precio de costo de hasta 6 dígitos',
               viewCharactersCount: false,
               acceptEmpty: false,
-              onEditingComplete: (p0) =>
+              onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_lastSalePriceFocusNode),
             ),
             CreateTextFormField(
@@ -236,7 +236,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               maxValueForValidation: 999999.99,
               textForValidation: 'Ingrese un precio de venta de hasta 6 dígitos',
               viewCharactersCount: false,
-              onEditingComplete: (p0) =>
+              onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_currentStockFocusNode),
             ),
             _isAdd != null && _isAdd! //Si es un alta, permite la edicion del Stock
@@ -250,7 +250,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                   maxValueForValidation: 99999.99,
                   textForValidation: 'Ingrese un stock de hasta 5 dígitos',
                   viewCharactersCount: false,
-                  onEditingComplete: (p0) =>
+                  onEditingComplete: () =>
                       FocusScope.of(context).requestFocus(_controlledFocusNode),
                 )
               : Padding(
@@ -337,7 +337,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                       viewCharactersCount: false,
                       textForValidation: 'Requerido',
                       acceptEmpty: false,
-                      onEditingComplete: (p0) async =>
+                      onEditingComplete: () async =>
                           await _searchPresentationContainerName()
                     ),
                   ),
@@ -780,7 +780,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   }
 */
 
-  void _updatePresentationFields(MedicineDTO3 medicine) {
+  void _updatePresentationFields(MedicineDTO2 medicine) {
     _nameController.value = TextEditingValue(text: medicine.name!);
     _presentationContainerController.value = TextEditingValue(
         text: medicine.presentation!.name!);

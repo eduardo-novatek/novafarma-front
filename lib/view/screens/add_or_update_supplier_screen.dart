@@ -4,26 +4,18 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
-import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriCustomerFindPaymentNumber, uriSupplierFindName;
-import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
+import 'package:novafarma_front/model/globals/constants.dart' show
+  uriSupplierFindName;
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/supplier_dto.dart';
-import '../../model/DTOs/user_dto_1.dart';
-import '../../model/globals/publics.dart';
-import '../../model/globals/requests/add_or_update_customer.dart';
 import '../../model/globals/requests/add_or_update_supplier.dart';
-import '../../model/globals/requests/fetch_customer_list.dart';
 import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
-import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/supplier_selection_dialog.dart';
 
@@ -170,7 +162,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
                 viewCharactersCount: false,
                 textForValidation: 'Ingrese un nombre de hasta 30 caracteres',
                 acceptEmpty: false,
-                onEditingComplete: (p0) =>
+                onEditingComplete: () =>
                     FocusScope.of(context).requestFocus(_telephone1FocusNode),
               ),
             ),
@@ -183,7 +175,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 10,
               textForValidation: 'El teléfono debe contener entre 8 y 10 dígitos',
               acceptEmpty: false,
-              onEditingComplete: (p0) =>
+              onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_telephone2FocusNode),
             ),
             CreateTextFormField(
@@ -194,7 +186,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 10,
               textForValidation: 'Ingrese un teléfono de hasta 10 dígitos',
               acceptEmpty: true,
-              onEditingComplete: (p0) =>
+              onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_addressFocusNode),
             ),
             CreateTextFormField(
@@ -206,7 +198,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 70,
               textForValidation: 'Ingrese una dirección de hasta 70 caracteres',
               viewCharactersCount: false,
-              onEditingComplete: (p0) =>
+              onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
             ),
             CreateTextFormField(
@@ -218,7 +210,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               maxValueForValidation: 60,
               textForValidation: 'Ingrese un email de hasta 60 caracteres',
               viewCharactersCount: false,
-              onEditingComplete: (p0) =>
+              onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_notesFocusNode),
             ),
             CreateTextFormField(

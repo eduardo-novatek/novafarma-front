@@ -1,14 +1,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../DTOs/presentation_dto_1.dart';
-import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriPresentationAdd, uriPresentationUpdate;
-import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id de la presentacion persistida o id=0 si hubo un error

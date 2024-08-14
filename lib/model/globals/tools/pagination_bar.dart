@@ -14,7 +14,7 @@ class PaginationBar extends StatefulWidget {
   });
 
   @override
-  _PaginationBarState createState() => _PaginationBarState();
+  State<PaginationBar> createState() => _PaginationBarState();
 }
 
 class _PaginationBarState extends State<PaginationBar> {

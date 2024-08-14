@@ -110,6 +110,8 @@ class _ControlledMedicationDialogState extends State<ControlledMedicationDialog>
                             maxValueForValidation: 365,
                             textForValidation: 'Ingrese un valor entre 0 y 365',
                             initialFocus: true,
+                            onEditingComplete: () =>
+                              _toleranceDaysFocusNode.requestFocus(),
                           ),
                           const SizedBox(height: 20),
                           CreateTextFormField(

@@ -1,5 +1,4 @@
 import 'dart:html';
-
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';

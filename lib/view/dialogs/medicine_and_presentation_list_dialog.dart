@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:novafarma_front/model/DTOs/medicine_dto3.dart';
+import 'package:novafarma_front/model/DTOs/medicine_dto2.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
-import '../../model/globals/constants.dart' show sizePageMedicineAndPresentationList,
-  uriMedicineFindNamePage;
 import '../../model/globals/requests/fetch_medicine_by_name_list.dart';
 import '../../model/globals/tools/create_key_pressed.dart' show isEscape;
 import '../../model/globals/tools/pagination_bar.dart';
@@ -13,10 +11,10 @@ import '../../model/globals/tools/pagination_bar.dart';
 ///Dado el nombre de un medicamento, carga una lista de medicamentos que
 ///coincida parcialmente en su nombre, y cada uno con sus diferentes presentaciones.
 ///Devuelve el medicamento seleccionado o null si canceló o no hay coincidencias.
-Future<MedicineDTO3?> medicineAndPresentationListDialog(
+Future<MedicineDTO2?> medicineAndPresentationListDialog(
     {required String medicineName, required BuildContext context,}) async {
 
-  PageObject<MedicineDTO3> pageObject = PageObject.empty();
+  PageObject<MedicineDTO2> pageObject = PageObject.empty();
   await fetchMedicineByNameList(
     medicineName: medicineName,
     isLike: true,
@@ -24,7 +22,7 @@ Future<MedicineDTO3?> medicineAndPresentationListDialog(
     context: context
   );
   if (pageObject.totalElements == 0) return null;
-  MedicineDTO3? medicineSelected = await showDialog(
+  MedicineDTO2? medicineSelected = await showDialog(
       context: context,
       barrierDismissible: false, //modal
       builder: (BuildContext context) {
@@ -43,7 +41,7 @@ Future<MedicineDTO3?> medicineAndPresentationListDialog(
 ///Recibe y actualiza el pageObject
 class _MedicineDialog extends StatefulWidget {
   final String medicineName;
-  final PageObject<MedicineDTO3> pageObject;
+  final PageObject<MedicineDTO2> pageObject;
 
   const _MedicineDialog({
     required this.medicineName,

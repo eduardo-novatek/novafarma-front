@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import 'package:flutter/cupertino.dart';
 import '../../objects/error_object.dart';
-import '../constants.dart' show socket, timeOutSecondsResponse, uriPresentationFindNameOnly;
+import '../constants.dart' show socket, timeOutSecondsResponse;
 
 ///Devuelve una List<T> del endpoint especificado (solo get). El tipo de datos
 ///debe ser un primitivo (para objetos usar fetchDataObject)

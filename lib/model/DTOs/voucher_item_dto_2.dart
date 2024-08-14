@@ -1,11 +1,10 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
-import 'medicine_dto.dart';
-import 'medicine_dto3.dart';
+import 'medicine_dto2.dart';
 
 class VoucherItemDTO2 extends Deserializable<VoucherItemDTO2> {
   int? voucherItemId;
-  MedicineDTO3? medicine;
+  MedicineDTO2? medicine;
   double? quantity;
   double? unitPrice;
 
@@ -27,7 +26,7 @@ class VoucherItemDTO2 extends Deserializable<VoucherItemDTO2> {
   VoucherItemDTO2 fromJson(Map<String, dynamic> json) {
     return VoucherItemDTO2(
       voucherItemId: json['voucherItemId'],
-      medicine: MedicineDTO3().fromJson(json['medicine']),
+      medicine: MedicineDTO2().fromJson(json['medicine']),
       quantity: json['quantity'],
       unitPrice: json['unitPrice'],
     );

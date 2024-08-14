@@ -2,15 +2,12 @@ import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
-import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/globals/constants.dart' show uriPresentationFindNameOnly;
 import '../../model/globals/tools/create_key_pressed.dart' show isEscape;
 import '../../model/globals/tools/fetch_data.dart';
-import '../../model/globals/tools/message.dart';
 
 ///Dado el nombre de un medicamento, carga una lista de medicamentos que
 ///coincida parcialmente en su nombre, y cada uno con sus diferentes presentaciones.

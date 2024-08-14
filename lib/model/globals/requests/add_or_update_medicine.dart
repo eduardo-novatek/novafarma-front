@@ -2,13 +2,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
-import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
-import '../constants.dart' show uriMedicineAdd, uriMedicineUpdate, uriSupplierAdd, uriSupplierUpdate;
+import '../constants.dart' show uriMedicineAdd, uriMedicineUpdate;
 import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 

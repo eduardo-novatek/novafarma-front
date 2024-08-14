@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
-import 'package:novafarma_front/model/DTOs/medicine_dto2.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -23,7 +22,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import '../../model/DTOs/controlled_medication_dto.dart';
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/medicine_dto.dart';
-import '../../model/DTOs/medicine_dto3.dart';
+import '../../model/DTOs/medicine_dto2.dart';
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/controlled_icon.dart';
@@ -75,8 +74,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   //Carga el medicamento buscado por codigo
   MedicineDTO1 _medicine = MedicineDTO1.empty();
   //Carga el medicamento para el objeto _controlledMedication (toma los datos de _medicine)
-  //MedicineDTO2 _medicine2 = MedicineDTO2.empty();
-  MedicineDTO3 _medicine3 = MedicineDTO3.empty();
+  MedicineDTO2 _medicine3 = MedicineDTO2.empty();
 
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
@@ -141,7 +139,12 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                                 label: 'Código',
                                 dataType: DataTypeEnum.text,
                                 initialFocus: true,
-                                onEditingComplete: (value) async {
+                                onEditingComplete: () async {
+                                  //Evita la reinvocación de _barCodeOk() desde el listener _barCode una vez que
+                                  //el campo pierda el foco
+                                  setState(() {
+                                    _focusEnabled = false;
+                                  });
                                   if (await _barCodeOk()) {
                                     _quantityFocusNode.requestFocus();
                                   } else {
@@ -342,7 +345,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     _quantityFocusNode.addListener(_quantityListener);
   }
 
-  void _barCodeListener() {
+  Future<void> _barCodeListener() async {
     if (_barCodeFocusNode.hasFocus) {
       HardwareKeyboard.instance.addHandler(_handleKeyEvent);
       _barCodeController.selection = TextSelection(
@@ -350,77 +353,21 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           extentOffset: _barCodeController.text.length
       );
       _initialize(initializeCodeBar: true);
-    } else {
+
+    } else { //Perdió el foco
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
-    }
-
-    //Da tiempo a ejecutar evento onChange de los botones del Dialog
-    /*Future.delayed(const Duration(milliseconds: 100), () async {
-      if (!_focusEnabled || _barCodeFocusNode.hasFocus) {
-        _setBarCodeValidated(true);
-        return;
-      }
-      if (_barCodeController.text.trim().isEmpty) {
-        _barCodeFocusNode.requestFocus();
-        _setBarCodeValidated(true);
-        return;
-      }
-      if (widget.barCodeList!.contains(_barCodeController.text)) {
-        _setBarCodeValidated(false);
-        await message(context: context, message:'El artículo ya está agregado al comprobante');
-        _barCodeFocusNode.requestFocus();
-        return;
-      }
-      _medicine = MedicineDTO1.empty();
-      _medicine2 = MedicineDTO2.empty();
-      await fetchMedicineBarCode(
-          barCode: _barCodeController.text,
-          medicine: _medicine,
-      ).then((value) async {
-        if (_medicine.medicineId != null) {
-          _medicine2 = MedicineDTO2(
-            medicineId: _medicine.medicineId,
-            name: _medicine.name
-          );
-          if (_isSupplier() || _isAdjustmentStock() ||_medicine.currentStock! > 0) {
-            (bool, DateTime?) result = (true, null);
-            if (! _isSupplier() && ! _isAdjustmentStock()) {
-              if (_medicine.controlled!) result = await _medicineControlledValidated();
-            }
-            if (result.$1) {
-              _updateVoucherItem();
-            } else {
-              if (result.$2 != null) {
-                await message(
-                  context: context,
-                  title: 'No autorizado',
-                  message: '${_medicine.name} '
-                      '${_medicine.presentation!.name} '
-                      '${_medicine.presentation!.quantity} '
-                      '${_medicine.presentation!.unitName}'
-                      '\n\nPróxima fecha de retiro: ${dateToStr(result.$2!)}',
-                );
-              }
-              _barCodeFocusNode.requestFocus();
-            }
-
-          } else {
-            _setBarCodeValidated(false);
-            await message(
-                context: context,
-                title: 'Sin stock',
-                message:'${_medicine.name} '
-                    '${_medicine.presentation!.name} '
-                    '${_medicine.presentation!.quantity} '
-                    '${_medicine.presentation!.unitName}'
-            );
-            _barCodeFocusNode.requestFocus();
-          }
+      if (_focusEnabled) {
+        if (await _barCodeOk()) {
+          _quantityFocusNode.requestFocus();
+        } else {
+          _barCodeFocusNode.requestFocus();
         }
-      }).onError((error, stackTrace) {
-        _barCodeFindError(error);
-      });
-    });*/
+      } else {
+        setState(() {
+          _focusEnabled = true;
+        });
+      }
+    }
   }
 
   Future<void> _barCodeFindError(Object? error) async {
@@ -432,7 +379,6 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       } else {
         _setBarCodeValidated(false);
         if (mounted) _showMessageConnectionError(context: context);
-        //if (mounted) _showMessageConnectionError(context: context, isBarCode: true);
       }
       if (kDebugMode) print(error.toString());
     } else {
@@ -443,6 +389,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   bool _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+      setState(() {
+        _focusEnabled = false;
+      });
       Navigator.of(context).pop();
       return true;  // Evento manejado
     }
@@ -468,6 +417,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           validate = false;
         }
       }
+      return null;
     });
 
     //Si se produjo un error en fetchMedicineDateAuthorizationSale, salgo sin validar
@@ -714,6 +664,11 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   Future<bool> _barCodeOk() async {
+    if (_barCodeController.text.isEmpty) {
+      _setBarCodeValidated(false);
+      return Future.value(false);
+    }
+
     if (widget.barCodeList!.contains(_barCodeController.text.trim().toUpperCase())) {
       _setBarCodeValidated(false);
       await message(context: context, message:'El artículo ya está agregado al comprobante');
@@ -722,18 +677,14 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     bool ok = false;
     _medicine = MedicineDTO1.empty();
     //_medicine2 = MedicineDTO2.empty();
-    _medicine3 = MedicineDTO3.empty();
+    _medicine3 = MedicineDTO2.empty();
 
     await fetchMedicineBarCode(
-    barCode: _barCodeController.text,
-    medicine: _medicine,
+      barCode: _barCodeController.text,
+      medicine: _medicine,
     ).then((value) async {
       if (_medicine.medicineId != null) {
-        /*_medicine2 = MedicineDTO2(
-            medicineId: _medicine.medicineId,
-            name: _medicine.name
-         */
-        _medicine3 = MedicineDTO3(
+        _medicine3 = MedicineDTO2(
             medicineId: _medicine.medicineId,
             name: _medicine.name,
             presentation: _medicine.presentation,
@@ -778,5 +729,4 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     });
     return Future.value(ok);
   }
-
 }

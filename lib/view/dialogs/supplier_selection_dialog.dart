@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 
-import '../../model/DTOs/customer_dto1.dart';
-
 class SupplierSelectionDialog extends StatelessWidget {
   final List<SupplierDTO> suppliers;
   final Function(int) onSelect;
