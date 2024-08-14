@@ -321,7 +321,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         if (result == 'medicines_add_update') {
           await _goAddOrUpdateMedicineScreen();
         } else if (result == 'medicine_list') {
-          // Acción para listar medicamentos
+          await _goListMedicineScreen();
         }
       }
     });
@@ -471,6 +471,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Future<void> _goListSupplierScreen() async {
     setState(() {
       _currentWidget = ListSupplierScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _goListMedicineScreen() async {
+    setState(() {
+      _currentWidget = ListMedicineScreen(
         onCancel: () {
           setState(() {
             _currentWidget = msgHomeScreen;

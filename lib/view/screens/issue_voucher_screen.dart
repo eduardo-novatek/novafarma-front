@@ -645,6 +645,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
             modifyVoucherItem: modifyVoucherItem,
             onModify: (modifiedVoucher) {
               setState(() {
+                _voucherItemList[index].unitPrice = modifiedVoucher.unitPrice;
                 _voucherItemList[index].quantity = modifiedVoucher.quantity;
               });
             },

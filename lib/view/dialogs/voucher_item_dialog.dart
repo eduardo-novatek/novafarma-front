@@ -228,6 +228,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   void _modifyVoucherItem() {
     widget.onModify!(
       VoucherItemDTO(
+        unitPrice: _voucherItem.unitPrice,
         quantity: _voucherItem.quantity,
       )
     );
@@ -289,12 +290,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           ? TableRow(
               children: [
                 const Text('Precio unitario:'),
-                widget.modifyVoucherItem == null
+                widget.modifyVoucherItem == null //Alta?
                   ? _buildPriceAdd()
-                  : Text(widget.modifyVoucherItem!.unitPrice != null
-                        ? '\$${widget.modifyVoucherItem!.unitPrice!}'
-                        : ''
-                    ),
+                  : _buildPriceUpdate()
               ],
             )
           : const TableRow(
@@ -352,6 +350,52 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                 textForValidation: 'Requerido',
                 viewCharactersCount: false,
                 acceptEmpty: false,
+                onEditingComplete: () {
+                  if (_costPriceController.text.isNotEmpty) {
+                    _voucherItem.unitPrice =
+                        double.parse(_costPriceController.text);
+                  }
+                  _quantityFocusNode.requestFocus();
+                },
+              ),
+            ),
+          ),
+          const Expanded(child: SizedBox.shrink()),
+        ],
+      );
+    }
+
+    return widgetReturn;
+  }
+
+  Widget _buildPriceUpdate() {
+    late Widget widgetReturn;
+
+    if (widget.movementType == MovementTypeEnum.sale) {
+      widgetReturn = Text(widget.modifyVoucherItem!.unitPrice != null
+          ? '\$${widget.modifyVoucherItem!.unitPrice!}'
+          : ''
+      );
+
+    } else if (widget.movementType == MovementTypeEnum.purchase) {
+      widgetReturn = Row(
+        children: [
+          Baseline(
+            baseline: 13,
+            baselineType: TextBaseline.alphabetic,
+            child: SizedBox(
+              width: 80,
+              child: CreateTextFormField(
+                label: '',
+                controller: _costPriceController,
+                focusNode: _costPriceFocusNode,
+                dataType: DataTypeEnum.number,
+                minValueForValidation: 0,
+                maxValueForValidation: 999999.99,
+                textForValidation: 'Requerido',
+                viewCharactersCount: false,
+                acceptEmpty: false,
+                initialFocus: true,
                 onEditingComplete: () {
                   if (_costPriceController.text.isNotEmpty) {
                     _voucherItem.unitPrice =
