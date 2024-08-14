@@ -64,9 +64,11 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _barCodeController = TextEditingController();
+  final TextEditingController _costPriceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
 
   final FocusNode _barCodeFocusNode = FocusNode();
+  final FocusNode _costPriceFocusNode = FocusNode();
   final FocusNode _quantityFocusNode = FocusNode();
 
   VoucherItemDTO _voucherItem = VoucherItemDTO.empty();
@@ -88,6 +90,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     //Si es una modificacion
     if (widget.modifyVoucherItem != null) {
       _updateVoucherItem();
+      _costPriceController.value = TextEditingValue(
+          text: '${_voucherItem.unitPrice}'
+      );
       _quantityController.value = TextEditingValue(
           text: '${_voucherItem.quantity}'
       );
@@ -99,9 +104,11 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   void dispose() {
     super.dispose();
     _barCodeController.dispose();
+    _costPriceController.dispose();
     _quantityController.dispose();
 
     _barCodeFocusNode.dispose();
+    _costPriceFocusNode.dispose();
     _quantityFocusNode.dispose();
   }
 
@@ -132,7 +139,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          widget.modifyVoucherItem == null
+                          widget.modifyVoucherItem == null //Si es un Alta
                             ? CreateTextFormField(
                                 controller: _barCodeController,
                                 focusNode: _barCodeFocusNode,
@@ -146,7 +153,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                                     _focusEnabled = false;
                                   });
                                   if (await _barCodeOk()) {
-                                    _quantityFocusNode.requestFocus();
+                                    widget.movementType == MovementTypeEnum.purchase
+                                        ? _costPriceFocusNode.requestFocus()
+                                        : _quantityFocusNode.requestFocus();
                                   } else {
                                     _barCodeFocusNode.requestFocus();
                                   }
@@ -246,7 +255,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1),
-        1: FlexColumnWidth(2),
+        1: FlexColumnWidth(3),
       },
       children: [
         TableRow(
@@ -281,9 +290,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
               children: [
                 const Text('Precio unitario:'),
                 widget.modifyVoucherItem == null
-                  ? Text(_voucherItem.unitPrice != null
-                        ? '\$ ${_voucherItem.unitPrice}'
-                        : '')
+                  ? _buildPriceAdd()
                   : Text(widget.modifyVoucherItem!.unitPrice != null
                         ? '\$${widget.modifyVoucherItem!.unitPrice!}'
                         : ''
@@ -316,6 +323,52 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     );
   }
 
+  Widget _buildPriceAdd() {
+    late Widget widgetReturn;
+
+    if (widget.movementType == MovementTypeEnum.sale) {
+      widgetReturn = Text(
+        _voucherItem.unitPrice != null
+            ? '\$ ${_voucherItem.unitPrice}'
+            : '',
+        textAlign: TextAlign.start,
+      );
+
+    } else if (widget.movementType == MovementTypeEnum.purchase) {
+      widgetReturn = Row(
+        children: [
+          Baseline(
+            baseline: 13,
+            baselineType: TextBaseline.alphabetic,
+            child: SizedBox(
+              width: 80,
+              child: CreateTextFormField(
+                label: '',
+                controller: _costPriceController,
+                focusNode: _costPriceFocusNode,
+                dataType: DataTypeEnum.number,
+                minValueForValidation: 0,
+                maxValueForValidation: 999999.99,
+                textForValidation: 'Requerido',
+                viewCharactersCount: false,
+                acceptEmpty: false,
+                onEditingComplete: () {
+                  _voucherItem.unitPrice = double.parse(_costPriceController.text);
+                  _quantityFocusNode.requestFocus();
+                },
+              ),
+            ),
+          ),
+          const Expanded(child: SizedBox.shrink()),
+        ],
+      );
+    }
+
+    return widgetReturn;
+  }
+
+
+
   Widget _modifyMedicineName() {
     return Row (
       children: [
@@ -342,6 +395,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   void _createListeners() {
     _barCodeFocusNode.addListener(_barCodeListener);
+    _costPriceFocusNode.addListener(_costPriceListener);
     _quantityFocusNode.addListener(_quantityListener);
   }
 
@@ -358,7 +412,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
       if (_focusEnabled) {
         if (await _barCodeOk()) {
-          _quantityFocusNode.requestFocus();
+          widget.movementType == MovementTypeEnum.purchase
+            ? _costPriceFocusNode.requestFocus()
+            : _quantityFocusNode.requestFocus();
         } else {
           _barCodeFocusNode.requestFocus();
         }
@@ -522,7 +578,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         _voucherItem.controlled = _medicine.controlled;
         _voucherItem.controlledMedication =
             _medicine.controlled! ? _controlledMedication : null;
-        //
+
         _barCodeValidated = true;
 
       } else { //Modificacion
@@ -537,6 +593,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         _voucherItem.controlledMedication =
             _voucherItem.controlled! ? _controlledMedication : null;
       }
+
+      if (_isSupplier()) {
+        _costPriceController.value = TextEditingValue(
+            text: '${_voucherItem.unitPrice}'
+        );
+      }
+
     });
   }
 
@@ -555,6 +618,19 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   bool _isAdjustmentStock() =>
     widget.movementType == MovementTypeEnum.adjustmentStock;
+
+  void _costPriceListener() {
+    if (_costPriceFocusNode.hasFocus) {
+      HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+      _costPriceController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: _costPriceController.text.length
+      );
+    } else {
+      _voucherItem.unitPrice = double.parse(_costPriceController.text);
+      HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    }
+  }
 
   void _quantityListener() {
     if (_quantityFocusNode.hasFocus) {
@@ -598,7 +674,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     });
   }
 
-  double? _oppositeQuantity(double? quantity) {
+   double? _oppositeQuantity(double? quantity) {
      if (widget.movementType == MovementTypeEnum.sale ||
          widget.movementType == MovementTypeEnum.returnToSupplier) {
       quantity = quantity! * -1;
