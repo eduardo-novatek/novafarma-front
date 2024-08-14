@@ -10,7 +10,7 @@ class CreateTextFormField extends StatefulWidget {
   final String label;
   final double? minValueForValidation;  //si es texto, es el largo minimo. Si es numero, es el valor minimo,...
   final double? maxValueForValidation;
-  final String textForValidation; //texto de validacion si esta ocurre
+  final String? textForValidation; //texto de validacion si ocurre un error
   final DataTypeEnum dataType;
   final bool? viewCharactersCount; //Mostrar contador de caracteres
   final int maxLines; //cantidad de lineas 'visibles'

@@ -353,7 +353,10 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                 viewCharactersCount: false,
                 acceptEmpty: false,
                 onEditingComplete: () {
-                  _voucherItem.unitPrice = double.parse(_costPriceController.text);
+                  if (_costPriceController.text.isNotEmpty) {
+                    _voucherItem.unitPrice =
+                        double.parse(_costPriceController.text);
+                  }
                   _quantityFocusNode.requestFocus();
                 },
               ),
@@ -445,9 +448,11 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   bool _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-      setState(() {
-        _focusEnabled = false;
-      });
+      if (mounted) {
+        setState(() {
+          _focusEnabled = false;
+        });
+      }
       Navigator.of(context).pop();
       return true;  // Evento manejado
     }
@@ -627,7 +632,9 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
           extentOffset: _costPriceController.text.length
       );
     } else {
-      _voucherItem.unitPrice = double.parse(_costPriceController.text);
+      if (_costPriceController.text.isNotEmpty) {
+        _voucherItem.unitPrice = double.parse(_costPriceController.text);
+      }
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     }
   }
@@ -732,6 +739,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       _medicine = MedicineDTO1.empty();
       _controlledMedication = null;
       _voucherItem = VoucherItemDTO.empty();
+      _costPriceController.value = const TextEditingValue(text: '');
       if (initializeCodeBar) {
         _barCodeController.value = TextEditingValue.empty;
         //_pushFocus(context: context, isBarCode: true);
