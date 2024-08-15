@@ -1,19 +1,23 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data_object_pageable.dart';
+import 'package:novafarma_front/model/globals/controlled_icon.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
+import 'package:novafarma_front/model/objects/page_object.dart';
 
-import '../../model/DTOs/voucher_dto_1.dart';
+import '../../model/DTOs/medicine_dto1.dart';
+import '../../model/DTOs/presentation_dto.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/constants.dart'
-    show uriSupplierDelete, uriSupplierFindAll, uriSupplierFindVouchers;
+import '../../model/globals/constants.dart' show sizePageMedicineList,
+  uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage;
+import '../../model/globals/tools/date_time.dart' show dateToStr;
 import '../../model/globals/tools/fetch_data_object.dart';
+import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/open_dialog.dart';
-import '../dialogs/vouchers_from_supplier_dialog.dart';
+import '../../model/globals/tools/pagination_bar.dart';
 
 class ListMedicineScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
@@ -38,18 +42,32 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   static const double _colCostPrice = 0.2;
   static const double _colSalePrice = 0.2;
   static const double _colStock = 0.2;
+  static const double _colMenu = 0.2;
 
-  final List<SupplierDTO> _medicineList = [];
+  final _nameFilterController = TextEditingController();
+  final _nameFilterFocusNode = FocusNode();
+
   bool _loading = false;
+
+  final PageObject<MedicineDTO1> _pageObject = PageObject.empty();
+
+  /*final List<MedicineDTO1> _medicineList = [];
+  final Map<String, int> _metadata = {
+    'pageNumber': 0,
+    'totalPages': 0,
+    'totalElements': 0,
+  };*/
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _loadDataPageable();
   }
 
   @override
   void dispose() {
+    _nameFilterController.dispose();
+    _nameFilterFocusNode.dispose();
     super.dispose();
   }
 
@@ -58,7 +76,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.9,
+        width: MediaQuery.of(context).size.width * 0.8,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -75,6 +93,9 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           children: [
             _buildTitleBar(),
             _buildBody(),
+            _nameFilterController.text.trim().isEmpty
+                ? _buildFooter()
+                : const SizedBox.shrink(),
           ],
         ),
       ),
@@ -92,16 +113,41 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       ),
       padding: const EdgeInsets.all(16.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            'Listado de proveedores',
+            'Listado de medicamentos',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20.0,
               fontWeight: FontWeight.bold,
             ),
           ),
+          //const SizedBox(width: 260.0), // Espacio entre el título y el campo de texto
+          Expanded(
+            child: Center(
+              child: SizedBox(
+                width: 300.0,
+                child: TextField(
+                  controller: _nameFilterController,
+                  focusNode: _nameFilterFocusNode,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelText: 'Filtrar por nombre',
+                    labelStyle: const TextStyle(color: Colors.white),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.blue.shade300,
+                    suffixIcon: IconButton(
+                      onPressed: _clearFilter,
+                      icon: const Icon(Icons.clear, color: Colors.white),
+                    ),
+                  ),
+                  onSubmitted: (value) => _loadDataFilter(),
+                ),
+              ),
+            ),
+          ),
+          //const SizedBox(width: 260.0), // Espacio entre el campo de texto y el botón de cierre
           IconButton(
             onPressed: widget.onCancel,
             icon: const Icon(Icons.close),
@@ -123,9 +169,9 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
               children: [
                 ListView.builder(
                   padding: const EdgeInsets.only(right: _spaceMenuAndBorder),
-                  itemCount: _medicineList.length,
+                  itemCount: _pageObject.content.length,
                   itemBuilder: (context, index) {
-                    return _buildSupplierRow(index);
+                    return _buildMedicineRow(index);
                   },
                 ),
                 if (_loading)
@@ -145,23 +191,25 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       padding: const EdgeInsets.only(right: _spaceMenuAndBorder),
       child: Table(
         columnWidths: const {
-          0: FlexColumnWidth(_colName),
-          1: FlexColumnWidth(_colPresentation),
-          2: FlexColumnWidth(_colLastAddDate),
-          3: FlexColumnWidth(_colCostPrice),
-          4: FlexColumnWidth(_colSalePrice),
-          5: FlexColumnWidth(_colStock),
-          6: FlexColumnWidth(_colControlled),
+          0: FlexColumnWidth(_colControlled),
+          1: FlexColumnWidth(_colName),
+          2: FlexColumnWidth(_colPresentation),
+          3: FlexColumnWidth(_colLastAddDate),
+          4: FlexColumnWidth(_colCostPrice),
+          5: FlexColumnWidth(_colSalePrice),
+          6: FlexColumnWidth(_colStock),
+          8: FlexColumnWidth(_colMenu),
         },
         children: [
           TableRow(
             children: [
+              const SizedBox.shrink(), // Celda vacía para icono 'controlado'
               _buildColumn('NOMBRE'),
-              _buildColumn('TELÉFONO 1'),
-              _buildColumn('TELÉFONO 2'),
-              _buildColumn('DIRECCIÓN'),
-              _buildColumn('EMAIL'),
-              _buildColumn('NOTAS'),
+              _buildColumn('PRESENTACIÓN'),
+              _buildColumn('ACTUALIZADO'),
+              _buildColumn('P.COSTO'),
+              _buildColumn('P.VENTA'),
+              _buildColumn('STOCK'),
               const SizedBox.shrink(), // Celda vacía para boton de menu
             ],
           ),
@@ -173,30 +221,41 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   Widget _buildColumn(String text) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          text,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-              fontSize: 15.0,
-              fontWeight: FontWeight.bold
-          ),
-        ),
+      child: Text(
+        text,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  Future<void> _loadData() async {
-    _toggleLoading();
-    await fetchDataObject<SupplierDTO>(
-      uri: uriSupplierFindAll,
-      classObject: SupplierDTO.empty(),
-    ).then((data) {
-      _medicineList.clear();
+  Widget _buildFooter() {
+    return _pageObject.totalPages != 0
+        ? PaginationBar(
+            totalPages: _pageObject.totalPages,
+            initialPage: _pageObject.pageNumber,
+            onPageChanged: (page) {
+              setState(() {
+                _pageObject.pageNumber = page - 1;
+                _loadDataPageable();
+              });
+            },
+          )
+        : const SizedBox.shrink();
+  }
+
+  Future<void> _loadDataPageable() async {
+    _setLoading(true);
+    await fetchDataObjectPageable<MedicineDTO1>(
+      uri: '$uriMedicineFindAll/${_pageObject.pageNumber}/$sizePageMedicineList',
+      classObject: MedicineDTO1.empty(),
+    ).then((pageObjectResult) {
+      _pageObject.content.clear();
       setState(() {
-        _medicineList.addAll(data as Iterable<SupplierDTO>);
+        _pageObject.content.addAll(
+            pageObjectResult.content as Iterable<MedicineDTO1>);
       });
+
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
@@ -220,17 +279,72 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         }
       }
     });
-    _toggleLoading();
+    _setLoading(false);
   }
 
-  void _toggleLoading() {
+  void _setLoading(bool loading) {
     setState(() {
-      _loading = !_loading;
+      _loading = loading;
     });
   }
 
-  Widget _buildSupplierRow(int index) {
-    SupplierDTO supplier = _medicineList[index];
+  Future<void> _loadDataFilter() async {
+    if (_nameFilterController.text.trim().isEmpty) {
+      _loadDataPageable();
+      return;
+    }
+    _setLoading(true);
+    await fetchDataObjectPageable<MedicineDTO1>(
+      uri: '$uriMedicineFindNamePage'
+          '/${_nameFilterController.text.trim()}'
+          '/${_pageObject.pageNumber}'
+          '/$sizePageMedicineList}',
+      classObject: MedicineDTO1.empty(),
+    ).then((medicineFiltered) {
+      _pageObject.content.clear();
+      if (medicineFiltered.totalElements > 0) {
+        setState(() {
+          _pageObject.content.addAll(
+              medicineFiltered.content as Iterable<MedicineDTO1>);
+        });
+      }
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+          context: context,
+          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
+          messageTypeEnum: error.message != null
+              ? MessageTypeEnum.warning
+              : MessageTypeEnum.error,
+        );
+        if (kDebugMode) {
+          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+        }
+      } else {
+        FloatingMessage.show(
+          context: context,
+          text: 'Error obteniendo datos',
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) {
+          print('Error obteniendo datos: ${error.toString()}');
+        }
+      }
+    });
+    _setLoading(false);
+  }
+
+  void _clearFilter() {
+    if (_nameFilterController.text.trim().isNotEmpty) {
+      setState(() {
+        _nameFilterController.clear();
+      });
+      _loadDataPageable();
+    }
+  }
+
+  Widget _buildMedicineRow(int index) {
+    MedicineDTO1 medicine = _pageObject.content[index];
     return Container(
       decoration: BoxDecoration(
         color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
@@ -242,23 +356,29 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       ),
       child: Table(
         columnWidths: const {
-          0: FlexColumnWidth(_colName),
-          1: FlexColumnWidth(_colPresentation),
-          2: FlexColumnWidth(_colLastAddDate),
-          3: FlexColumnWidth(_colCostPrice),
-          4: FlexColumnWidth(_colSalePrice),
-          5: FlexColumnWidth(_colStock),
-          6: FlexColumnWidth(_colControlled),
+          0: FlexColumnWidth(_colControlled),
+          1: FlexColumnWidth(_colName),
+          2: FlexColumnWidth(_colPresentation),
+          3: FlexColumnWidth(_colLastAddDate),
+          4: FlexColumnWidth(_colCostPrice),
+          5: FlexColumnWidth(_colSalePrice),
+          6: FlexColumnWidth(_colStock),
+          8: FlexColumnWidth(_colMenu),
         },
         children: [
           TableRow(
             children: [
-              _buildTableCell(text: supplier.name),
-              _buildTableCell(text: supplier.telephone1.toString()),
-              _buildTableCell(text: supplier.telephone2.toString()),
-              _buildTableCell(text: supplier.address),
-              _buildTableCell(text: supplier.email),
-              _buildTableCellNotes(supplier.notes!),
+              TableCell(
+                  child: medicine.controlled != null && medicine.controlled!
+                    ? controlledIcon()
+                    : const SizedBox.shrink()
+              ),
+              _buildTableCell(text: medicine.name),
+              _buildTableCell(text: _buildPresentation(medicine.presentation!)),
+              _buildTableCell(text: dateToStr(medicine.lastAddDate!)),
+              _buildTableCell(text: medicine.lastCostPrice!.toString()),
+              _buildTableCell(text: medicine.lastSalePrice!.toString()),
+              _buildTableCell(text: medicine.currentStock!.toString()),
               _showMenu(index),
             ],
           )
@@ -266,6 +386,10 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       ),
     );
   }
+
+  String? _buildPresentation(PresentationDTO presentation) =>
+    '${presentation.name} ${presentation.quantity} ${presentation.unitName}';
+
 
   TableCell _buildTableCellNotes(String notes) {
     return TableCell(
@@ -298,14 +422,24 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
             value: 0,
             child: Row(
               children: [
-                Icon(Icons.assignment_outlined, color: Colors.black),
+                Icon(Icons.medical_information, color: Colors.black),
                 SizedBox(width: 8),
-                Text('Comprobantes')
+                Text('opcion 1')
               ],
             ),
           ),
           const PopupMenuItem<int>(
             value: 1,
+            child: Row(
+              children: [
+                Icon(Icons.assignment_outlined, color: Colors.black),
+                SizedBox(width: 8),
+                Text('opcion 2')
+              ],
+            ),
+          ),
+          const PopupMenuItem<int>(
+            value: 2,
             child: Row(
               children: [
                 Icon(Icons.delete, color: Colors.black),
@@ -331,7 +465,6 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           child: Text(
             text ?? '',
             overflow: TextOverflow.ellipsis,
-            //style: const TextStyle(fontSize: 14.0),
           )
         ),
       ),
@@ -341,49 +474,52 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   void _onSelected(BuildContext context, int menuItem, int index) {
     switch (menuItem) {
       case 0:
-        _vouchersSupplier(index);
+        //_controlledMedications(index);
         break;
       case 1:
+        //_vouchersCustomer(index);
+        break;
+      case 2:
         _delete(index);
         break;
     }
   }
 
-  Future<void> _vouchersSupplier(int index) async {
+ /* Future<void> _vouchersCustomer(int index) async {
     _toggleLoading();
     //Verifico la existencia de por lo menos un voucher
     await fetchDataObjectPageable(
-        uri: '$uriSupplierFindVouchers/${_medicineList[index].supplierId}/0/1',
+        uri: '$uriCustomerFindVouchersPage/${_medicineList[index].customerId}/0/1',
         classObject: VoucherDTO1.empty(),
     ).then((pageObject) {
-      if (pageObject.totalElements == 0) {
-        FloatingMessage.show(
-          context: context,
-          text: 'Sin datos',
-          messageTypeEnum: MessageTypeEnum.info,
-        );
-      } else {
-        SupplierDTO supplier = _medicineList[index];
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: VouchersFromSupplierDialog(
-                supplierId: supplier.supplierId!,
-                supplierName: supplier.name,
-              ),
-            );
-          },
-        );
-      }
+     if (pageObject.totalElements == 0) {
+       FloatingMessage.show(
+         context: context,
+         text: 'Sin datos',
+         messageTypeEnum: MessageTypeEnum.info,
+       );
+     } else {
+       CustomerDTO1 customer = _medicineList[index];
+       showDialog(
+         context: context,
+         builder: (context) {
+           return AlertDialog(
+             content: VouchersFromCustomerDialog(
+               customerId: customer.customerId!,
+               customerName: '${customer.lastname}, ${customer.name}',
+             ),
+           );
+         },
+       );
+     }
     }).onError((error, stackTrace) {
       String? msg;
       if (error is ErrorObject) {
-        msg = error.message;
+          msg = error.message;
       } else {
         msg = error.toString().contains('XMLHttpRequest error')
-            ? 'Error de conexión'
-            : error.toString();
+          ? 'Error de conexión'
+          : error.toString();
       }
       if (msg != null) {
         FloatingMessage.show(
@@ -395,33 +531,82 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       }
     });
     _toggleLoading();
-  }
+  }*/
+
+ /* Future<void> _controlledMedications(int index) async {
+    _toggleLoading();
+    await fetchDataObject(
+      uri: '$uriCustomerFindControlledMedications/${_medicineList[index].customerId}',
+      classObject: ControlledMedicationDTO1.empty(),
+    ).then((value) {
+      _toggleLoading();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ControlledMedicationListFromCustomerDialog(
+              customerName: '${_medicineList[index].lastname}, '
+                  '${_medicineList[index].name}',
+              medications: value as List<ControlledMedicationDTO1>
+          );
+        },
+      );
+    }).onError((error, stackTrace) {
+      _toggleLoading();
+      String? msg;
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+          FloatingMessage.show(
+            context: context,
+            text: 'Sin datos',
+            messageTypeEnum: MessageTypeEnum.info,
+          );
+        } else {
+          msg = error.message;
+        }
+
+      } else {
+        genericError(error!, context, isFloatingMessage: true);
+      }
+      if (msg != null) {
+        FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) print(error);
+      }
+    });
+  }*/
 
   Future<void> _delete(int index) async {
-    SupplierDTO supplierSelected = _medicineList[index];
+    MedicineDTO1 medicineSelected = _pageObject.content[index];
 
     int option = await OpenDialog(
       context: context,
-      title: 'Eliminar proveedor',
-      content: '${supplierSelected.name}\n\n'
+      title: 'Eliminar medicamento',
+      content: '${medicineSelected.name} '
+          '${medicineSelected.presentation!.name} '
+          '${medicineSelected.presentation!.quantity} '
+          '${medicineSelected.presentation!.unitName} '
+          '\n\n'
           '¿Confirma?',
       textButton1: 'Si',
       textButton2: 'No',
     ).view();
 
     if (option == 1) {
-      _toggleLoading();
+      _setLoading(true);
       try {
-        await fetchDataObject<SupplierDTO>(
-          uri: '$uriSupplierDelete/${supplierSelected.supplierId}/true',
-          classObject: SupplierDTO.empty(),
+        await fetchDataObject<MedicineDTO1>(
+          uri: '$uriMedicineDelete/${medicineSelected.medicineId!}',
+          classObject: MedicineDTO1.empty(),
         );
         setState(() {
-          _medicineList.removeAt(index);
+          _pageObject.content.removeAt(index);
         });
         FloatingMessage.show(
           context: context,
-          text: 'Proveedor eliminado con éxito',
+          text: 'Medicamento eliminado con éxito',
           messageTypeEnum: MessageTypeEnum.info,
         );
       } catch (error) {
@@ -447,7 +632,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           }
         }
       } finally {
-        _toggleLoading();
+        _setLoading(false);
       }
     }
   }
