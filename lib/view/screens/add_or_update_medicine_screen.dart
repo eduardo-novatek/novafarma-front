@@ -460,7 +460,6 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
   Future<void> _submitForm() async {
     _changeStateLoading(true);
-
     PresentationDTO presentationDTO = PresentationDTO(
         name: _presentationContainerController.text.trim(),
         quantity: int.parse(_presentationQuantityController.text),
@@ -566,6 +565,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       currentStock: double.parse(_currentStockController.text.trim()),
       controlled: _controlled!,
     );
+    //Nota: no se especifica 'deleted' porque lo maneja el backend
   }
 
   PresentationDTO _buildPresentation() {
@@ -643,8 +643,15 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
           medicine: medicine,
       );
       if (medicine.medicineId != null) {
-        _updateFields(medicine);
-        registered = true;
+        if (! medicine.deleted!) {
+          _updateFields(medicine);
+          registered = true;
+        } else {
+          throw ErrorObject(
+            statusCode: HttpStatus.conflict,
+            message: 'El medicamento está eliminado'
+          );
+        }
       }
 
     } catch (error) {
@@ -653,13 +660,21 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
           registered = false;
         } else {
           registered = null;
-          await OpenDialog(
+          if (error.message!.contains('El medicamento está eliminado')) {
+            FloatingMessage.show(
               context: context,
-              title: 'Error',
-              content: error.message != null
-                  ? error.message!
-                  : 'Error ${error.statusCode}'
-          ).view();
+              text: error.message!,
+              messageTypeEnum: MessageTypeEnum.warning
+            );
+          } else {
+            await OpenDialog(
+                context: context,
+                title: 'Error',
+                content: error.message != null
+                    ? error.message!
+                    : 'Error ${error.statusCode}'
+            ).view();
+          }
         }
       } else {
         registered = null;

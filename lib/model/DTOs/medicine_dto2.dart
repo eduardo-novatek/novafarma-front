@@ -6,19 +6,22 @@ class MedicineDTO2 extends Deserializable<MedicineDTO2> {
   PresentationDTO? presentation;
   String? name;
   bool? controlled;
+  bool? deleted;
 
   MedicineDTO2({
     this.medicineId,
     this.presentation,
     this.name,
-    this.controlled
+    this.controlled,
+    this.deleted
   });
 
   MedicineDTO2.empty():
     medicineId = null,
     presentation = null,
     name = null,
-    controlled = null;
+    controlled = null,
+    deleted = null;
 
   @override
   MedicineDTO2 fromJson(Map<String, dynamic> json) {
@@ -26,7 +29,8 @@ class MedicineDTO2 extends Deserializable<MedicineDTO2> {
       medicineId: json['medicineId'],
       presentation: PresentationDTO().fromJson(json['presentation']),
       name: json['name'],
-      controlled: json['controlled']
+      controlled: json['controlled'],
+      deleted: json['deleted'],
     );
   }
 
@@ -37,6 +41,7 @@ class MedicineDTO2 extends Deserializable<MedicineDTO2> {
       'presentation': presentation,
       'name': name,
       'controlled': controlled,
+      'deleted': deleted,
     };
   }
 

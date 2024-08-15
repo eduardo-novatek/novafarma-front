@@ -38,10 +38,10 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   static const double _colControlled = 0.2; //icono
   static const double _colName = 2.5;
   static const double _colPresentation = 1.5;
-  static const double _colLastAddDate = 0.5;
-  static const double _colCostPrice = 0.2;
-  static const double _colSalePrice = 0.2;
-  static const double _colStock = 0.2;
+  static const double _colLastAddDate = 0.8;
+  static const double _colCostPrice = 0.7;
+  static const double _colSalePrice = 0.7;
+  static const double _colStock = 0.7;
   static const double _colMenu = 0.2;
 
   final _nameFilterController = TextEditingController();
@@ -50,13 +50,6 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   bool _loading = false;
 
   final PageObject<MedicineDTO1> _pageObject = PageObject.empty();
-
-  /*final List<MedicineDTO1> _medicineList = [];
-  final Map<String, int> _metadata = {
-    'pageNumber': 0,
-    'totalPages': 0,
-    'totalElements': 0,
-  };*/
 
   @override
   void initState() {
@@ -93,9 +86,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           children: [
             _buildTitleBar(),
             _buildBody(),
-            _nameFilterController.text.trim().isEmpty
-                ? _buildFooter()
-                : const SizedBox.shrink(),
+            _buildFooter()
           ],
         ),
       ),
@@ -142,7 +133,12 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
                       icon: const Icon(Icons.clear, color: Colors.white),
                     ),
                   ),
-                  onSubmitted: (value) => _loadDataFilter(),
+                  onSubmitted: (value) {
+                    setState(() {
+                      _pageObject.pageNumber = 0; //Fuerza a que el filtro cargue la primera pagina
+                    });
+                    _loadDataFilterPageable();
+                  },
                 ),
               ),
             ),
@@ -230,7 +226,19 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   }
 
   Widget _buildFooter() {
-    return _pageObject.totalPages != 0
+    return PaginationBar(
+      totalPages: _pageObject.totalPages,
+      initialPage: _pageObject.pageNumber + 1,
+      onPageChanged: (page) {
+        setState(() {
+          _pageObject.pageNumber = page - 1;
+        });
+        _nameFilterController.text.trim().isNotEmpty
+          ? _loadDataFilterPageable()
+          : _loadDataPageable();
+      },
+    );
+    /*return _pageObject.totalPages != 0
         ? PaginationBar(
             totalPages: _pageObject.totalPages,
             initialPage: _pageObject.pageNumber,
@@ -242,6 +250,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
             },
           )
         : const SizedBox.shrink();
+     */
   }
 
   Future<void> _loadDataPageable() async {
@@ -255,6 +264,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         _pageObject.content.addAll(
             pageObjectResult.content as Iterable<MedicineDTO1>);
       });
+      _updatePageObject(pageObjectResult);
 
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
@@ -282,13 +292,22 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
     _setLoading(false);
   }
 
+  void _updatePageObject(PageObject<dynamic> pageObjectResult) {
+    _pageObject.pageNumber = pageObjectResult.pageNumber;
+    _pageObject.pageSize = pageObjectResult.pageSize;
+    _pageObject.totalPages = pageObjectResult.totalPages;
+    _pageObject.totalElements = pageObjectResult.totalElements;
+    _pageObject.first = pageObjectResult.first;
+    _pageObject.last = pageObjectResult.last;
+  }
+
   void _setLoading(bool loading) {
     setState(() {
       _loading = loading;
     });
   }
 
-  Future<void> _loadDataFilter() async {
+  Future<void> _loadDataFilterPageable() async {
     if (_nameFilterController.text.trim().isEmpty) {
       _loadDataPageable();
       return;
@@ -297,16 +316,19 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
     await fetchDataObjectPageable<MedicineDTO1>(
       uri: '$uriMedicineFindNamePage'
           '/${_nameFilterController.text.trim()}'
+          '/true' //busqeda con like
+          '/true' //incluye eliminados
           '/${_pageObject.pageNumber}'
-          '/$sizePageMedicineList}',
+          '/$sizePageMedicineList',
       classObject: MedicineDTO1.empty(),
-    ).then((medicineFiltered) {
+    ).then((pageObjectResult) {
       _pageObject.content.clear();
-      if (medicineFiltered.totalElements > 0) {
+      if (pageObjectResult.totalElements > 0) {
         setState(() {
           _pageObject.content.addAll(
-              medicineFiltered.content as Iterable<MedicineDTO1>);
+              pageObjectResult.content as Iterable<MedicineDTO1>);
         });
+        _updatePageObject(pageObjectResult);
       }
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
@@ -368,11 +390,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         children: [
           TableRow(
             children: [
-              TableCell(
-                  child: medicine.controlled != null && medicine.controlled!
-                    ? controlledIcon()
-                    : const SizedBox.shrink()
-              ),
+              _buildControlledIcon(medicine),
               _buildTableCell(text: medicine.name),
               _buildTableCell(text: _buildPresentation(medicine.presentation!)),
               _buildTableCell(text: dateToStr(medicine.lastAddDate!)),
@@ -384,6 +402,15 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           )
         ],
       ),
+    );
+  }
+
+  TableCell _buildControlledIcon(MedicineDTO1 medicine) {
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.middle,
+      child: medicine.controlled != null && medicine.controlled!
+        ? controlledIcon()
+        : const SizedBox.shrink()
     );
   }
 

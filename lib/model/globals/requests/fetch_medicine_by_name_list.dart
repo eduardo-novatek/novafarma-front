@@ -14,10 +14,9 @@ import '../tools/floating_message.dart';
 ///objeto pageObject con los medicamentos resultantes de buscarlo por nombre.
 Future<void> fetchMedicineByNameList({
   required String medicineName,
-  //required List<MedicineDTO3> medicineList,
   required PageObject<MedicineDTO2> pageObject,
   required bool isLike, //true: busqueda es mediante LIKE, false: coincidencia desde la izquierda (mediante indice)
-  //required int pageNumber,
+  required bool includeDeleted, //true: incluye los medicamentos marcados como eliminado
   required BuildContext context
 }) async {
 
@@ -25,6 +24,7 @@ Future<void> fetchMedicineByNameList({
     uri: '$uriMedicineFindNamePage'
         '/$medicineName'
         '/$isLike'
+        '/$includeDeleted'
         '/${pageObject.pageNumber}'
         '/$sizePageMedicineAndPresentationList',
     classObject: MedicineDTO2.empty(),

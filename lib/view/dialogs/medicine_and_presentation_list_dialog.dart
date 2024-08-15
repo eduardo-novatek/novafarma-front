@@ -18,6 +18,7 @@ Future<MedicineDTO2?> medicineAndPresentationListDialog(
   await fetchMedicineByNameList(
     medicineName: medicineName,
     isLike: true,
+    includeDeleted: false,
     pageObject: pageObject,
     context: context
   );
@@ -140,6 +141,7 @@ class _MedicineDialogState extends State<_MedicineDialog> {
             await fetchMedicineByNameList(
                 medicineName: widget.medicineName,
                 isLike: true,
+                includeDeleted: false,
                 pageObject: widget.pageObject,
                 context: context
             );

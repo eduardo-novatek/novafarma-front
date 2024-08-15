@@ -14,6 +14,7 @@ class MedicineDTO1 extends Deserializable<MedicineDTO1> {
   double? lastSalePrice;
   double? currentStock;
   bool? controlled;
+  bool? deleted;
 
   //final bool? isFirst;
 
@@ -27,7 +28,8 @@ class MedicineDTO1 extends Deserializable<MedicineDTO1> {
     lastCostPrice = null,
     lastSalePrice =  null,
     currentStock = null,
-    controlled =  null
+    controlled =  null,
+    deleted = null
     //isFirst = null
   ;
 
@@ -42,6 +44,7 @@ class MedicineDTO1 extends Deserializable<MedicineDTO1> {
     this.lastSalePrice,
     this.currentStock,
     this.controlled,
+    this.deleted,
     //this.isFirst,
   });
 
@@ -59,6 +62,7 @@ class MedicineDTO1 extends Deserializable<MedicineDTO1> {
       lastSalePrice: json['lastSalePrice'],
       currentStock: json['currentStock'],
       controlled: json['controlled'],
+      deleted: json['deleted'],
     );
     return m;
   }
@@ -76,6 +80,7 @@ class MedicineDTO1 extends Deserializable<MedicineDTO1> {
       'lastSalePrice': lastSalePrice,
       'currentStock': currentStock,
       'controlled': controlled,
+      'deleted': deleted,
     };
   }
 }

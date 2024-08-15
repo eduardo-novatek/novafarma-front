@@ -76,7 +76,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   //Carga el medicamento buscado por codigo
   MedicineDTO1 _medicine = MedicineDTO1.empty();
   //Carga el medicamento para el objeto _controlledMedication (toma los datos de _medicine)
-  MedicineDTO2 _medicine3 = MedicineDTO2.empty();
+  MedicineDTO2 _medicine2 = MedicineDTO2.empty();
 
   bool _focusEnabled = true;  //Foco habilitado para los TextFormField
   bool _barCodeValidated = true;
@@ -475,19 +475,19 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
   Future<void> _barCodeFindError(Object? error) async {
     if (error is ErrorObject) {
+      _setBarCodeValidated(false);
       if (error.statusCode == HttpStatus.notFound) {
-        _setBarCodeValidated(false);
         _initialize(initializeCodeBar: false);
         await message(context: context, message: 'Artículo no encontrado');
-      } else {
-        _setBarCodeValidated(false);
-        if (mounted) _showMessageConnectionError(context: context);
+      } else if (error.message!.contains('El medicamento está eliminado')) {
+        await message(context: context, message: error.message!);
+      } else if (mounted) {
+        _showMessageConnectionError(context: context);
       }
-      if (kDebugMode) print(error.toString());
     } else {
       genericError(error!, context, isFloatingMessage: true);
     }
-
+    if (kDebugMode) print(error.toString());
   }
 
   bool _handleKeyEvent(KeyEvent event) {
@@ -603,7 +603,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     //Si _controlledMedication es null, crea el objeto vacío
     _controlledMedication ??= ControlledMedicationDTO1.empty();
     _controlledMedication?.customerId =  widget.customerOrSupplierId;
-    _controlledMedication?.medicine = _medicine3;
+    _controlledMedication?.medicine = _medicine2;
     _controlledMedication?.customerName =
       '${widget.customer!.lastname}, ${widget.customer!.name}';
     _controlledMedication?.lastSaleDate = null;
@@ -755,17 +755,13 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         || widget.movementType != MovementTypeEnum.adjustmentStock && quantity > 0);
   }
 
-  Future<Null> _showMessageConnectionError({
-    required BuildContext context,
-    //required bool isBarCode,
-  }) async {
+  Future<Null> _showMessageConnectionError({required BuildContext context}) async {
     FloatingMessage.show(
       context: context,
       text: "Error de conexión",
       messageTypeEnum: MessageTypeEnum.error,
       allowFlow: true,
     );
-    //if (context.mounted) _pushFocus(context: context, isBarCode: isBarCode);
   }
 
   void _pushFocus({required BuildContext context, required bool isBarCode}) {
@@ -804,15 +800,14 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     }
     bool ok = false;
     _medicine = MedicineDTO1.empty();
-    //_medicine2 = MedicineDTO2.empty();
-    _medicine3 = MedicineDTO2.empty();
+    _medicine2 = MedicineDTO2.empty();
 
     await fetchMedicineBarCode(
       barCode: _barCodeController.text,
       medicine: _medicine,
     ).then((value) async {
       if (_medicine.medicineId != null) {
-        _medicine3 = MedicineDTO2(
+        _medicine2 = MedicineDTO2(
             medicineId: _medicine.medicineId,
             name: _medicine.name,
             presentation: _medicine.presentation,
