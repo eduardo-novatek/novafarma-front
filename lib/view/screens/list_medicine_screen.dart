@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
@@ -134,9 +133,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
                     ),
                   ),
                   onSubmitted: (value) {
-                    setState(() {
-                      _pageObject.pageNumber = 0; //Fuerza a que el filtro cargue la primera pagina
-                    });
+                    _pageObject.pageNumber = 0; //Indica que el filtro cargue la primera pagina
                     _loadDataFilterPageable();
                   },
                 ),
@@ -230,27 +227,12 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       totalPages: _pageObject.totalPages,
       initialPage: _pageObject.pageNumber + 1,
       onPageChanged: (page) {
-        setState(() {
-          _pageObject.pageNumber = page - 1;
-        });
+        _pageObject.pageNumber = page - 1;
         _nameFilterController.text.trim().isNotEmpty
           ? _loadDataFilterPageable()
           : _loadDataPageable();
       },
     );
-    /*return _pageObject.totalPages != 0
-        ? PaginationBar(
-            totalPages: _pageObject.totalPages,
-            initialPage: _pageObject.pageNumber,
-            onPageChanged: (page) {
-              setState(() {
-                _pageObject.pageNumber = page - 1;
-                _loadDataPageable();
-              });
-            },
-          )
-        : const SizedBox.shrink();
-     */
   }
 
   Future<void> _loadDataPageable() async {
@@ -260,12 +242,10 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       classObject: MedicineDTO1.empty(),
     ).then((pageObjectResult) {
       _pageObject.content.clear();
-      setState(() {
-        _pageObject.content.addAll(
-            pageObjectResult.content as Iterable<MedicineDTO1>);
-      });
+      _pageObject.content.addAll(
+          pageObjectResult.content as Iterable<MedicineDTO1>
+      );
       _updatePageObject(pageObjectResult);
-
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
@@ -323,13 +303,10 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       classObject: MedicineDTO1.empty(),
     ).then((pageObjectResult) {
       _pageObject.content.clear();
-      if (pageObjectResult.totalElements > 0) {
-        setState(() {
-          _pageObject.content.addAll(
-              pageObjectResult.content as Iterable<MedicineDTO1>);
-        });
-        _updatePageObject(pageObjectResult);
-      }
+      _pageObject.content.addAll(
+          pageObjectResult.content as Iterable<MedicineDTO1>
+      );
+      _updatePageObject(pageObjectResult);
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
@@ -358,9 +335,8 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
 
   void _clearFilter() {
     if (_nameFilterController.text.trim().isNotEmpty) {
-      setState(() {
-        _nameFilterController.clear();
-      });
+      _nameFilterController.clear();
+      _pageObject.pageNumber = 0; //Indica que cargue la primera pagina
       _loadDataPageable();
     }
   }
@@ -416,27 +392,6 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
 
   String? _buildPresentation(PresentationDTO presentation) =>
     '${presentation.name} ${presentation.quantity} ${presentation.unitName}';
-
-
-  TableCell _buildTableCellNotes(String notes) {
-    return TableCell(
-      verticalAlignment: TableCellVerticalAlignment.middle,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8.0),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: Icon(
-              Icons.note,
-              color: notes.isNotEmpty ? Colors.green : Colors.grey,
-            ),
-            tooltip: notes,
-            onPressed: null,
-          ),
-        ),
-      ),
-    );
-  }
 
   TableCell _showMenu(int index) {
     return TableCell(
