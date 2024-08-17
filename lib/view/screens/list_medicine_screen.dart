@@ -1,8 +1,10 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
@@ -40,13 +42,14 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   static const double _colLastAddDate = 0.8;
   static const double _colCostPrice = 0.7;
   static const double _colSalePrice = 0.7;
-  static const double _colStock = 0.7;
-  static const double _colMenu = 0.2;
+  static const double _colStock = 0.4;
+  static const double _colMenu = 0.25;
 
   final _nameFilterController = TextEditingController();
   final _nameFilterFocusNode = FocusNode();
 
   bool _loading = false;
+  int _highlightedIndex = -1; //iluminacion de fila al pasar el mouse
 
   final PageObject<MedicineDTO1> _pageObject = PageObject.empty();
 
@@ -191,7 +194,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           4: FlexColumnWidth(_colCostPrice),
           5: FlexColumnWidth(_colSalePrice),
           6: FlexColumnWidth(_colStock),
-          8: FlexColumnWidth(_colMenu),
+          7: FlexColumnWidth(_colMenu),
         },
         children: [
           TableRow(
@@ -343,6 +346,77 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
 
   Widget _buildMedicineRow(int index) {
     MedicineDTO1 medicine = _pageObject.content[index];
+    return MouseRegion(
+      onEnter: (_) => setState(() {
+        _highlightedIndex = index;
+      }),
+      onExit: (_) => setState(() {
+        _highlightedIndex = -1;
+      }),
+      child: Container(
+        decoration: BoxDecoration(
+          color: _highlightedIndex == index
+              ? Colors.blue.shade50
+              : Colors.white,
+              //: (index % 2 == 0 ? Colors.white : Colors.grey.shade100),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.shade200,
+            ),
+          ),
+        ),
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(_colControlled),
+            1: FlexColumnWidth(_colName),
+            2: FlexColumnWidth(_colPresentation),
+            3: FlexColumnWidth(_colLastAddDate),
+            4: FlexColumnWidth(_colCostPrice),
+            5: FlexColumnWidth(_colSalePrice),
+            6: FlexColumnWidth(_colStock),
+            7: FlexColumnWidth(_colMenu),
+          },
+          children: [
+            TableRow(
+              children: [
+                _buildControlledIcon(medicine),
+                _buildTableCell(
+                    text: medicine.name,
+                    isDeleted: medicine.deleted!
+                ),
+                _buildTableCell(
+                    text: _buildPresentation(medicine.presentation!),
+                    isDeleted: medicine.deleted!
+                ),
+                _buildTableCell(
+                    text: dateToStr(medicine.lastAddDate!),
+                    isDeleted: medicine.deleted!
+                ),
+                _buildTableCell(
+                    text: medicine.lastCostPrice!.toString(),
+                    isDeleted: medicine.deleted!
+                ),
+                _buildTableCell(
+                    text: medicine.lastSalePrice!.toString(),
+                    isDeleted: medicine.deleted!
+                ),
+                _buildTableCell(
+                    text: medicine.currentStock!.toString(),
+                    isDeleted: medicine.deleted!
+                ),
+                _showMenu(index),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+
+/*
+  Widget _buildMedicineRow(int index) {
+    MedicineDTO1 medicine = _pageObject.content[index];
     return Container(
       decoration: BoxDecoration(
         color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
@@ -361,18 +435,36 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           4: FlexColumnWidth(_colCostPrice),
           5: FlexColumnWidth(_colSalePrice),
           6: FlexColumnWidth(_colStock),
-          8: FlexColumnWidth(_colMenu),
+          7: FlexColumnWidth(_colMenu),
         },
         children: [
           TableRow(
             children: [
               _buildControlledIcon(medicine),
-              _buildTableCell(text: medicine.name),
-              _buildTableCell(text: _buildPresentation(medicine.presentation!)),
-              _buildTableCell(text: dateToStr(medicine.lastAddDate!)),
-              _buildTableCell(text: medicine.lastCostPrice!.toString()),
-              _buildTableCell(text: medicine.lastSalePrice!.toString()),
-              _buildTableCell(text: medicine.currentStock!.toString()),
+              _buildTableCell(
+                text: medicine.name,
+                isDeleted: medicine.deleted!
+              ),
+              _buildTableCell(
+                text: _buildPresentation(medicine.presentation!),
+                isDeleted: medicine.deleted!
+              ),
+              _buildTableCell(
+                text: dateToStr(medicine.lastAddDate!),
+                isDeleted: medicine.deleted!
+              ),
+              _buildTableCell(
+                text: medicine.lastCostPrice!.toString(),
+                isDeleted: medicine.deleted!
+              ),
+              _buildTableCell(
+                text: medicine.lastSalePrice!.toString(),
+                isDeleted: medicine.deleted!
+              ),
+              _buildTableCell(
+                text: medicine.currentStock!.toString(),
+                isDeleted: medicine.deleted!
+              ),
               _showMenu(index),
             ],
           )
@@ -380,12 +472,13 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       ),
     );
   }
+*/
 
   TableCell _buildControlledIcon(MedicineDTO1 medicine) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: medicine.controlled != null && medicine.controlled!
-        ? controlledIcon()
+        ? controlledIcon(isDeleted: medicine.deleted!)
         : const SizedBox.shrink()
     );
   }
@@ -400,7 +493,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         onSelected: (menuItem) => _onSelected(context, menuItem, index),
         tooltip: 'Menú',
         itemBuilder: (context) => [
-          const PopupMenuItem<int>(
+          /*const PopupMenuItem<int>(
             value: 0,
             child: Row(
               children: [
@@ -419,36 +512,52 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
                 Text('opcion 2')
               ],
             ),
-          ),
-          const PopupMenuItem<int>(
-            value: 2,
-            child: Row(
-              children: [
-                Icon(Icons.delete, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Eliminar')
-              ],
-            ),
+          ),*/
+          PopupMenuItem<int>(
+            value: 0,
+            child: _buildDeleteOrRecover(index),
           ),
         ],
       ),
     );
   }
 
-  TableCell _buildTableCell({String? text, bool? alignRight}) {
+  Row _buildDeleteOrRecover(int index) {
+    if (! _pageObject.content[index].deleted!) {
+      return const Row(
+        children: [
+          Icon(Icons.delete, color: Colors.red),
+          SizedBox(width: 8),
+          Text('Eliminar', style: TextStyle(color: Colors.red),)
+        ],
+      );
+    } else {
+      return const Row(
+        children: [
+          Icon(Icons.delete_forever, color: Colors.green),
+          SizedBox(width: 8),
+          Text('Recuperar', style: TextStyle(color: Colors.green),)
+        ],
+      );
+    }
+  }
+
+  TableCell _buildTableCell({
+    String? text, bool alignRight = false, bool isDeleted = false}) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.middle,
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0),
         child: Align(
-          alignment: alignRight != null && alignRight
-            ? Alignment.centerRight
-            : Alignment.centerLeft,
-          child: Text(
-            text ?? '',
+          alignment: alignRight ? Alignment.centerRight : Alignment.centerLeft,
+          child: Text(text ?? '',
             overflow: TextOverflow.ellipsis,
-          )
-        ),
+            style: TextStyle(
+              color: isDeleted ? Colors.grey : Colors.black,
+              decoration: isDeleted ? TextDecoration.lineThrough : null
+            )
+          ),
+        )
       ),
     );
   }
@@ -456,116 +565,18 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   void _onSelected(BuildContext context, int menuItem, int index) {
     switch (menuItem) {
       case 0:
-        //_controlledMedications(index);
-        break;
-      case 1:
-        //_vouchersCustomer(index);
-        break;
-      case 2:
-        _delete(index);
+        _deleteOrRecover(index);
         break;
     }
   }
 
- /* Future<void> _vouchersCustomer(int index) async {
-    _toggleLoading();
-    //Verifico la existencia de por lo menos un voucher
-    await fetchDataObjectPageable(
-        uri: '$uriCustomerFindVouchersPage/${_medicineList[index].customerId}/0/1',
-        classObject: VoucherDTO1.empty(),
-    ).then((pageObject) {
-     if (pageObject.totalElements == 0) {
-       FloatingMessage.show(
-         context: context,
-         text: 'Sin datos',
-         messageTypeEnum: MessageTypeEnum.info,
-       );
-     } else {
-       CustomerDTO1 customer = _medicineList[index];
-       showDialog(
-         context: context,
-         builder: (context) {
-           return AlertDialog(
-             content: VouchersFromCustomerDialog(
-               customerId: customer.customerId!,
-               customerName: '${customer.lastname}, ${customer.name}',
-             ),
-           );
-         },
-       );
-     }
-    }).onError((error, stackTrace) {
-      String? msg;
-      if (error is ErrorObject) {
-          msg = error.message;
-      } else {
-        msg = error.toString().contains('XMLHttpRequest error')
-          ? 'Error de conexión'
-          : error.toString();
-      }
-      if (msg != null) {
-        FloatingMessage.show(
-          context: context,
-          text: msg,
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) print(error);
-      }
-    });
-    _toggleLoading();
-  }*/
-
- /* Future<void> _controlledMedications(int index) async {
-    _toggleLoading();
-    await fetchDataObject(
-      uri: '$uriCustomerFindControlledMedications/${_medicineList[index].customerId}',
-      classObject: ControlledMedicationDTO1.empty(),
-    ).then((value) {
-      _toggleLoading();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return ControlledMedicationListFromCustomerDialog(
-              customerName: '${_medicineList[index].lastname}, '
-                  '${_medicineList[index].name}',
-              medications: value as List<ControlledMedicationDTO1>
-          );
-        },
-      );
-    }).onError((error, stackTrace) {
-      _toggleLoading();
-      String? msg;
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-          FloatingMessage.show(
-            context: context,
-            text: 'Sin datos',
-            messageTypeEnum: MessageTypeEnum.info,
-          );
-        } else {
-          msg = error.message;
-        }
-
-      } else {
-        genericError(error!, context, isFloatingMessage: true);
-      }
-      if (msg != null) {
-        FloatingMessage.show(
-          context: context,
-          text: msg,
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) print(error);
-      }
-    });
-  }*/
-
-  Future<void> _delete(int index) async {
+  Future<void> _deleteOrRecover(int index) async {
     MedicineDTO1 medicineSelected = _pageObject.content[index];
+    bool isDelete = ! _pageObject.content[index].deleted!;
 
     int option = await OpenDialog(
       context: context,
-      title: 'Eliminar medicamento',
+      title: isDelete ? 'Eliminar medicamento' : 'Recuperar medicamento',
       content: '${medicineSelected.name} '
           '${medicineSelected.presentation!.name} '
           '${medicineSelected.presentation!.quantity} '
@@ -580,38 +591,40 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       _setLoading(true);
       try {
         await fetchDataObject<MedicineDTO1>(
-          uri: '$uriMedicineDelete/${medicineSelected.medicineId!}',
+          uri: '$uriMedicineDelete/${medicineSelected.medicineId!}/$isDelete',
           classObject: MedicineDTO1.empty(),
         );
-        setState(() {
-          _pageObject.content.removeAt(index);
-        });
-        FloatingMessage.show(
-          context: context,
-          text: 'Medicamento eliminado con éxito',
-          messageTypeEnum: MessageTypeEnum.info,
-        );
-      } catch (error) {
-        if (error is ErrorObject) {
+        //Recarga la lista
+        _nameFilterController.text.trim().isEmpty
+          ? _loadDataPageable()
+          : _loadDataFilterPageable();
+
+        if (mounted) {
           FloatingMessage.show(
             context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
+            text: 'Medicamento ${isDelete
+                ? 'eliminado'
+                : 'recuperado'} con éxito',
+            messageTypeEnum: MessageTypeEnum.info,
+          );
+        }
+      } catch (error) {
+        if (error is ErrorObject) {
+          if (mounted) {
+          FloatingMessage.show(
+            context: context,
+            text: '${error.message ?? 'Error indeterminado'} (${error
+                .statusCode})',
             messageTypeEnum: error.message != null
                 ? MessageTypeEnum.warning
                 : MessageTypeEnum.error,
           );
+        }
           if (kDebugMode) {
             print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
           }
-        } else {
-          FloatingMessage.show(
-            context: context,
-            text: 'Error obteniendo datos',
-            messageTypeEnum: MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('Error obteniendo datos: ${error.toString()}');
-          }
+        } else if (mounted) {
+            genericError(error, context);
         }
       } finally {
         _setLoading(false);

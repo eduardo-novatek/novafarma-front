@@ -122,10 +122,11 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   Future<void> _findByLastname() async {
+    if (_lastnameController.text.trim().isEmpty) return;
     await _updateCustomerList(
         isDocument: false,
         value: _lastnameController.text
-    ).then((value) {
+    ).then((value) {a27a
       if (_customerList.isNotEmpty) {
         if (_customerList.length == 1) {
           _updateSelectedClient(0);

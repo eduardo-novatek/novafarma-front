@@ -53,6 +53,8 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
   final _lastnameFilterFocusNode = FocusNode();
 
   bool _loading = false;
+  int _highlightedIndex = -1; //iluminacion de fila al pasar el mouse
+
   final Map<String, int> _metadata = {
     'pageNumber': 0,
     'totalPages': 0,
@@ -352,42 +354,53 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   Widget _buildCustomerRow(int index) {
     CustomerDTO1 customer = _customerList[index];
-    return Container(
-      decoration: BoxDecoration(
-        color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
+    return MouseRegion(
+      onEnter: (_) => setState(() {
+        _highlightedIndex = index;
+      }),
+      onExit: (_) => setState(() {
+        _highlightedIndex = -1;
+      }),
+      child: Container(
+        decoration: BoxDecoration(
+          color: _highlightedIndex == index
+              ? Colors.blue.shade50
+              : Colors.white,
+          //: (index % 2 == 0 ? Colors.white : Colors.grey.shade100),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.grey.shade200,
+            ),
           ),
         ),
-      ),
-      child: Table(
-        columnWidths: const {
-          0: FlexColumnWidth(_colLastname),
-          1: FlexColumnWidth(_colName),
-          2: FlexColumnWidth(_colDocument),
-          3: FlexColumnWidth(_colTelephone),
-          4: FlexColumnWidth(_colAddDate),
-          5: FlexColumnWidth(_colPayNumber),
-          6: FlexColumnWidth(_colPartner),
-          7: FlexColumnWidth(_colNotes),
-          8: FlexColumnWidth(_colMenu),
-        },
-        children: [
-          TableRow(
-            children: [
-              _buildTableCell(text: customer.lastname),
-              _buildTableCell(text: customer.name),
-              _buildTableCell(text: customer.document.toString()),
-              _buildTableCell(text: customer.telephone.toString()),
-              _buildTableCell(text: dateToStr(customer.addDate)),
-              _buildTableCell(text: customer.paymentNumber.toString()),
-              _buildTableCell(text: customer.partner! ? 'Sí' : 'No'),
-              _buildTableCellNotes(customer.notes!),
-              _showMenu(index),
-            ],
-          )
-        ],
+        child: Table(
+          columnWidths: const {
+            0: FlexColumnWidth(_colLastname),
+            1: FlexColumnWidth(_colName),
+            2: FlexColumnWidth(_colDocument),
+            3: FlexColumnWidth(_colTelephone),
+            4: FlexColumnWidth(_colAddDate),
+            5: FlexColumnWidth(_colPayNumber),
+            6: FlexColumnWidth(_colPartner),
+            7: FlexColumnWidth(_colNotes),
+            8: FlexColumnWidth(_colMenu),
+          },
+          children: [
+            TableRow(
+              children: [
+                _buildTableCell(text: customer.lastname),
+                _buildTableCell(text: customer.name),
+                _buildTableCell(text: customer.document.toString()),
+                _buildTableCell(text: customer.telephone.toString()),
+                _buildTableCell(text: dateToStr(customer.addDate)),
+                _buildTableCell(text: customer.paymentNumber.toString()),
+                _buildTableCell(text: customer.partner! ? 'Sí' : 'No'),
+                _buildTableCellNotes(customer.notes!),
+                _showMenu(index),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
