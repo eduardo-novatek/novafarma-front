@@ -21,6 +21,7 @@ import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart'
 import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
+import 'package:novafarma_front/view/dialogs/presentation_container_quantities_list_dialog.dart';
 
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto_1.dart';
@@ -170,7 +171,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
                 textForValidation: 'Ingrese un nombre de envase de hasta 20 caracteres',
                 acceptEmpty: false,
                 onEditingComplete: () async =>
-                await _searchPresentationContainerName()
+                await _searchContainerName()
               ),
             ),
             const SizedBox(height: 16,),
@@ -186,6 +187,9 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
                 viewCharactersCount: false,
                 textForValidation: 'Ingrese una cantidad de hasta 99999.99',
                 acceptEmpty: false,
+                onEditingComplete: () {
+                  _searchQuantities();
+                },
               ),
             ),
             const SizedBox(height: 16,),
@@ -235,7 +239,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     );
   }
 
-  Future<void> _searchPresentationContainerName() async {
+  Future<void> _searchContainerName() async {
     if (_nameController.text.trim().isEmpty) return;
     _changeStateLoading(true);
     String? containerSelected = await presentationContainerNameListDialog(
@@ -250,6 +254,23 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     }
     if (mounted) FocusScope.of(context).requestFocus(_quantityFocusNode);
   }
+
+  Future<void> _searchQuantities() async {
+    if (_nameController.text.trim().isEmpty) return;
+    _changeStateLoading(true);
+    double? quantitySelected = await presentationContainerQuantitiesListDialog(
+      presentationContainerName: _nameController.text.trim(),
+      context: context,
+    );
+    _changeStateLoading(false);
+    _isAdd = true;
+    if (quantitySelected != null) {
+      _quantityController.value = TextEditingValue(text: quantitySelected.toString());
+      _isAdd = false;
+    }
+    if (mounted) FocusScope.of(context).requestFocus(_quantityFocusNode);
+  }
+
 
   Widget _buildFooter() {
     return Padding(

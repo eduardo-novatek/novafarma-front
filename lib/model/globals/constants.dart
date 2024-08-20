@@ -40,7 +40,7 @@ const String uriRoleFindId = "/role/findId";
 const String uriUserAdd = "/user/add";
 const String uriUserFindAll = "/user/findAll";
 const String uriUserFindId = "/user/findId";
-const String uriUserNameExist = "user/userNameExist";
+const String uriUserNameExist = "/user/userNameExist";
 
 //Customer
 const String uriCustomerFindAll = "/customer/findAll";
@@ -81,19 +81,20 @@ const String uriVoucherAdd = "/voucher/add";
 const String uriVoucherFindVoucherItems = "/voucher/findVoucherItems";
 
 //Controlled Medication
-const String uriDateAuthorizationSale = "controlledMedication/dateAuthorizationSale";
+const String uriDateAuthorizationSale = "/controlledMedication/dateAuthorizationSale";
 const String uriControlledMedicationAdd = "/controlledMedication/add";
 
 //Presentations
 const String uriPresentationGetId = "/presentation/getId";
-const String uriPresentationFindName = "presentation/findName";
-const String uriPresentationFindNameOnly = "presentation/findNameOnly";
-const String uriPresentationFindAll = "presentation/findAll";
-const String uriPresentationAdd = "presentation/add";
-const String uriPresentationUpdate = "presentation/update";
+const String uriPresentationFindName = "/presentation/findName";
+const String uriPresentationFindNameOnly = "/presentation/findNameOnly";
+const String uriPresentationFindQuantities = "/presentation/findQuantities";
+const String uriPresentationFindAll = "/presentation/findAll";
+const String uriPresentationAdd = "/presentation/add";
+const String uriPresentationUpdate = "/presentation/update";
 
 //Units
 const String uriUnitFindAll = "/unit/findAll";
 const String uriUnitAdd = "/unit/add";
-const String uriUnitUpdate = "unit/update";
+const String uriUnitUpdate = "/unit/update";
 

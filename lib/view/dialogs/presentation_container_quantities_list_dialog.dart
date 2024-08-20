@@ -5,31 +5,30 @@ import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
-import '../../model/globals/constants.dart' show uriPresentationFindNameOnly;
+import '../../model/globals/constants.dart' show uriPresentationFindNameOnly, uriPresentationFindQuantities;
 import '../../model/globals/tools/create_key_pressed.dart' show isEscape;
 import '../../model/globals/tools/fetch_data.dart';
 
-///Dado el nombre un envase, carga una lista de envases que
-///coincida parcialmente en su nombre. Devuelve el envase seleccionado o null
-///si canceló o no hay coincidencias.
-Future<String?> presentationContainerNameListDialog({
+///Dado el nombre un envase, carga una lista cantidades relacionadas a dicho
+///envase que (coincida parcial en su nombre). Devuelve la cantiad seleccionada
+///o null si canceló o no existe el envase.
+Future<double?> presentationContainerQuantitiesListDialog({
   required String presentationContainerName,
   required BuildContext context,}) async {
 
-  String? containerSelected;
+  double? quantitySelected;
 
   await fetchData<String>(
-    uri: '$uriPresentationFindNameOnly/$presentationContainerName'
+    uri: '$uriPresentationFindQuantities/$presentationContainerName'
   ).then((data) async {
-    containerSelected = await showDialog(
+    quantitySelected = await showDialog(
       context: context,
       barrierDismissible: false, //modal
       builder: (BuildContext context) {
         return PopScope( //Evita salida con flecha atras del navegador
           canPop: false,
-          child: _ContainerNamesDialog(
-            presentationContainerList: data,
-            presentationContainerName: presentationContainerName,
+          child: _QuantitiesDialog(
+            quantityList: data as List<double>,
           ),
         );
       }
@@ -47,24 +46,22 @@ Future<String?> presentationContainerNameListDialog({
       genericError(error!, context);
     }
   });
-  return Future.value(containerSelected);
+  return Future.value(quantitySelected);
 }
 
 ///Devuelve el envase seleccionado o null si cancela
-class _ContainerNamesDialog extends StatefulWidget {
-  final String presentationContainerName;
-  final List<String> presentationContainerList;
+class _QuantitiesDialog extends StatefulWidget {
+  final List<double> quantityList;
 
-  const _ContainerNamesDialog({
-    required this.presentationContainerName,
-    required this.presentationContainerList
+  const _QuantitiesDialog({
+    required this.quantityList
   });
 
   @override
-  State<_ContainerNamesDialog> createState() => _ContainerNamesDialogState();
+  State<_QuantitiesDialog> createState() => _QuantitiesDialogState();
 }
 
-class _ContainerNamesDialogState extends State<_ContainerNamesDialog> {
+class _QuantitiesDialogState extends State<_QuantitiesDialog> {
   bool _loading = false;
 
   @override
@@ -109,12 +106,12 @@ class _ContainerNamesDialogState extends State<_ContainerNamesDialog> {
         const SizedBox(height: 8.0,),
         Flexible(
           child: ListView.builder(
-            itemCount: widget.presentationContainerList.length,
+            itemCount: widget.quantityList.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text(widget.presentationContainerList[index]),
+                title: Text(widget.quantityList[index].toString()),
                 onTap: () => Navigator.of(context).pop(
-                    widget.presentationContainerList[index]
+                    widget.quantityList[index]
                 ),
               );
             },
