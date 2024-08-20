@@ -126,7 +126,7 @@ class CustomerBoxState extends State<CustomerBox> {
     await _updateCustomerList(
         isDocument: false,
         value: _lastnameController.text
-    ).then((value) {a27a
+    ).then((value) {
       if (_customerList.isNotEmpty) {
         if (_customerList.length == 1) {
           _updateSelectedClient(0);

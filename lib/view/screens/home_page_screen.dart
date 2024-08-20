@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
 
+import 'add_or_update_presentation_screen.dart';
 import 'list_medicine_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -349,7 +350,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
         const PopupMenuItem<String>(
-          value: 'medicine_list',
+          value: 'presentation_list',
           child: ListTile(
             leading: Icon(Icons.list),
             title: Text('Listar presentaciones'),
@@ -359,9 +360,9 @@ class _HomePageScreenState extends State<HomePageScreen> {
     ).then((String? result) async {
       if (result != null) {
         Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
-        if (result == 'medicines_add_update') {
-
-        } else if (result == 'medicine_list') {
+        if (result == 'presentations_add_update') {
+          await _goAddOrUpdatePresentationScreen();
+        } else if (result == 'presentation_list') {
           // Acción para listar medicamentos
         }
       }
@@ -427,6 +428,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Future<void> _goAddOrUpdateMedicineScreen() async {
     setState(() {
       _currentWidget = AddOrUpdateMedicineScreen(
+        onBlockedStateChange: (block) {
+          setState(() {
+            _enableMenu = !block;
+          });
+        },
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _goAddOrUpdatePresentationScreen() async {
+    setState(() {
+      _currentWidget = AddOrUpdatePresentationScreen(
         onBlockedStateChange: (block) {
           setState(() {
             _enableMenu = !block;

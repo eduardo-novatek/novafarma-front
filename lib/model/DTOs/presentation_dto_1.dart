@@ -4,7 +4,7 @@ import 'package:novafarma_front/model/globals/deserializable.dart';
 class PresentationDTO1 extends Deserializable<PresentationDTO1> {
   int? presentationId;
   String? name;
-  int? quantity;
+  double? quantity;
   UnitDTO1? unit;
   //final bool? isFirst;
 
