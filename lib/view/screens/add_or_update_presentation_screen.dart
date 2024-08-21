@@ -56,10 +56,12 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   final _formKey = GlobalKey<FormState>();
   final _formBarCodeKey = GlobalKey<FormState>();
 
-  final _nameController = TextEditingController();
+  final _currentContainerController = TextEditingController();
+  final _newNameController = TextEditingController();
   final _quantityController = TextEditingController();
 
-  final _nameFocusNode = FocusNode();
+  final _currentContainerFocusNode = FocusNode();
+  final _newNameFocusNode = FocusNode();
   final _quantityFocusNode = FocusNode();
   final _unitNameFocusNode = FocusNode();
 
@@ -82,10 +84,12 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _currentContainerController.dispose();
+    _newNameController.dispose();
     _quantityController.dispose();
 
-    _nameFocusNode.dispose();
+    _currentContainerFocusNode.dispose();
+    _newNameFocusNode.dispose();
     _quantityFocusNode.dispose();
     _unitNameFocusNode.dispose();
     super.dispose();
@@ -163,15 +167,32 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
               width: 190,
               child: CreateTextFormField(
                 label: 'Envase',
-                controller: _nameController,
-                focusNode: _nameFocusNode,
+                controller: _currentContainerController,
+                focusNode: _currentContainerFocusNode,
                 dataType: DataTypeEnum.text,
                 maxValueForValidation: 20,
                 viewCharactersCount: false,
-                textForValidation: 'Ingrese un nombre de envase de hasta 20 caracteres',
+                textForValidation: 'Máximo 20 caracteres',
                 acceptEmpty: false,
                 onEditingComplete: () async =>
                 await _searchContainerName()
+              ),
+            ),
+            const SizedBox(height: 16,),
+            SizedBox(
+              width: 190,
+              child: CreateTextFormField(
+                  label: 'Nuevo envase',
+                  controller: _newNameController,
+                  focusNode: _newNameFocusNode,
+                  dataType: DataTypeEnum.text,
+                  maxValueForValidation: 20,
+                  viewCharactersCount: false,
+                  textForValidation: 'Máximo 20 caracteres',
+                  acceptEmpty: true,
+                  onEditingComplete: () {
+                    FocusScope.of(context).requestFocus(_quantityFocusNode);
+                  },
               ),
             ),
             const SizedBox(height: 16,),
@@ -240,26 +261,32 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   }
 
   Future<void> _searchContainerName() async {
-    if (_nameController.text.trim().isEmpty) return;
+    if (_currentContainerController.text.trim().isEmpty) return;
     _changeStateLoading(true);
     String? containerSelected = await presentationContainerNameListDialog(
-        presentationContainerName: _nameController.text.trim(),
+        presentationContainerName: _currentContainerController.text.trim(),
         context: context,
     );
     _changeStateLoading(false);
     _isAdd = true;
     if (containerSelected != null) {
-      _nameController.value = TextEditingValue(text: containerSelected);
+      _currentContainerController.value = TextEditingValue(text: containerSelected);
       _isAdd = false;
     }
-    if (mounted) FocusScope.of(context).requestFocus(_quantityFocusNode);
+    _newNameController.value = TextEditingValue(text: containerSelected ?? '');
+    if (mounted) {
+      FocusScope.of(context).requestFocus(_isAdd!
+        ? _quantityFocusNode
+        : _newNameFocusNode
+      );
+    }
   }
 
   Future<void> _searchQuantities() async {
-    if (_nameController.text.trim().isEmpty) return;
+    if (_currentContainerController.text.trim().isEmpty) return;
     _changeStateLoading(true);
     double? quantitySelected = await presentationContainerQuantitiesListDialog(
-      presentationContainerName: _nameController.text.trim(),
+      presentationContainerName: _currentContainerController.text.trim(),
       context: context,
     );
     _changeStateLoading(false);
@@ -302,7 +329,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   }
 
   bool _disableAcceptButton() =>
-    _nameController.text.trim().isEmpty
+    _currentContainerController.text.trim().isEmpty
       || _quantityController.text.trim().isEmpty
       || _unitSelected == defaultFirstOption
       || _unitSelected == defaultLastOption;
@@ -315,7 +342,9 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   Future<void> _submitForm() async {
     _changeStateLoading(true);
     PresentationDTO presentationDTO = PresentationDTO(
-        name: _nameController.text.trim(),
+        name: _newNameController.text.trim().isEmpty
+          ? _currentContainerController.text.trim()
+          : _newNameController.text.trim(),
         quantity: double.parse(_quantityController.text),
         unitName: _unitSelected
     );
@@ -331,7 +360,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     if (_presentationId == 0) {
       try {
         PresentationDTO1 presentationDTO1 = PresentationDTO1(
-            name: _nameController.text.trim(),
+            name: _currentContainerController.text.trim(),
             quantity: double.parse(_quantityController.text),
             unit: UnitDTO1(unitId: _getSelectedUnitId())
         );
@@ -694,7 +723,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
 
   void _initialize() {
     setState(() {
-      _nameController.value = TextEditingValue.empty;
+      _currentContainerController.value = TextEditingValue.empty;
       _quantityController.value = TextEditingValue.empty;
       _unitSelected = defaultFirstOption;
     });

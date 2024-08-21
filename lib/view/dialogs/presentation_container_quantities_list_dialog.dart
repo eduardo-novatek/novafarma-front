@@ -1,7 +1,9 @@
 import 'dart:html';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -18,7 +20,7 @@ Future<double?> presentationContainerQuantitiesListDialog({
 
   double? quantitySelected;
 
-  await fetchData<String>(
+  await fetchData<double>(
     uri: '$uriPresentationFindQuantities/$presentationContainerName'
   ).then((data) async {
     quantitySelected = await showDialog(
@@ -27,9 +29,7 @@ Future<double?> presentationContainerQuantitiesListDialog({
       builder: (BuildContext context) {
         return PopScope( //Evita salida con flecha atras del navegador
           canPop: false,
-          child: _QuantitiesDialog(
-            quantityList: data as List<double>,
-          ),
+          child: _QuantitiesDialog(quantityList: data),
         );
       }
     );
@@ -85,50 +85,98 @@ class _QuantitiesDialogState extends State<_QuantitiesDialog> {
         borderRadius: BorderRadius.zero, // Esquinas rectas
       ),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.2,
-        height: MediaQuery.of(context).size.height * 0.6,
+        width: 80,
+        height: 340,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             _loading
-              ? const Expanded(child: Center(child: CircularProgressIndicator()))
-              : Flexible(child: _buildColumn(context)),
-          ]
+                ? const CircularProgressIndicator()
+                : _buildColumn(context),
+          ],
         ),
       ),
     );
   }
 
-  Column _buildColumn(BuildContext context) {
+  Widget _buildColumn(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 8.0,),
-        Flexible(
+        SizedBox(
+          height: 250,
           child: ListView.builder(
             itemCount: widget.quantityList.length,
             itemBuilder: (context, index) {
               return ListTile(
-                title: Text(widget.quantityList[index].toString()),
-                onTap: () => Navigator.of(context).pop(
-                    widget.quantityList[index]
+                title: Text(
+                  widget.quantityList[index].toString(),
                 ),
+                onTap: () => Navigator.of(context).pop(widget.quantityList[index]),
               );
             },
-          )
-
+          ),
         ),
         const Divider(),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0),
           child: ElevatedButton(
-            onPressed: () =>Navigator.of(context).pop(null),
+            onPressed: () => Navigator.of(context).pop(null),
             child: const Text('Cancelar'),
           ),
-        )
-      ]
+        ),
+      ],
     );
   }
+
+
+  /* @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero, // Esquinas rectas
+      ),
+      child: SizedBox(
+        width: 80, // Ancho deseado
+        height: 340, // Altura deseada
+        child: Column(
+          children: [
+            _loading
+                ? const CircularProgressIndicator()
+                : _buildColumn(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColumn(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 250,
+          child: ListView.builder(
+            itemCount: widget.quantityList.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(
+                  widget.quantityList[index].toString(),
+                  textAlign: TextAlign.center,
+                ),
+                onTap: () => Navigator.of(context).pop(widget.quantityList[index]),
+              );
+            },
+          ),
+        ),
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20.0),
+          child: ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(null),
+            child: const Text('Cancelar'),
+          ),
+        ),
+      ],
+    );
+  }*/
 
   void setLoading(bool loading) {
     setState(() {
