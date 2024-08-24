@@ -8,7 +8,7 @@ import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriPresentationAdd, uriPresentationUpdate;
 import '../tools/fetch_data_object.dart';
 
-///Devuelve el id de la presentacion persistida o id=0 si hubo un error
+///Devuelve el id de la presentacion persistida/modificada, o id=0 si hubo un error
 Future<int> addOrUpdatePresentation({
   required PresentationDTO1 presentation,
   required bool isAdd,

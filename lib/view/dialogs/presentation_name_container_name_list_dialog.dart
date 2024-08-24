@@ -9,7 +9,7 @@ import '../../model/globals/constants.dart' show uriPresentationFindNameOnly;
 import '../../model/globals/tools/create_key_pressed.dart' show isEscape;
 import '../../model/globals/tools/fetch_data.dart';
 
-///Dado el nombre un envase, carga una lista de envases que
+///Dado el nombre un envase, carga una lista de nombres de envases que
 ///coincida parcialmente en su nombre. Devuelve el envase seleccionado o null
 ///si canceló o no hay coincidencias.
 Future<String?> presentationContainerNameListDialog({

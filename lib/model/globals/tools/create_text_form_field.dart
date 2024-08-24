@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 class CreateTextFormField extends StatefulWidget {
   final bool validate;
+  final bool enabled;
   final bool acceptEmpty;
   final String label;
   final double? minValueForValidation;  //si es texto, es el largo minimo. Si es numero, es el valor minimo,...
@@ -29,6 +30,7 @@ class CreateTextFormField extends StatefulWidget {
     required this.controller,
     required this.label,
     required this.dataType,
+    this.enabled = true,
     this.validationStates,
     this.maxLines = 1, //solo para campos de texto
     this.viewCharactersCount = true,
@@ -82,6 +84,7 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
         TextFormField (
           focusNode: widget.focusNode,
           controller: widget.controller,
+          enabled: widget.enabled,
           autofocus: widget.initialFocus!,
           keyboardType: _determinateInputType(),
           maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,

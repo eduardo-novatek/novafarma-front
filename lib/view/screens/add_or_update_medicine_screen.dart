@@ -30,7 +30,7 @@ import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/medicine_and_presentation_list_dialog.dart';
-import '../dialogs/presentation_container_name_list_dialog.dart';
+import '../dialogs/presentation_name_container_name_list_dialog.dart';
 import '../dialogs/unit_show_dialog.dart';
 
 class AddOrUpdateMedicineScreen extends StatefulWidget {
@@ -497,12 +497,14 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
             String msg = 'La unidad de medida $_unitSelected fué eliminada por '
                 'otro usuario.\nLa lista ha sido actualizada.';
 
-            FloatingMessage.show(
-                context: context,
-                text: msg,
-                messageTypeEnum: MessageTypeEnum.warning,
-                secondsDelay: 8
-            );
+            if (mounted) {
+              FloatingMessage.show(
+                  context: context,
+                  text: msg,
+                  messageTypeEnum: MessageTypeEnum.warning,
+                  secondsDelay: 8
+              );
+            }
             _loadUnits(false);
             setState(() {
               _unitSelected = defaultFirstOption;
@@ -511,11 +513,13 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
           }
         } else {
           if (error.toString().contains('XMLHttpRequest error')) {
-            FloatingMessage.show(
+            if (mounted) {
+              FloatingMessage.show(
                 context: context,
                 text: 'Error de conexión',
                 messageTypeEnum: MessageTypeEnum.error,
-            );
+              );
+            }
           }
         }
         _changeStateLoading(false);
