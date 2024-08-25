@@ -95,7 +95,6 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _nameController.dispose();
     _presentationContainerController.dispose();
     _presentationQuantityController.dispose();
@@ -115,6 +114,9 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     _lastSalePriceFocusNode.dispose();
     _currentStockFocusNode.dispose();
     _controlledFocusNode.dispose();
+
+    _barCodeFocusNode.removeListener(() {_barCodeListener;});
+    super.dispose();
   }
 
   @override

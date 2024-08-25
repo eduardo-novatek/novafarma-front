@@ -11,7 +11,6 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriCustomerFindPaymentNumber;
 import 'package:novafarma_front/model/globals/generic_error.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -76,7 +75,6 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _documentController.dispose();
     _dateController.dispose();
     _lastnameController.dispose();
@@ -92,6 +90,10 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     _notesFocusNode.dispose();
     _telephoneFocusNode.dispose();
     _paymentNumberFocusNode.dispose();
+
+    _documentFocusNode.removeListener(() {_documentListener;});
+    _dateFocusNode.removeListener(() {_dateListener;});
+    super.dispose();
   }
 
   @override
@@ -511,7 +513,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
   }
 
-  Future<void> _registeredDocumentNovaDaily() async {
+ /* Future<void> _registeredDocumentNovaDaily() async {
     List<PartnerNovaDailyDTO> _partnerNovaDailyList = [];
     _changeStateLoading(true);
 
@@ -566,7 +568,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     //if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
     //return Future.value(registered);
 
-  }
+  }*/
 
   /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
   void _updateFields(Object customer) {

@@ -764,14 +764,14 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     );
   }
 
-  void _pushFocus({required BuildContext context, required bool isBarCode}) {
+ /* void _pushFocus({required BuildContext context, required bool isBarCode}) {
     setState(() {
       Future.delayed(const Duration(milliseconds: 10), (){
         FocusScope.of(context)
             .requestFocus(isBarCode ? _barCodeFocusNode : _quantityFocusNode); //foco vuelve al campo
       });
     });
-  }
+  }*/
 
   void _initialize({required bool initializeCodeBar}) {
     setState(() {

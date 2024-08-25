@@ -1,10 +1,8 @@
 
-import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/medicine_dto2.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
@@ -13,10 +11,7 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption,
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
-import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_presentation_id.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -24,15 +19,11 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/presentation_container_list_dialog.dart';
 import 'package:novafarma_front/view/dialogs/presentation_container_quantities_list_dialog.dart';
 
-import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto_1.dart';
-import '../../model/globals/publics.dart' show userLogged;
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
-import '../dialogs/medicine_and_presentation_list_dialog.dart';
-import '../dialogs/presentation_name_container_name_list_dialog.dart';
 import '../dialogs/unit_show_dialog.dart';
 
 class AddOrUpdatePresentationScreen extends StatefulWidget {
@@ -55,7 +46,6 @@ class AddOrUpdatePresentationScreen extends StatefulWidget {
 
 class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _formBarCodeKey = GlobalKey<FormState>();
 
   final _currentContainerController = TextEditingController();
   final _newNameController = TextEditingController();
@@ -93,8 +83,9 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     _newNameFocusNode.dispose();
     _quantityFocusNode.dispose();
     _unitNameFocusNode.dispose();
-    super.dispose();
 
+    _currentContainerFocusNode.removeListener(_currentContainerListener);
+    super.dispose();
   }
 
   @override
@@ -176,13 +167,12 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
                 textForValidation: 'Máximo 20 caracteres',
                 acceptEmpty: false,
                 onEditingComplete: () async {
-                  _currentContainerFocusNode.removeListener(() =>
-                    _currentContainerListener
-                  );
+                  //Borra el evento del listener para evitar la doble llamada
+                  //a _searchContainerName, que se desencadenaría en el listener
+                  _currentContainerFocusNode.removeListener(_currentContainerListener);
+                  _currentContainerFocusNode.unfocus();
                   await _searchContainerName();
-                  _currentContainerFocusNode.addListener(() =>
-                    _currentContainerListener
-                  );
+                  _currentContainerFocusNode.addListener(_currentContainerListener);
                 }
               ),
             ),
@@ -217,8 +207,8 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
                 viewCharactersCount: false,
                 textForValidation: 'Requerido (máx: 99999.99)',
                 acceptEmpty: false,
-                onEditingComplete: () {
-                  _searchQuantities();
+                onEditingComplete: () async {
+                  await _searchQuantities();
                 },
               ),
             ),
@@ -233,8 +223,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Unidad',
+                        const Text('Unidad',
                           style: TextStyle(fontSize: 12),
                         ),
                         _buildRefreshUnitsButton(),
@@ -321,14 +310,22 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
       context: context,
     );
     _changeStateLoading(false);
-    //_isAdd = true;
     if (quantitySelected != null) {
       _quantityController.value = TextEditingValue(text: quantitySelected.toString());
-      _isAdd = false;
+      setState(() {
+        _isAdd = false;
+      });
     }
-    if (mounted) FocusScope.of(context).requestFocus(_quantityFocusNode);
+    //addPostFrameCallback garantiza que la asignación del foco ocurra después
+    //de que se complete el renderizado del cuadro de texto.
+    //Otra opción sería mediante Future.delayed...
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        FocusScope.of(context).requestFocus(_unitNameFocusNode);
+        FocusScope.of(context).nextFocus();
+      }
+    });
   }
-
 
   Widget _buildFooter() {
     return Padding(
@@ -364,11 +361,6 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
       || _quantityController.text.trim().isEmpty
       || _unitSelected == defaultFirstOption
       || _unitSelected == defaultLastOption;
-  /*_isAdd == null
-      || _nameController.text.trim().isEmpty
-      || _quantityController.text.trim().isEmpty
-      || _unitSelected == defaultFirstOption
-      || _unitSelected == defaultLastOption;*/
 
   Future<void> _submitForm() async {
     _changeStateLoading(true);
@@ -474,184 +466,16 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   }
 
   void _createListeners() {
-    _currentContainerFocusNode.addListener(() => _currentContainerListener);
-    //_currentContainerListener();
+    _currentContainerFocusNode.addListener(_currentContainerListener);
   }
 
-  void _currentContainerListener() {
-    //_currentContainerFocusNode.addListener(() {
-      if (!_currentContainerFocusNode.hasFocus) {
-        _searchContainerName();
-      } else if (_currentContainerFocusNode.hasFocus) {
-        _initialize();
-      }
-    //});
+  Future<void> _currentContainerListener() async {
+    if (!_currentContainerFocusNode.hasFocus) {
+      await _searchContainerName();
+    } else if (_currentContainerFocusNode.hasFocus) {
+      _initialize();
+    }
   }
-
-  /// true/false si el codigo de barras ya existe/no existe;
-  /// null si se lanzó un error.
-  /*Future<bool?> _isRegisteredBarCode() async {
-    bool? registered = false;
-    MedicineDTO1? medicine = MedicineDTO1.empty();
-
-    _changeStateLoading(true);
-    try {
-      await fetchMedicineBarCode(
-          barCode: _barCodeController.value.text.trim(),
-          medicine: medicine,
-      );
-      if (medicine.medicineId != null) {
-        if (! medicine.deleted!) {
-          _updateFields(medicine);
-          registered = true;
-        } else {
-          throw ErrorObject(
-            statusCode: HttpStatus.conflict,
-            message: 'El medicamento está eliminado'
-          );
-        }
-      }
-
-    } catch (error) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-          registered = false;
-        } else {
-          registered = null;
-          if (error.message!.contains('El medicamento está eliminado')) {
-            FloatingMessage.show(
-              context: context,
-              text: error.message!,
-              messageTypeEnum: MessageTypeEnum.warning
-            );
-          } else {
-            await OpenDialog(
-                context: context,
-                title: 'Error',
-                content: error.message != null
-                    ? error.message!
-                    : 'Error ${error.statusCode}'
-            ).view();
-          }
-        }
-      } else {
-        registered = null;
-        if (error.toString().contains('XMLHttpRequest error')) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException')) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }
-      }
-    } finally {
-      _changeStateLoading(false);
-    }
-    if (registered == null && mounted) {
-      FocusScope.of(context).removeListener(() {_barCodeFocusNode;});
-      FocusScope.of(context).requestFocus(_barCodeFocusNode);
-      FocusScope.of(context).addListener(() {_barCodeFocusNode;});
-    }
-    return Future.value(registered);
-  }*/
-
-  /*
-  /// true/false si el medicamento (nombre+presentacion) ya existe/no existe;
-  /// null si se lanzó un error.
-  Future<bool?> _isRegisteredMedicine() async {
-    bool? registered = false;
-    List<MedicineDTO1> medicineList = [];
-
-    _changeStateLoading(true);
-    try {
-      await fetchSupplierList(
-          supplierList: medicineList,
-          uri: '$uriSupplierFindName/${_nameController.text.trim()}'
-      );
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SupplierSelectionDialog(
-            suppliers: medicineList,
-            onSelect: (index) {
-              //Si no canceló
-              if (index != -1) {
-                _updateFields(medicineList[index]);
-                registered = true;
-                //Canceló...Si encontró solo uno y es el mismo nombre...
-              } else if (medicineList.length == 1
-                  && _nameController.text.trim().toUpperCase()
-                      == medicineList[0].name) {
-                registered = null;
-              }
-            },
-          );
-        }
-      );
-    } catch (error) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-          registered = false;
-        } else {
-          registered = null;
-          await OpenDialog(
-              context: context,
-              title: 'Error',
-              content: error.message != null
-                  ? error.message!
-                  : 'Error ${error.statusCode}'
-          ).view();
-        }
-      } else {
-        registered = null;
-        if (error.toString().contains('XMLHttpRequest error')) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException')) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }
-      }
-    } finally {
-      _changeStateLoading(false);
-    }
-    if (registered == null && mounted) {
-      FocusScope.of(context).removeListener(() {_nameFocusNode;});
-      FocusScope.of(context).requestFocus(_nameFocusNode);
-      FocusScope.of(context).addListener(() {_nameFocusNode;});
-    }
-
-    return Future.value(registered);
-  }
-*/
 
   ///Antes de actualizar la var. _unitSelected, chequea que la unidad de medida
   ///exista en la lista. Si no existe, refresca las unidades.
@@ -696,17 +520,19 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   }
 
   void _changeStateLoading(bool isLoading) {
-    setState(() {
-      _isLoading = isLoading;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = isLoading;
+      });
+    }
     widget.onBlockedStateChange!(isLoading);
   }
 
   Future<void> _loadUnits(bool isInitState) async {
-    if (isInitState) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (isInitState && mounted) {
+        setState(() {
+          _isLoading = true;
+        });
     } else {
       _changeStateLoading(true);
     }
@@ -730,7 +556,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
       genericError(error!, context);
     });
 
-    if (isInitState) {
+    if (isInitState && mounted) {
       setState(() {
         _isLoading = false;
       });
@@ -784,6 +610,5 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
       });
     }
   }
-
 
 }

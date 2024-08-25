@@ -1,13 +1,11 @@
 import 'dart:html';
 
-import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 
 import '../../DTOs/medicine_dto1.dart';
 import '../../objects/error_object.dart';
 import '../constants.dart' show uriMedicineFindBarCode;
 import '../tools/fetch_data_object.dart';
-import '../tools/floating_message.dart';
 
 Future<void> fetchMedicineBarCode({
   required String barCode,

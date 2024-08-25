@@ -1,13 +1,11 @@
 import 'dart:html';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
-import '../../model/globals/constants.dart' show uriPresentationFindNameOnly, uriPresentationFindQuantities;
+import '../../model/globals/constants.dart' show uriPresentationFindQuantities;
 import '../../model/globals/tools/create_key_pressed.dart' show isEscape;
 import '../../model/globals/tools/fetch_data.dart';
 

@@ -6,9 +6,8 @@ import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/presentation_dto.dart';
-import '../../model/globals/constants.dart' show uriPresentationFindName, uriPresentationFindNameOnly;
+import '../../model/globals/constants.dart' show uriPresentationFindName;
 import '../../model/globals/tools/create_key_pressed.dart' show isEscape;
-import '../../model/globals/tools/fetch_data.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
 
 ///Dado el nombre un envase, carga una lista de envases (presentaciones) que
