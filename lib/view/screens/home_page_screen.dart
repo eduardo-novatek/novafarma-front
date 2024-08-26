@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
+import 'package:novafarma_front/view/screens/list_presentation_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
   final String title;
@@ -360,7 +361,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         if (result == 'presentations_add_update') {
           await _goAddOrUpdatePresentationScreen();
         } else if (result == 'presentation_list') {
-          // Acción para listar medicamentos
+          await _goListPresentationScreen();
         }
       }
     });
@@ -500,6 +501,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Future<void> _goListMedicineScreen() async {
     setState(() {
       _currentWidget = ListMedicineScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _goListPresentationScreen() async {
+    setState(() {
+      _currentWidget = ListPresentationScreen(
         onCancel: () {
           setState(() {
             _currentWidget = msgHomeScreen;

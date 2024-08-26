@@ -7,6 +7,7 @@ const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server Nov
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
 const int sizePageMedicineList = 20;
+const int sizePagePresentationList = 20;
 const int sizePageVoucherListOfCustomer = 8;
 const int sizePageVoucherListOfSupplier = 8;
 const int sizePageMedicineAndPresentationList = 8;
@@ -92,6 +93,7 @@ const String uriPresentationFindQuantities = "/presentation/findQuantities";
 const String uriPresentationFindAll = "/presentation/findAll";
 const String uriPresentationAdd = "/presentation/add";
 const String uriPresentationUpdate = "/presentation/update";
+const String uriPresentationDelete = "/presentation/delete";
 
 //Units
 const String uriUnitFindAll = "/unit/findAll";

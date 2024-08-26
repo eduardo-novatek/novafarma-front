@@ -54,6 +54,10 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
+    } else if (requestType == RequestTypeEnum.delete){
+      response = await http.delete(url)
+          .timeout(const Duration(seconds: timeOutSecondsResponse));
+
     } else {
       response = await http.get(url)
           .timeout(const Duration(seconds: timeOutSecondsResponse));
