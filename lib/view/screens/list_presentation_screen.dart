@@ -12,7 +12,7 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/constants.dart' show sizePageMedicineList, sizePagePresentationList, uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage, uriPresentationDelete, uriPresentationFindAll;
+import '../../model/globals/constants.dart' show sizePageMedicineList, sizePagePresentationList, uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage, uriPresentationDelete, uriPresentationFindAll, uriPresentationFindName;
 import '../../model/globals/tools/date_time.dart' show dateToStr;
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/fetch_data_object_pageable.dart';
@@ -132,7 +132,7 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
                   ),
                   onSubmitted: (value) {
                     //_pageObject.pageNumber = 0; //Indica que el filtro cargue la primera pagina
-                    //_loadDataFilterPageable();
+                    _loadDataFilter();
                   },
                 ),
               ),
@@ -213,15 +213,14 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
   }
 
   Widget _buildFooter() {
+    if(_nameFilterController.text.trim().isNotEmpty) {
+      return const SizedBox.shrink();
+    }
     return PaginationBar(
       totalPages: _pageObject.totalPages,
       initialPage: _pageObject.pageNumber + 1,
       onPageChanged: (page) {
         _pageObject.pageNumber = page - 1;
-        /*_nameFilterController.text.trim().isNotEmpty
-          ? _loadDataFilterPageable()
-          : _loadDataPageable();
-         */
         _loadDataPageable();
       },
     );
@@ -279,27 +278,21 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
       _loading = loading;
     });
   }
-/*
-  Future<void> _loadDataFilterPageable() async {
+
+  Future<void> _loadDataFilter() async {
     if (_nameFilterController.text.trim().isEmpty) {
       _loadDataPageable();
       return;
     }
     _setLoading(true);
-    await fetchDataObjectPageable<MedicineDTO1>(
-      uri: '$uriMedicineFindNamePage'
-          '/${_nameFilterController.text.trim()}'
-          '/true' //busqeda con like
-          '/true' //incluye eliminados
-          '/${_pageObject.pageNumber}'
-          '/$sizePageMedicineList',
-      classObject: MedicineDTO1.empty(),
-    ).then((pageObjectResult) {
+    await fetchDataObject<PresentationDTO>(
+      uri: '$uriPresentationFindName/${_nameFilterController.text.trim()}',
+      classObject: PresentationDTO.empty(),
+    ).then((data) {
       _pageObject.content.clear();
       _pageObject.content.addAll(
-          pageObjectResult.content as Iterable<MedicineDTO1>
+          data as Iterable<PresentationDTO>
       );
-      _updatePageObject(pageObjectResult);
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
@@ -325,7 +318,7 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
     });
     _setLoading(false);
   }
-*/
+
 
   void _clearFilter() {
     if (_nameFilterController.text.trim().isNotEmpty) {
@@ -468,11 +461,9 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
           requestType: RequestTypeEnum.delete
         );
         //Recarga la lista
-        /*_nameFilterController.text.trim().isEmpty
+        _nameFilterController.text.trim().isEmpty
           ? _loadDataPageable()
-          : _loadDataFilterPageable();
-         */
-        _loadDataPageable();
+          : _loadDataFilter();
 
         if (mounted) {
           FloatingMessage.show(
