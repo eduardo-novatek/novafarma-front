@@ -31,7 +31,7 @@ import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/medicine_and_presentation_list_dialog.dart';
 import '../dialogs/presentation_name_container_name_list_dialog.dart';
-import '../dialogs/unit_show_dialog.dart';
+import '../dialogs/unit_add_dialog.dart';
 
 class AddOrUpdateMedicineScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
@@ -953,7 +953,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   }*/
 
   Future<void> _addUnit() async {
-    final String? unit = await unitShowDialog(context: context);
+    final String? unit = await unitAddDialog(context: context);
     if (unit != null) {
       await _loadUnits(false).then((_) {
         if (mounted) {

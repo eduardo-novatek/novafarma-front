@@ -302,6 +302,10 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
       return [MaskTextInputFormatter(mask: '##/##/####')];
     } else if (widget.dataType == DataTypeEnum.number) {
       return [FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*$')),];
+    } else if (widget.dataType == DataTypeEnum.text) {
+      return [FilteringTextInputFormatter.allow(
+        RegExp(r'[a-zA-Z0-9\s().:,!\-_ñÑ]')
+      )];
     }
     return [];
   }

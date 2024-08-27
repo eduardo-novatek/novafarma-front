@@ -13,7 +13,7 @@ import '../../model/globals/tools/open_dialog.dart';
 
 ///Permite el alta de una nueva unidad de medida. Devuelve el nombre de la
 ///nueva unidad persistida o null si ocurrió un error
-Future<String?> unitShowDialog(
+Future<String?> unitAddDialog(
     {UnitDTO? unitDTO, required BuildContext context,}
 ) async {
 

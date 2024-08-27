@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/view/dialogs/unit_add_dialog.dart';
 import 'package:novafarma_front/view/screens.dart';
 import 'package:novafarma_front/view/screens/list_presentation_screen.dart';
+
+import 'add_or_update_unit_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
   final String title;
@@ -398,7 +401,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       if (result != null) {
         Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
         if (result == 'units_add_update') {
-
+          await _goAddOrUpdateUnitsScreen();
         } else if (result == 'units_list') {
           // Acción para listar medicamentos
         }
@@ -485,6 +488,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
       );
     });
   }
+
+  Future<void> _goAddOrUpdateUnitsScreen() async {
+    setState(() {
+      _currentWidget = AddOrUpdateUnitScreen(
+        onBlockedStateChange: (block) {
+          setState(() {
+            _enableMenu = !block;
+          });
+        },
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
 
   Future<void> _goListSupplierScreen() async {
     setState(() {

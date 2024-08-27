@@ -9,6 +9,9 @@ Future<void> genericError(
   {bool isFloatingMessage = false}
   ) async {
 
+  //Para los casos en que Future.value(0)
+  if (error is int && error == 0) return Future.value();
+
   if (error.toString().contains('XMLHttpRequest error')) {
     if (isFloatingMessage) {
       FloatingMessage.show(

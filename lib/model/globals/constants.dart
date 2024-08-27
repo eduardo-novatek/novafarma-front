@@ -97,6 +97,7 @@ const String uriPresentationDelete = "/presentation/delete";
 
 //Units
 const String uriUnitFindAll = "/unit/findAll";
+const String uriUnitFindNameLike = "/unit/findNameLike";
 const String uriUnitAdd = "/unit/add";
 const String uriUnitUpdate = "/unit/update";
 

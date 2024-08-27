@@ -1,9 +1,7 @@
-
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
@@ -12,21 +10,20 @@ import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstO
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
+import 'package:novafarma_front/model/globals/requests/add_or_update_unit.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
-import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
-import 'package:novafarma_front/view/dialogs/presentation_container_list_dialog.dart';
 import 'package:novafarma_front/view/dialogs/presentation_container_quantities_list_dialog.dart';
 
 import '../../model/DTOs/presentation_dto_1.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
-import '../../model/globals/tools/custom_dropdown.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/unit_add_dialog.dart';
+import '../dialogs/unit_list_dialog.dart';
 
-class AddOrUpdatePresentationScreen extends StatefulWidget {
+class AddOrUpdateUnitScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
   // parámetros y no devuelve ningún valor. En este caso, se utiliza para
   // definir el tipo del callback onCancel, que se llamará cuando el usuario
@@ -34,36 +31,30 @@ class AddOrUpdatePresentationScreen extends StatefulWidget {
   final ui.VoidCallback onCancel;
   final ValueChanged<bool>? onBlockedStateChange;
 
-  const AddOrUpdatePresentationScreen({
+  const AddOrUpdateUnitScreen({
     super.key,
     this.onBlockedStateChange,
     required this.onCancel,
   });
 
   @override
-  State<AddOrUpdatePresentationScreen> createState() => _AddOrUpdatePresentationScreen();
+  State<AddOrUpdateUnitScreen> createState() => _AddOrUpdatePresentationScreen();
 }
 
-class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen> {
+class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _currentContainerController = TextEditingController();
-  final _newContainerNameController = TextEditingController();
-  final _quantityController = TextEditingController();
+  final _currentNameController = TextEditingController();
+  final _newNameController = TextEditingController();
 
-  final _currentContainerFocusNode = FocusNode();
-  final _newContainerNameFocusNode = FocusNode();
-  final _quantityFocusNode = FocusNode();
-  final _unitNameFocusNode = FocusNode();
+  final _currentNameFocusNode = FocusNode();
+  final _newNameFocusNode = FocusNode();
 
   bool? _isAdd; // true: add, false: update, null: hubo error
   bool _isLoading = false;
 
-  final List<UnitDTO> _unitList = [
-    UnitDTO(unitId: 0, name: defaultFirstOption)
-  ];
-  String _unitSelected = defaultFirstOption;
-  int _presentationId = 0;
+  final List<UnitDTO> _unitList = [];
+  int _unitId = 0;
 
   @override
   void initState() {
@@ -75,16 +66,13 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
 
   @override
   void dispose() {
-    _currentContainerController.dispose();
-    _newContainerNameController.dispose();
-    _quantityController.dispose();
+    _currentNameController.dispose();
+    _newNameController.dispose();
 
-    _currentContainerFocusNode.dispose();
-    _newContainerNameFocusNode.dispose();
-    _quantityFocusNode.dispose();
-    _unitNameFocusNode.dispose();
+    _currentNameFocusNode.dispose();
+    _newNameFocusNode.dispose();
 
-    _currentContainerFocusNode.removeListener(_currentContainerListener);
+    _currentNameFocusNode.removeListener(_currentContainerListener);
     super.dispose();
   }
 
@@ -95,7 +83,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.35,
+            width: MediaQuery.of(context).size.width * 0.2,
             decoration: BoxDecoration(
               border: Border.all(
                 color: Colors.black,
@@ -136,7 +124,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
       color: Colors.blue,
       padding: const EdgeInsets.all(8.0),
       child: const Text(
-        'Agregar o actualizar presentaciones',
+        'Agregar o actualizar unidades de medida',
         style: TextStyle(
           color: Colors.white,
           fontSize: 19.0,
@@ -158,21 +146,21 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
             SizedBox(
               width: 190,
               child: CreateTextFormField(
-                label: 'Envase',
-                controller: _currentContainerController,
-                focusNode: _currentContainerFocusNode,
+                label: 'Unidad',
+                controller: _currentNameController,
+                focusNode: _currentNameFocusNode,
                 dataType: DataTypeEnum.text,
-                maxValueForValidation: 20,
+                maxValueForValidation: 4,
                 viewCharactersCount: false,
-                textForValidation: 'Máximo 20 caracteres',
+                textForValidation: 'Máximo 4 caracteres',
                 acceptEmpty: false,
                 onEditingComplete: () async {
                   //Borra el evento del listener para evitar la doble llamada
                   //a _searchContainerName, que se desencadenaría en el listener
-                  _currentContainerFocusNode.removeListener(_currentContainerListener);
-                  _currentContainerFocusNode.unfocus();
-                  await _searchContainerName();
-                  _currentContainerFocusNode.addListener(_currentContainerListener);
+                  _currentNameFocusNode.removeListener(_currentContainerListener);
+                  _currentNameFocusNode.unfocus();
+                  await _searchUnitName();
+                  _currentNameFocusNode.addListener(_currentContainerListener);
                 }
               ),
             ),
@@ -180,76 +168,18 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
             SizedBox(
               width: 190,
               child: CreateTextFormField(
-                  label: 'Nuevo envase',
-                  controller: _newContainerNameController,
-                  focusNode: _newContainerNameFocusNode,
+                  label: 'Nueva unidad',
+                  controller: _newNameController,
+                  focusNode: _newNameFocusNode,
                   enabled: _isAdd != null && ! _isAdd!, //Se habilita si es una modificacion
                   dataType: DataTypeEnum.text,
-                  maxValueForValidation: 20,
+                  maxValueForValidation: 4,
                   viewCharactersCount: false,
                   textForValidation: '',
                   acceptEmpty: true,
                   onEditingComplete: () {
-                    FocusScope.of(context).requestFocus(_quantityFocusNode);
+                    FocusScope.of(context).requestFocus(_currentNameFocusNode);
                   },
-              ),
-            ),
-            const SizedBox(height: 16,),
-            SizedBox(
-              width: 160,
-              child: CreateTextFormField(
-                label: 'Cantidad',
-                controller: _quantityController,
-                focusNode: _quantityFocusNode,
-                dataType: DataTypeEnum.number,
-                minValueForValidation: 0,
-                maxValueForValidation: 99999.99,
-                viewCharactersCount: false,
-                textForValidation: 'Requerido (máx: 99999.99)',
-                acceptEmpty: false,
-                onEditingComplete: () async {
-                  await _searchQuantities();
-                },
-              ),
-            ),
-            const SizedBox(height: 16,),
-            Flexible(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 110,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Unidad',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        _buildRefreshUnitsButton(),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: CustomDropdown<String>(
-                      focusNode: _unitNameFocusNode,
-                      themeData: ThemeData(),
-                      optionList:  _unitList.map((e) => e.name).toList(),
-                      selectedOption: _unitSelected,
-                      isSelected: true, //! _isAdd!,
-                      callback: (unit) {
-                        if (unit == defaultLastOption) _addUnit();
-                        if (mounted) {
-                          setState(() {
-                            _unitSelected  = unit!;
-                          });
-                        }
-                        // Callback function
-                      },
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
@@ -258,32 +188,29 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     );
   }
 
-  Future<void> _searchContainerName() async {
-    if (_currentContainerController.text.trim().isEmpty) return;
+  Future<void> _searchUnitName() async {
+    if (_currentNameController.text.trim().isEmpty) return;
     _changeStateLoading(true);
-    PresentationDTO? presentationSelected = await presentationContainerListDialog(
-        presentationContainerName: _currentContainerController.text.trim(),
-        context: context,
+    UnitDTO? unitSelected = await unitListDialog(
+      unitName: _currentNameController.text.trim(),
+      context: context,
     );
     _changeStateLoading(false);
-    if (presentationSelected != null) {
-      _presentationId = presentationSelected.presentationId!;
-      _currentContainerController.value = TextEditingValue(
-          text: presentationSelected.name!
+    if (unitSelected != null) {
+      _unitId = unitSelected.unitId!;
+      _currentNameController.value = TextEditingValue(
+          text: unitSelected.name!
       );
-      _newContainerNameController.value = TextEditingValue(
-          text: presentationSelected.name!
+      _newNameController.value = TextEditingValue(
+          text: unitSelected.name!
       );
-      _quantityController.value = TextEditingValue(
-          text: presentationSelected.quantity!.toString()
-      );
-      _updateUnitSelected(presentationSelected.unitName!);
+      //_updateUnitSelected(unitSelected.unitName!);
       setState(() {
         _isAdd = false;
       });
     } else {
-      _newContainerNameController.value = const TextEditingValue(text: '');
-      _presentationId = 0;
+      _newNameController.value = const TextEditingValue(text: '');
+      _unitId = 0;
       setState(() {
         _isAdd = true;
       });
@@ -294,19 +221,20 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     //Otra opción sería mediante Future.delayed...
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        FocusScope.of(context).requestFocus(_isAdd!
+        FocusScope.of(context).requestFocus(_newNameFocusNode);
+        /*FocusScope.of(context).requestFocus(_isAdd!
             ? _quantityFocusNode
-            : _newContainerNameFocusNode
-        );
+            : _newNameFocusNode
+        );*/
       }
     });
   }
 
-  Future<void> _searchQuantities() async {
-    if (_currentContainerController.text.trim().isEmpty) return;
+ /* Future<void> _searchQuantities() async {
+    if (_currentNameController.text.trim().isEmpty) return;
     _changeStateLoading(true);
     double? quantitySelected = await presentationContainerQuantitiesListDialog(
-      presentationContainerName: _currentContainerController.text.trim(),
+      presentationContainerName: _currentNameController.text.trim(),
       context: context,
     );
     _changeStateLoading(false);
@@ -325,16 +253,17 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
         FocusScope.of(context).nextFocus();
       }
     });
-  }
+  }*/
 
   Widget _buildFooter() {
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           ElevatedButton(
             onPressed: _disableAcceptButton() ? null : () async {
+            //onPressed: () async {
               if (! _formKey.currentState!.validate()) return; //Valida el resto del formulario
               if (await _confirm() == 1) {
                 _submitForm();
@@ -356,63 +285,56 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     );
   }
 
-  bool _disableAcceptButton() =>
-    _currentContainerController.text.trim().isEmpty
-      || _quantityController.text.trim().isEmpty
-      || _unitSelected == defaultFirstOption
-      || _unitSelected == defaultLastOption;
+  bool _disableAcceptButton() => _isAdd == null;
 
   Future<void> _submitForm() async {
     _changeStateLoading(true);
     try {
-      PresentationDTO1 presentationDTO1 = PresentationDTO1(
-          presentationId: _presentationId == 0 ? null : _presentationId,
-          name: _newContainerNameController.text.trim().isEmpty
-              ? _currentContainerController.text.trim()
-              : _newContainerNameController.text.trim(),
-          quantity: double.parse(_quantityController.text),
-          unit: UnitDTO1(unitId: _getSelectedUnitId())
+      UnitDTO unitDTO = UnitDTO(
+          unitId: _unitId == 0 ? null : _unitId,
+          name: _newNameController.text.trim().isEmpty
+              ? _currentNameController.text.trim()
+              : _newNameController.text.trim(),
       );
-
       if (mounted) {
-        //Actualiza la var. publica con el id de la nueva presentacion agregada
-        _presentationId = await addOrUpdatePresentation(
-          presentation: presentationDTO1,
+        //Actualiza la var. publica con el id de la nueva unidad agregada
+        _unitId = (await addOrUpdateUnit(
+          unit: unitDTO,
           isAdd: _isAdd!,
           context: context,
-        );
+        ))!;
       }
-      if (_presentationId != 0) {
+      if (_unitId != 0) {
         if (mounted) {
           FloatingMessage.show(
               context: context,
-              text: 'Presentación ${_isAdd! ? 'agregada' : 'actualizada'} con éxito',
+              text: 'Unidad de medida ${_isAdd! ? 'agregada' : 'actualizada'} con éxito',
               messageTypeEnum: MessageTypeEnum.info
           );
         }
         if (kDebugMode) {
-          print('Presentación ${_isAdd! ? 'agregada' : 'actualizada'} '
-              'con éxito (id=$_presentationId)'
+          print('Unidad de medida  ${_isAdd! ? 'agregada' : 'actualizada'} '
+              'con éxito (id=$_unitId)'
         );
         }
         _initialize();
-        if (mounted) FocusScope.of(context).requestFocus(_currentContainerFocusNode);
+        if (mounted) FocusScope.of(context).requestFocus(_currentNameFocusNode);
 
       } else {
         if(mounted) {
           FloatingMessage.show(
             context: context,
-            text: 'Error creando o actualizando presentación',
+            text: 'Error creando o actualizando unidad de medida ',
             messageTypeEnum: MessageTypeEnum.error,
           );
         }
-        if (kDebugMode) print('Error creando o actualizando presentación');
+        if (kDebugMode) print('Error creando o actualizando unidad de medida ');
       }
 
     } catch (error) {
       if (error is ErrorObject) {
         if (error.message != null) {
-          String msg = error.message!;
+          /*String msg = error.message!;
           if (error.message!.contains("NO EXISTE UNA UNIDAD DE MEDIDA")) {
             msg = 'La unidad de medida $_unitSelected fué eliminada por '
                 'otro usuario.\nLa lista ha sido actualizada.';
@@ -420,11 +342,11 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
             setState(() {
               _unitSelected = defaultFirstOption;
             });
-          }
+          }*/
           if (mounted) {
             FloatingMessage.show(
               context: context,
-              text: msg,
+              text: error.message!,
               messageTypeEnum: MessageTypeEnum.warning,
             );
           }
@@ -438,10 +360,6 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     _changeStateLoading(false);
   }
 
-  //Devuelve el id de la unidad de medidad seleccionada
-  int? _getSelectedUnitId() => _unitList.firstWhere((element)
-    => element.name == _unitSelected).unitId;
-
   void _cancelForm() {
     widget.onCancel(); // Llamar al callback de cancelación
   }
@@ -449,7 +367,9 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   Future<int> _confirm() async {
     return await OpenDialog(
         title: 'Confirmar',
-        content: _isAdd! ? '¿Agregar la presentación?' : '¿Actualizar la presentación?',
+        content: _isAdd!
+          ? '¿Agregar la unidad de medida?'
+          : '¿Actualizar la unidad de medida?',
         textButton1: 'Si',
         textButton2: 'No',
         context: context
@@ -467,20 +387,20 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
   }
 
   void _createListeners() {
-    _currentContainerFocusNode.addListener(_currentContainerListener);
+    _currentNameFocusNode.addListener(_currentContainerListener);
   }
 
   Future<void> _currentContainerListener() async {
-    if (!_currentContainerFocusNode.hasFocus) {
-      await _searchContainerName();
-    } else if (_currentContainerFocusNode.hasFocus) {
+    if (!_currentNameFocusNode.hasFocus) {
+      await _searchUnitName();
+    } else if (_currentNameFocusNode.hasFocus) {
       _initialize();
     }
   }
 
   ///Antes de actualizar la var. _unitSelected, chequea que la unidad de medida
   ///exista en la lista. Si no existe, refresca las unidades.
-  Future<void> _updateUnitSelected(String unitName) async {
+  /*Future<void> _updateUnitSelected(String unitName) async {
     if (! _unitExistInList(unitName)) {
       await _loadUnits(false);
       if (! _unitExistInList(unitName)) {
@@ -499,23 +419,21 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     setState(() {
       _unitSelected = unitName;
     });
-  }
+  }*/
 
-  bool _unitExistInList(String unitName) {
+  /*bool _unitExistInList(String unitName) {
     UnitDTO unit = _unitList.firstWhere(
       (e) => e.name == unitName,
       orElse: () => UnitDTO.empty(),
     );
     return unit.name != null;
-  }
+  }*/
 
   void _initialize() {
-    _currentContainerController.value = TextEditingValue.empty;
-    _newContainerNameController.value = TextEditingValue.empty;
-    _quantityController.value = TextEditingValue.empty;
-    _presentationId = 0;
+    _currentNameController.value = TextEditingValue.empty;
+    _newNameController.value = TextEditingValue.empty;
+    _unitId = 0;
     setState(() {
-      _unitSelected = defaultFirstOption;
       _isAdd = null;
     });
   }
@@ -566,7 +484,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
     }
   }
 
-  Widget _buildRefreshUnitsButton() {
+  /*Widget _buildRefreshUnitsButton() {
     return SizedBox(
       width: 30,
       height: 30,
@@ -597,18 +515,13 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
         ),
       ),
     );
-  }
+  }*/
 
   Future<void> _addUnit() async {
     final String? unit = await unitAddDialog(context: context);
     if (unit != null) {
       await _loadUnits(false).then((_) {
-        if (mounted) {
-          setState(() {
-            _unitSelected = unit;
-          });
-        }
-      });
+    });
     }
   }
 
