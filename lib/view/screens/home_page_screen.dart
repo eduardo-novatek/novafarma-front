@@ -4,6 +4,7 @@ import 'package:novafarma_front/view/screens.dart';
 import 'package:novafarma_front/view/screens/list_presentation_screen.dart';
 
 import 'add_or_update_unit_screen.dart';
+import 'list_unit_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
   final String title;
@@ -390,7 +391,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
         const PopupMenuItem<String>(
-          value: 'medicine_list',
+          value: 'units_list',
           child: ListTile(
             leading: Icon(Icons.list),
             title: Text('Listar unidades de medida'),
@@ -403,7 +404,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         if (result == 'units_add_update') {
           await _goAddOrUpdateUnitsScreen();
         } else if (result == 'units_list') {
-          // Acción para listar medicamentos
+          await _goListUnitScreen();
         }
       }
     });
@@ -506,7 +507,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
-
   Future<void> _goListSupplierScreen() async {
     setState(() {
       _currentWidget = ListSupplierScreen(
@@ -551,6 +551,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
         });
       },
     );
+  }
+
+  Future<void> _goListUnitScreen() async {
+    setState(() {
+      _currentWidget = ListUnitScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
   }
 
 
