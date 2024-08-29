@@ -121,7 +121,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           return Container(
-            width: constraints.maxWidth * 0.4, // 40% del ancho disponible
+            width: constraints.maxWidth * 0.45, // 40% del ancho disponible
             height: constraints.maxHeight * 0.61,
             padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 40),
             child: Column(
@@ -322,7 +322,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   Widget _buildPriceAdd() {
-    late Widget widgetReturn;
+    Widget widgetReturn = const SizedBox.shrink();
 
     if (widget.movementType == MovementTypeEnum.sale) {
       widgetReturn = Text(
@@ -369,7 +369,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   Widget _buildPriceUpdate() {
-    late Widget widgetReturn;
+    Widget widgetReturn = const SizedBox.shrink();
 
     if (widget.movementType == MovementTypeEnum.sale) {
       widgetReturn = Text(widget.modifyVoucherItem!.unitPrice != null
@@ -410,7 +410,6 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         ],
       );
     }
-
     return widgetReturn;
   }
 

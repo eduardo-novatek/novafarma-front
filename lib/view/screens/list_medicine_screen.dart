@@ -625,67 +625,24 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   }
 
   Future<void> _stockMovements(int index) async {
-    final PageObject page;
     _setLoading(true);
-
-    final uri = Uri(
-      scheme: 'http',
-      host: host,
-      port: port,
-      path: uriMedicineFindStockMovements,
-      queryParameters: {
-        'medicineId': _pageObject.content[index].medicineId.toString(),
-        'pageNumber': '0',
-        'pageSize': sizePageMedicineStockMovements.toString(),
+    MedicineDTO1 medicine = _pageObject.content[index];
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: StockMovementsDialog(
+            medicineId: medicine.medicineId!,
+            medicineName: '${medicine.name!} '
+                '${medicine.presentation!.name} '
+                '${medicine.presentation!.quantity} '
+                '${medicine.presentation!.unitName}',
+            controlled: medicine.controlled!,
+            deleted: medicine.deleted!,
+          ),
+        );
       },
     );
-
-    //Verifico la existencia de por lo menos un movimiento de stock
-    await fetchDataObjectPageable(
-      uri: uri,
-      isRequestParam: true,
-      classObject: StockMovementDTO.empty(),
-    ).then((pageObject) {
-      if (pageObject.totalElements == 0) {
-        FloatingMessage.show(
-          context: context,
-          text: 'Sin datos',
-          messageTypeEnum: MessageTypeEnum.info,
-        );
-      } else {
-        MedicineDTO1 medicine = _pageObject.content[index];
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              content: StockMovementsDialog(
-                medicineId: medicine.medicineId!,
-                medicineName: '${medicine.name!} '
-                    '${medicine.presentation!.quantity} '
-                    '${medicine.presentation!.unitName}'
-              ),
-            );
-          },
-        );
-      }
-    }).onError((error, stackTrace) {
-      String? msg;
-      if (error is ErrorObject) {
-        msg = error.message;
-      } else {
-        msg = error.toString().contains('XMLHttpRequest error')
-            ? 'Error de conexión'
-            : error.toString();
-      }
-      if (msg != null) {
-        FloatingMessage.show(
-          context: context,
-          text: msg,
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) print(error);
-      }
-    });
     _setLoading(false);
   }
 

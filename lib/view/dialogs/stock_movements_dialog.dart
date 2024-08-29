@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/stock_movement_dto.dart';
-import 'package:novafarma_front/model/DTOs/voucher_dto_1.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
@@ -11,18 +10,23 @@ import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/buildTableCell.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/error_object.dart';
-import '../../model/globals/constants.dart' show host, port, sizePageMedicineStockMovements, sizePageVoucherListOfCustomer, uriCustomerFindVouchersPage, uriMedicineFindStockMovements, uriVoucherFindVoucherItems;
+import '../../model/globals/constants.dart' show host, port,
+  sizePageMedicineStockMovements, uriMedicineFindStockMovements;
 import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/floating_message.dart';
 
 class StockMovementsDialog extends StatefulWidget {
   final int medicineId;
   final String medicineName;
+  final bool controlled;
+  final bool deleted;
 
   const StockMovementsDialog({
     super.key,
     required this.medicineId,
     required this.medicineName,
+    required this.controlled,
+    required this.deleted,
   });
 
   @override
@@ -30,18 +34,15 @@ class StockMovementsDialog extends StatefulWidget {
 }
 
 class _StockMovementsDialogState extends State<StockMovementsDialog> {
-  //final List<VoucherDTO1> _voucherPageList = [];
-  //final Map<String, List<VoucherItemDTO2>> _voucherItems = {};
-  //final Map<String, bool> _voucherLoading = {};
   final PageObject<StockMovementDTO> _pageObject = PageObject.empty();
   int _highlightedIndex = -1; //iluminacion de fila al pasar el mouse
   bool _loading = true;
 
   static const double _spaceMenuAndBorder = 30.0;
   static const double _colDateTime = 1.0;
-  static const double _colMovementType = 1.0;
+  static const double _colMovementType = 1.3;
   static const double _colQuantity = 0.6;
-  static const double _colUnitPrice = 0.6;
+  static const double _colUnitPrice = 0.7;
 
   @override
   void initState() {
@@ -105,15 +106,34 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
-          child: Text(
-            widget.medicineName,
-            style: const TextStyle(
-              fontSize: 18,
-              fontStyle: FontStyle.italic,
-              color: Colors.black54,
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildControlledIcon(widget.controlled, 16.0),
+              const SizedBox(width: 8.0,),
+              Text(
+                widget.medicineName,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.black54,
+                ),
+              ),
+              widget.deleted
+                ? _msgDeleted()
+                : const SizedBox.shrink(),
+            ],
           ),
         ),
+      ],
+    );
+  }
+
+  Row _msgDeleted() {
+    return const Row(
+      children: [
+        SizedBox(width: 8.0,),
+        Text('(eliminado)', style: TextStyle(color: Colors.red),)
       ],
     );
   }
@@ -181,19 +201,23 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
                   children: [
                     buildTableCell(
                       text: stockMovement.dateTime != null
-                          ? dateToStr(stockMovement.dateTime)! : '',
+                          ? dateTimeToStr(stockMovement.dateTime)! : '',
+                      size: 14
                     ),
                     buildTableCell(
                         text: stockMovement.movementType != null
                             ? nameMovementType(stockMovement.movementType!)
-                            : 'Ingreso al sistema'
+                            : 'Ingreso al sistema',
+                        size: 14
                     ),
                     buildTableCell(
                       text: stockMovement.quantity.toString(),
+                      size: 14,
                       rightAlign: true,
                     ),
                     buildTableCell(
                         text: '\$${formatDouble(stockMovement.unitPrice!)}',
+                        size: 14,
                         rightAlign: true
                     ),
                   ],
@@ -280,12 +304,12 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
       child: Text(
         text,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  /*Widget _buildControlledIcon(bool controlled, double size) {
+  Widget _buildControlledIcon(bool controlled, double size) {
     return controlled
         ? Tooltip(
             message: 'Medicamento controlado',
@@ -296,7 +320,7 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
             ),
           )
         : const SizedBox.shrink();
-  }*/
+  }
 
   void _updatePageObject(PageObject<dynamic> pageObjectResult) {
     _pageObject.pageNumber = pageObjectResult.pageNumber;

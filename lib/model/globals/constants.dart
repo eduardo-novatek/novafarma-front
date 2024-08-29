@@ -3,7 +3,7 @@
 
 const String host = 'localhost';
 const int port = 8080;
-const String socket = '$host:$port'; //server applications
+const String socket = '$host:$port'; //server application
 const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server NovaDaily
 
 const int timeOutSecondsResponse = 15;
