@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/stock_movement_dto.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
@@ -11,13 +12,13 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/constants.dart' show sizePageMedicineList,
-  uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage;
+import '../../model/globals/constants.dart' show host, port, sizePageMedicineList, sizePageMedicineStockMovements, socket, uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage, uriMedicineFindStockMovements;
 import '../../model/globals/tools/date_time.dart' show dateToStr;
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/open_dialog.dart';
 import '../../model/globals/tools/pagination_bar.dart';
+import '../dialogs/stock_movements_dialog.dart';
 
 class ListMedicineScreen extends StatefulWidget {
   //VoidCallback es un tipo de función predefinido en Flutter que no acepta
@@ -492,28 +493,18 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         onSelected: (menuItem) => _onSelected(context, menuItem, index),
         tooltip: 'Menú',
         itemBuilder: (context) => [
-          /*const PopupMenuItem<int>(
-            value: 0,
-            child: Row(
-              children: [
-                Icon(Icons.medical_information, color: Colors.black),
-                SizedBox(width: 8),
-                Text('opcion 1')
-              ],
-            ),
-          ),
           const PopupMenuItem<int>(
-            value: 1,
+            value: 0,
             child: Row(
               children: [
                 Icon(Icons.assignment_outlined, color: Colors.black),
                 SizedBox(width: 8),
-                Text('opcion 2')
+                Text('Movimientos de stock')
               ],
             ),
-          ),*/
+          ),
           PopupMenuItem<int>(
-            value: 0,
+            value: 1,
             child: _buildDeleteOrRecover(index),
           ),
         ],
@@ -564,6 +555,8 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   void _onSelected(BuildContext context, int menuItem, int index) {
     switch (menuItem) {
       case 0:
+        _stockMovements(index);
+      case 1:
         _deleteOrRecover(index);
         break;
     }
@@ -629,6 +622,71 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         _setLoading(false);
       }
     }
+  }
+
+  Future<void> _stockMovements(int index) async {
+    final PageObject page;
+    _setLoading(true);
+
+    final uri = Uri(
+      scheme: 'http',
+      host: host,
+      port: port,
+      path: uriMedicineFindStockMovements,
+      queryParameters: {
+        'medicineId': _pageObject.content[index].medicineId.toString(),
+        'pageNumber': '0',
+        'pageSize': sizePageMedicineStockMovements.toString(),
+      },
+    );
+
+    //Verifico la existencia de por lo menos un movimiento de stock
+    await fetchDataObjectPageable(
+      uri: uri,
+      isRequestParam: true,
+      classObject: StockMovementDTO.empty(),
+    ).then((pageObject) {
+      if (pageObject.totalElements == 0) {
+        FloatingMessage.show(
+          context: context,
+          text: 'Sin datos',
+          messageTypeEnum: MessageTypeEnum.info,
+        );
+      } else {
+        MedicineDTO1 medicine = _pageObject.content[index];
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: StockMovementsDialog(
+                medicineId: medicine.medicineId!,
+                medicineName: '${medicine.name!} '
+                    '${medicine.presentation!.quantity} '
+                    '${medicine.presentation!.unitName}'
+              ),
+            );
+          },
+        );
+      }
+    }).onError((error, stackTrace) {
+      String? msg;
+      if (error is ErrorObject) {
+        msg = error.message;
+      } else {
+        msg = error.toString().contains('XMLHttpRequest error')
+            ? 'Error de conexión'
+            : error.toString();
+      }
+      if (msg != null) {
+        FloatingMessage.show(
+          context: context,
+          text: msg,
+          messageTypeEnum: MessageTypeEnum.error,
+        );
+        if (kDebugMode) print(error);
+      }
+    });
+    _setLoading(false);
   }
 
 }

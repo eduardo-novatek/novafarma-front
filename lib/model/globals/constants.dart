@@ -1,12 +1,15 @@
 //const String socket = "192.168.1.8:8080";       //casa
 //const String socket = "192.168.43.203:8080";    //celu
 
-const String socket = 'localhost:8080';           //server applications
+const String host = 'localhost';
+const int port = 8080;
+const String socket = '$host:$port'; //server applications
 const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server NovaDaily
 
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
 const int sizePageMedicineList = 20;
+const int sizePageMedicineStockMovements = 20;
 const int sizePagePresentationList = 20;
 const int sizePageVoucherListOfCustomer = 8;
 const int sizePageVoucherListOfSupplier = 8;
@@ -76,6 +79,7 @@ const String uriMedicineUpdate = "/medicine/update";
 const String uriMedicineDelete = "/medicine/delete";
 const String uriMedicineFindNamePage ="/medicine/findNamePage";
 const String uriMedicineFindAll ="/medicine/findAll";
+const String uriMedicineFindStockMovements ="/medicine/findStockMovements";
 
 //Voucher
 const String uriVoucherAdd = "/voucher/add";

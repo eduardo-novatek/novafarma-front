@@ -12,8 +12,11 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 ///Devuelve una lista de objetos de la base de datos, obtenidos por paginación.
 ///Envía solo solicitudes get.
 Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
-  required String uri,
+  required dynamic uri,
   required T classObject,
+  //true: la url ya viene armada para que el backend consuma la consulta con RequestParams
+  //con lo cual se ignora el armado de la url
+  bool isRequestParam = false
 }) async {
 
   Uri url;
@@ -21,7 +24,12 @@ Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
   bool generalException = true;
 
   try {
-    url = Uri.http(socket, uri);
+    if (! isRequestParam) {
+      url = Uri.http(socket, uri as String);
+    } else {
+      url = uri as Uri;
+    }
+    //url = Uri.http(socket, uri);
 
     response = await http.get(url)
         .timeout(const Duration(seconds: timeOutSecondsResponse));
