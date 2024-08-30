@@ -319,6 +319,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
             title: Text('Listar medicamentos'),
           ),
         ),
+        const PopupMenuItem<String>(
+          value: 'medicine_nursing_report',
+          child: ListTile(
+            leading: Icon(Icons.list),
+            title: Text('Informe de enfermería'),
+          ),
+        ),
       ],
     ).then((String? result) async {
       if (result != null) {
@@ -327,6 +334,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
           await _goAddOrUpdateMedicineScreen();
         } else if (result == 'medicine_list') {
           await _goListMedicineScreen();
+        } else if (result == 'medicine_nursing_report') {
+          await _goNursingReport();
         }
       }
     });
@@ -522,6 +531,18 @@ class _HomePageScreenState extends State<HomePageScreen> {
   Future<void> _goListMedicineScreen() async {
     setState(() {
       _currentWidget = ListMedicineScreen(
+        onCancel: () {
+          setState(() {
+            _currentWidget = msgHomeScreen;
+          });
+        },
+      );
+    });
+  }
+
+  Future<void> _goNursingReport() async {
+    setState(() {
+      _currentWidget = NursingReportScreen(
         onCancel: () {
           setState(() {
             _currentWidget = msgHomeScreen;
