@@ -29,7 +29,6 @@ Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
     } else {
       url = uri as Uri;
     }
-    //url = Uri.http(socket, uri);
 
     response = await http.get(url)
         .timeout(const Duration(seconds: timeOutSecondsResponse));

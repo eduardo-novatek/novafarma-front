@@ -20,6 +20,7 @@ class CreateTextFormField extends StatefulWidget {
   final bool? initialFocus; //Si debe tener el foco inicial (por defecto es false. Debe ser true solo 1 TextFormField del formulario)
   final FocusNode? focusNode;
   final TextStyle? textStyle;
+  final InputDecoration? decoration;
   final List<bool>? validationStates; //lista para el manejo del estado de validacion de todos los textFormField
   final Function(String)? onChange;
   final Function(String)? onFieldSubmitted;
@@ -46,6 +47,7 @@ class CreateTextFormField extends StatefulWidget {
     this.onEditingComplete,
     this.focusNode,
     this.textStyle,
+    this.decoration,
   });
 
   @override
@@ -219,17 +221,19 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
 
 
   InputDecoration _buildInputDecoration(ThemeData themeData) {
-      return InputDecoration(
-          labelText: widget.label,
-          labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
-          counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
-          border: widget.isUnderline!
-            ? const UnderlineInputBorder()
-            : OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-      );
-    }
+      return widget.decoration == null
+        ? InputDecoration(
+            labelText: widget.label,
+            labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
+            counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
+            border: widget.isUnderline!
+              ? const UnderlineInputBorder()
+              : OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                )
+          )
+        : widget.decoration!;
+  }
 
     int? _maxLength() {
       return (widget.dataType == DataTypeEnum.text

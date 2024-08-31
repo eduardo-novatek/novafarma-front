@@ -8,6 +8,7 @@ const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server Nov
 
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
+const int sizePageCustomerNursingReportList = 15;
 const int sizePageMedicineList = 20;
 const int sizePageMedicineStockMovements = 20;
 const int sizePagePresentationList = 20;
@@ -57,6 +58,7 @@ const String uriCustomerUpdate = "/customer/update";
 const String uriCustomerDelete = "/customer/delete";
 const String uriCustomerFindControlledMedications = "/customer/findControlledMedications";
 const String uriCustomerFindVouchersPage = "/customer/findVouchers";
+const String uriCustomerNursingReportPage = "/customer/nursingReport";
 
 //NovaDaily
 const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
