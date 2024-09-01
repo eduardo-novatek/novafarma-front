@@ -41,8 +41,8 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
   static const double _spaceMenuAndBorder = 30.0;
   static const double _colDateTime = 1.0;
   static const double _colMovementType = 1.3;
-  static const double _colQuantity = 0.6;
-  static const double _colUnitPrice = 0.7;
+  static const double _colQuantity = 0.4;
+  static const double _colUnitPrice = 0.4;
 
   @override
   void initState() {
@@ -64,7 +64,7 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
         ],
       ),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.35,
+        width: MediaQuery.of(context).size.width * 0.5,
         height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -113,15 +113,17 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
               const SizedBox(width: 8.0,),
               Text(
                 widget.medicineName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
+                  color: widget.deleted ? Colors.grey : Colors.black54,
                   fontStyle: FontStyle.italic,
-                  color: Colors.black54,
-                ),
+                  decoration: widget.deleted ? TextDecoration.lineThrough : null
+                )
               ),
-              widget.deleted
+              /*widget.deleted
                 ? _msgDeleted()
                 : const SizedBox.shrink(),
+               */
             ],
           ),
         ),

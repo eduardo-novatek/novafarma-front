@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
+import 'package:novafarma_front/model/globals/buildTableCell.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
@@ -14,7 +15,8 @@ import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show sizePageCustomerNursingReportList, uriCustomerNursingReportPage;
 import '../../model/globals/tools/create_text_form_field.dart';
-import '../../model/globals/tools/date_time.dart' show dateTimeToStr, strDateViewToStrDate, strToDateTime;
+import '../../model/globals/tools/date_time.dart' show dateTimeToStr,
+  strDateViewToStrDate;
 import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/page_object_map.dart';
 
@@ -63,7 +65,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.6,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),
@@ -299,7 +301,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     return ExpansionTile(
       title: Text('${customer.name} - ${customer.document}'),
       children: [
-        _buildNursingReportsTable(nursingReports), // Llama a la función para construir la tabla
+        _buildNursingReportsTable(nursingReports),
       ],
     );
   }
@@ -319,16 +321,24 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
             cells: [
               DataCell(Text(dateTimeToStr(report.dateTime)!)),
               DataCell(Text(report.medicine!)),
-              DataCell(Text(report.quantity.toString())),
-              DataCell(Text('\$ ${report.unitPrice!}')),
+              DataCell(
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(report.quantity.toString())
+                  )
+              ),
+              DataCell(
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text('\$ ${formatDouble(report.unitPrice!)}')
+                )
+              )
             ],
           );
         }).toList(),
       ),
     );
   }
-
-
 
   void _updatePageObjectMap(PageObjectMap pageObjectResult) {
     _pageObjectMap.pageNumber = pageObjectResult.pageNumber;

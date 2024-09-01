@@ -80,7 +80,7 @@ class ControlledMedicationListFromCustomerDialog extends StatelessWidget {
                                 '${medication.medicine!.presentation?.name} '
                                 '${medication.medicine!.presentation?.quantity} '
                                 '${medication.medicine!.presentation?.unitName}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold)
                           ),
                           subtitle: _subTitle(medication),
                         ),

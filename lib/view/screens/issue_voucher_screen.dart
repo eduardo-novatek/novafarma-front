@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
 import '../../model/DTOs/customer_dto.dart';
@@ -463,6 +465,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
       _changeStateSaved(true);
     });
     try {
+      _validVoucher();
       await fetchDataObject<VoucherDTO>(
           uri: uriVoucherAdd,
           classObject: VoucherDTO.empty(),
@@ -484,7 +487,25 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
       setState(() {
         _changeStateSaved(false);
       });
-      throw Exception(e);
+      if (e is ErrorObject && mounted) {
+        FloatingMessage.show(
+          context: context,
+          text: e.message!,
+          messageTypeEnum: MessageTypeEnum.warning,
+          secondsDelay: 8
+        );
+      } else {
+        throw Exception(e);
+      }
+    }
+  }
+
+  void _validVoucher() {
+    if (_totalPriceVoucher > 999999.99) {
+      throw ErrorObject(
+        statusCode: HttpStatus.conflict,
+        message: 'El importe del comprobante excede el máximo permitido de 999999.99',
+      );
     }
   }
 

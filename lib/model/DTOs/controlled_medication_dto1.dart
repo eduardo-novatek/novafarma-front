@@ -11,7 +11,6 @@ class ControlledMedicationDTO1 extends Deserializable<ControlledMedicationDTO1> 
   int? frequencyDays;
   int? toleranceDays;
   DateTime? lastSaleDate;
-  //final bool? isFirst;
 
   ControlledMedicationDTO1.empty():
     controlledMedicationId = 0,
@@ -21,7 +20,6 @@ class ControlledMedicationDTO1 extends Deserializable<ControlledMedicationDTO1> 
     frequencyDays = 0,
     toleranceDays = 0,
     lastSaleDate = null
-    //isFirst = null,
   ;
 
     ControlledMedicationDTO1({
@@ -32,7 +30,6 @@ class ControlledMedicationDTO1 extends Deserializable<ControlledMedicationDTO1> 
       required this.frequencyDays,
       required this.toleranceDays,
       required this.lastSaleDate,
-      //this.isFirst,
     });
 
     @override
@@ -59,10 +56,5 @@ class ControlledMedicationDTO1 extends Deserializable<ControlledMedicationDTO1> 
       'lastSaleDate': lastSaleDate,
     };
   }
-
- /* @override
-  String toString() {
-    return name;
-  }*/
 
 }

@@ -37,8 +37,8 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
 
   static const double _spaceMenuAndBorder = 30.0;
   static const double _colControlled = 0.2; //icono
-  static const double _colName = 2.5;
-  static const double _colPresentation = 1.5;
+  static const double _colName = 2.4;
+  static const double _colPresentation = 1.6;
   static const double _colLastAddDate = 0.8;
   static const double _colCostPrice = 0.7;
   static const double _colSalePrice = 0.7;
@@ -71,7 +71,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.8,
+        width: MediaQuery.of(context).size.width * 0.83,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15.0),

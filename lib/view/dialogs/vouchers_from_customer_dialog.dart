@@ -62,7 +62,7 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
         ],
       ),
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.45,
+        width: MediaQuery.of(context).size.width * 0.57,
         height: MediaQuery.of(context).size.height * 0.7,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -146,10 +146,10 @@ class _VouchersFromCustomerDialogState extends State<VouchersFromCustomerDialog>
                 Table(
                   border: TableBorder.all(color: Colors.blue),
                   columnWidths: const {
-                    0: FlexColumnWidth(2),
-                    1: FlexColumnWidth(2),
-                    2: FlexColumnWidth(0.7),
-                    3: FlexColumnWidth(0.8),
+                    0: FlexColumnWidth(2.4),
+                    1: FlexColumnWidth(1.6),
+                    2: FlexColumnWidth(0.5),
+                    3: FlexColumnWidth(0.6),
                   },
                   children: [
                     TableRow(children: [

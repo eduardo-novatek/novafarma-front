@@ -223,7 +223,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               dataType: DataTypeEnum.number,
               minValueForValidation: 0,
               maxValueForValidation: 999999.99,
-              textForValidation: 'Ingrese un precio de costo de hasta 6 dígitos',
+              textForValidation: 'Ingrese un precio de costo de hasta 999999.99',
               viewCharactersCount: false,
               acceptEmpty: false,
               onEditingComplete: () =>
@@ -236,7 +236,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               dataType: DataTypeEnum.number,
               minValueForValidation: 0,
               maxValueForValidation: 999999.99,
-              textForValidation: 'Ingrese un precio de venta de hasta 6 dígitos',
+              textForValidation: 'Ingrese un precio de venta de hasta 999999.99',
               viewCharactersCount: false,
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_currentStockFocusNode),
@@ -250,7 +250,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                   acceptEmpty: false,
                   minValueForValidation: 0.001,
                   maxValueForValidation: 99999.99,
-                  textForValidation: 'Ingrese un stock de hasta 5 dígitos',
+                  textForValidation: 'Ingrese un stock de hasta 99999.99',
                   viewCharactersCount: false,
                   onEditingComplete: () =>
                       FocusScope.of(context).requestFocus(_controlledFocusNode),
