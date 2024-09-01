@@ -100,6 +100,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
       ),
       padding: const EdgeInsets.all(16.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
             'Informe de enfermería',
@@ -110,20 +111,17 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
             ),
           ),
           //const SizedBox(width: 260.0), // Espacio entre el título y el campo de texto
-          Expanded(
+          Center(
             child: Row(
               children: [
-                Center(
-                  child: SizedBox(
-                    width: 150.0,
-                    child: _startDate(),
-                  ),
+                SizedBox(
+                  width: 150.0,
+                  child: _startDate(),
                 ),
-                Center(
-                  child: SizedBox(
-                    width: 150.0,
-                    child: _endDate(),
-                  ),
+                const SizedBox(width: 16.0,),
+                SizedBox(
+                  width: 150.0,
+                  child: _endDate(),
                 ),
               ],
             ),
@@ -144,13 +142,14 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     return CreateTextFormField(
       controller: _startDateFilterController,
       focusNode: _startDateFilterFocusNode,
-      label: 'Fecha inicio',
       dataType: DataTypeEnum.date,
+      label: '',
       initialFocus: true,
       viewCharactersCount: false,
       acceptEmpty: false,
       decoration: InputDecoration(
           labelStyle: const TextStyle(color: Colors.white),
+          label: const Text('Fecha inicio'),
           border: const OutlineInputBorder(),
           filled: true,
           fillColor: Colors.blue.shade300,
@@ -169,11 +168,12 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     return CreateTextFormField(
       controller: _endDateFilterController,
       focusNode: _endDateFilterFocusNode,
-      label: 'Fecha fin',
       dataType: DataTypeEnum.date,
+      label: '',
       viewCharactersCount: false,
       acceptEmpty: false,
       decoration: InputDecoration(
+        label: const Text('Fecha fin'),
         labelStyle: const TextStyle(color: Colors.white),
         border: const OutlineInputBorder(),
         filled: true,
@@ -236,7 +236,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     await fetchNursingReportPageable(
       uri: '$uriCustomerNursingReportPage'
           '/${startDate}T00:00'
-          '/${endDate}T00:00'
+          '/${endDate}T23:59'
           '/${_pageObjectMap.pageNumber}'
           '/$sizePageCustomerNursingReportList',
     ).then((pageObject) {
@@ -320,11 +320,20 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
           return DataRow(
             cells: [
               DataCell(Text(dateTimeToStr(report.dateTime)!)),
-              DataCell(Text(report.medicine!)),
+              DataCell(
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 390),
+                  child: Text(
+                    report.medicine!,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,  // Evita el truncamiento
+                  ),
+                ),
+              ),
               DataCell(
                   Align(
                     alignment: Alignment.centerRight,
-                    child: Text(report.quantity.toString())
+                    child: Text(formatDouble(report.quantity!))
                   )
               ),
               DataCell(

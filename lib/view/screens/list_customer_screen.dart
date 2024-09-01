@@ -501,7 +501,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
 
   Future<void> _vouchersCustomer(int index) async {
     _toggleLoading();
-    //Verifico la existencia de por lo menos un voucher
+    //Verifica la existencia de por lo menos un voucher
     await fetchDataObjectPageable(
         uri: '$uriCustomerFindVouchersPage/${_customerList[index].customerId}/0/1',
         classObject: VoucherDTO1.empty(),
