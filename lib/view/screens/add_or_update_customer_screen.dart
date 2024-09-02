@@ -20,6 +20,7 @@ import '../../model/DTOs/user_dto_1.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/requests/add_or_update_customer.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
+import '../../model/globals/requests/fetch_partner_nova_daily_list.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/floating_message.dart';
@@ -417,13 +418,13 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         registered = await _registeredDocument();
         if (registered != null) {
           _isAdd = ! registered!;
-          if (registered!){
+          if (! registered!){
             //No esta registrado en NovaFarma. Se busca en NovaDaily y
             // actualiza campos.
             // **
             // ** SI DESHABILITA HASTA SOLUCIONAR CORS
             // **
-            //await _registeredDocumentNovaDaily();
+            await _registeredDocumentNovaDaily();
           }
         }
 
@@ -513,7 +514,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
   }
 
- /* Future<void> _registeredDocumentNovaDaily() async {
+  Future<void> _registeredDocumentNovaDaily() async {
     List<PartnerNovaDailyDTO> _partnerNovaDailyList = [];
     _changeStateLoading(true);
 
@@ -568,7 +569,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     //if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
     //return Future.value(registered);
 
-  }*/
+  }
 
   /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
   void _updateFields(Object customer) {
@@ -588,7 +589,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
     } else if (customer is PartnerNovaDailyDTO) {
       _dateController.value =
-          TextEditingValue(text: dateTimeToStr(customer.addDate)!);
+          TextEditingValue(text: daytimeToStrDate(customer.addDate.toString())!);
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name!);
       _paymentNumberController.value = TextEditingValue(

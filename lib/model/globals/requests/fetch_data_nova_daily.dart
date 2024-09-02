@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:novafarma_front/model/globals/constants.dart'
-    show novaDailyToken, socketNovaDaily, timeOutSecondsResponse,
-    uriNovaDailyFindPartnerDocument;
+    show timeOutSecondsResponse;
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -12,27 +11,19 @@ import '../../enums/request_type_enum.dart';
 
 /// value: valor a buscar. body: está por si se implementa un post
 Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
-  required String uri,
+  required Uri uri,
   required T classObject,
-  required String value,
   RequestTypeEnum? requestType = RequestTypeEnum.get,
   Object? body,
 }) async {
 
-  Uri url;
   http.Response response;
   bool generalException = true;
 
   try {
-    url = Uri.http(
-      socketNovaDaily,
-      uriNovaDailyFindPartnerDocument,
-      {'apiToken': novaDailyToken, 'cedula': value},
-    );
-
     if (requestType == RequestTypeEnum.post) {
         response = await http.post(
-            url,
+            uri,
             body: json.encode(body),
             headers:{
               "Content-Type": "application/json; charset=UTF-8",
@@ -41,13 +32,19 @@ Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
 
     } else if (requestType == RequestTypeEnum.put) {
       response = await http.put(
-          url,
+          uri,
           body: json.encode(body),
           headers: {"Content-Type": "application/json; charset=UTF-8",}
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else {
-      response = await http.get(url)
+      response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+          "Accept": "application/json"
+        }
+      )
           .timeout(const Duration(seconds: timeOutSecondsResponse));
     }
 

@@ -11,6 +11,8 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 
 ///Devuelve una lista de objetos de la base de datos, obtenidos por paginación.
 ///Envía solo solicitudes get.
+///uri tipo String: si el endpoint define el argumento como @PathVariable.
+///uri tipo Uri: si el endpoint define el argumento como @PathParam.
 Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
   required dynamic uri,
   required T classObject,

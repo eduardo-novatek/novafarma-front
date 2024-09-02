@@ -24,6 +24,19 @@ DateTime? strToDate(String? dateStr) {
   return date;
 }
 
+///Dada una Fecha y hora en formato nativo (yyyy-MM-dd HH:mm) devuelve la fecha
+///en formato DateTime yyyy-MM-dd como String.
+///Devuelve null si falla la conversion.
+String? daytimeToStrDate(String inputDateTime) {
+  try {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    return formatter.format(DateTime.parse(inputDateTime));
+  } catch (e) {
+      print('Error al convertir la fecha: $e');
+      return null;
+  }
+}
+
 ///Dada una fecha y hora en formato String, devuelve la fecha en formato
 ///DateTime, incluyendo hora y minutos. Si el argumento dateStr es "yyyy-MM-dd",
 ///devuelve un objeto DateTime con igual formato. Idem para dateStr="dd/MM/yyyy".

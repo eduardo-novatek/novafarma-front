@@ -3,8 +3,12 @@
 
 const String host = 'localhost';
 const int port = 8080;
-const String socket = '$host:$port'; //server application
-const String socketNovaDaily = 'novateksoluciones.dyndns.org:9091'; //server NovaDaily
+const String socket = '$host:$port';
+const String hostNovaDaily = 'novateksoluciones.dyndns.org';
+const int portNovaDaily = 9091;
+
+//Tokens
+const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1nH1A19CwLuSCHnT3X3DYU2DvfaKnJbp1lZEVXNV0TpjWIzZrAqOTjxcPDxaDInIsdPkLi8QGHfgrQaU3ZIa8sLapH7qgyWU8eIn5AXiXcn5cRVbfh44mljLZr5jvgmtGmvW2CMUHzdrWfxCzNoUQgP6XECm2f3ShGJjXDyjkJOLYaS9fNAamqqqVBm";
 
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
@@ -27,12 +31,15 @@ const String imagesPath = "assets/images/";
 const String superAdminUser = "N0v4Tek.2o24";
 const String superAdminPass = "n0vaF4rm4!";
 
-//Tokens
-const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1nH1A19CwLuSCHnT3X3DYU2DvfaKnJbp1lZEVXNV0TpjWIzZrAqOTjxcPDxaDInIsdPkLi8QGHfgrQaU3ZIa8sLapH7qgyWU8eIn5AXiXcn5cRVbfh44mljLZr5jvgmtGmvW2CMUHzdrWfxCzNoUQgP6XECm2f3ShGJjXDyjkJOLYaS9fNAamqqqVBm";
-
 //
 // EndPoints
 //
+
+//NovaDaily
+const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
+//'/socio/cedula?apiToken=$novaDailyToken&cedula';
+const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
+//'/socio/apellido?apiToken=$novaDailyToken&apellido';
 
 //Role
 const String uriRoleAdd = "/role/add";
@@ -59,12 +66,6 @@ const String uriCustomerDelete = "/customer/delete";
 const String uriCustomerFindControlledMedications = "/customer/findControlledMedications";
 const String uriCustomerFindVouchersPage = "/customer/findVouchers";
 const String uriCustomerNursingReportPage = "/customer/nursingReport";
-
-//NovaDaily
-const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
-    //'/socio/cedula?apiToken=$novaDailyToken&cedula';
-const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
-    //'/socio/apellido?apiToken=$novaDailyToken&apellido';
 
 //Supplier
 const String uriSupplierFindAll = "/supplier/findAll";
