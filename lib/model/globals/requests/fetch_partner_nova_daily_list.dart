@@ -27,10 +27,11 @@ Future<void> fetchPartnerNovaDailyList({
     },
   );
   await fetchDataNovaDaily(
-    //uri: url,
-    uri: Uri.parse('http://localhost:8081/${url.toString()}'),
+    //uri: url, //Habilitar si los CORS están definidos en el backend
+    uri: Uri.parse('http://localhost:8081/${url.toString()}'), //Habilitar si los CORS se manejan a través de un proxi docker
     classObject: PartnerNovaDailyDTO.empty(),
   ).then((data) {
+    if (data[0] == "null") return null;
     partnerNovaDailyList.clear();
     partnerNovaDailyList.addAll(
       data.cast<PartnerNovaDailyDTO>().map((e) => PartnerNovaDailyDTO(

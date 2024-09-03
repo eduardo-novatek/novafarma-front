@@ -117,3 +117,12 @@ String dateNow() {
   final formatter = DateFormat('dd/MM/yyyy');
   return formatter.format(DateTime.now());
 }
+
+String? strYMDHMToStrDMY(String inputDate) {
+  String? formattedDate;
+  DateTime? dateTime = DateTime.tryParse(inputDate);
+  if (dateTime != null) {
+    formattedDate = DateFormat('dd/MM/yyyy').format(dateTime);
+  }
+  return formattedDate;
+}

@@ -52,13 +52,15 @@ class PartnerNovaDailyDTO extends Deserializable<PartnerNovaDailyDTO> {
       name: json['nombre'],
       lastname: json['apellido'],
       document: int.parse(json['cedula']),
-      paymentNumber: int.tryParse(json['numeroCobro']),
+      paymentNumber: json['numeroCobro'] != ''
+          ? int.parse(json['numeroCobro'])
+          : 0,
       telephone: json['telefono'],
       address: json['direccion'],
-      birthDate: json['fechaNacimiento'],
-      addDate: daytimeToStrDate(json['fechaAlta']),
-      updateDate: daytimeToStrDate(json['fechaModificacion']),
-      deleteDate: daytimeToStrDate(json['fechaBaja']),
+      birthDate: strDateToStrDateView(json['fechaNacimiento']),
+      addDate: strYMDHMToStrDMY(json['fechaAlta']),
+      updateDate: strYMDHMToStrDMY(json['fechaModificacion']),
+      deleteDate: strYMDHMToStrDMY(json['fechaBaja']),
       notes: json['notas'],
     );
   }

@@ -13,6 +13,7 @@ import 'package:novafarma_front/model/globals/constants.dart' show
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
+import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -418,13 +419,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         registered = await _registeredDocument();
         if (registered != null) {
           _isAdd = ! registered!;
-          if (! registered!){
-            //No esta registrado en NovaFarma. Se busca en NovaDaily y
-            // actualiza campos.
-            // **
-            // ** SI DESHABILITA HASTA SOLUCIONAR CORS
-            // **
-            await _registeredDocumentNovaDaily();
+          if (! registered! && mounted){
+            //No esta registrado en NovaFarma. Se pregunta si desea buscar en NovaDaily
+            if (await _findInNovaDaily()) {
+              await _findDocumentNovaDaily();
+            } else {
+              //No permite el ingreso del cliente
+              if (mounted) FocusScope.of(context).requestFocus(_documentFocusNode);
+            }
           }
         }
 
@@ -433,6 +435,17 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         _initialize(initDocument: false);
       }
     });
+  }
+
+  Future<bool> _findInNovaDaily() async {
+    return await OpenDialog(
+      title: 'No encontrado',
+      content: 'Cliente no registado en NovaFarma.\n'
+          '¿Desea buscarlo en NovaDaily?',
+      textButton1: 'Si',
+      textButton2: 'No',
+      context: context,
+     ).view() == 1;
   }
 
   void _dateListener() {
@@ -483,27 +496,6 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         }
       } else {
         genericError(error, mounted ? context : context);
-        /*if (error.toString().contains('XMLHttpRequest error')) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException')) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }*/
       }
     } finally {
       _changeStateLoading(false);
@@ -511,20 +503,19 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
     if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
     return Future.value(registered);
-
   }
 
-  Future<void> _registeredDocumentNovaDaily() async {
-    List<PartnerNovaDailyDTO> _partnerNovaDailyList = [];
+  Future<void> _findDocumentNovaDaily() async {
+    List<PartnerNovaDailyDTO> partnerNovaDailyList = [];
     _changeStateLoading(true);
 
     try {
       await fetchPartnerNovaDailyList(
-        partnerNovaDailyList: _partnerNovaDailyList,
+        partnerNovaDailyList: partnerNovaDailyList,
         searchByDocument: true,
         value: _documentController.text,
       );
-      _updateFields(_partnerNovaDailyList[0]);
+      if (partnerNovaDailyList.isNotEmpty) _updateFields(partnerNovaDailyList[0]);
 
     } catch (error) {
       if (error is ErrorObject) {
@@ -588,8 +579,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _dependentId = customer.dependentId!;
 
     } else if (customer is PartnerNovaDailyDTO) {
-      _dateController.value =
-          TextEditingValue(text: daytimeToStrDate(customer.addDate.toString())!);
+      _dateController.value = TextEditingValue(text: customer.addDate!);
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name!);
       _paymentNumberController.value = TextEditingValue(
@@ -597,9 +587,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _telephoneController.value = TextEditingValue(text: customer.telephone!);
       _notesController.value = TextEditingValue(text: customer.notes!);
 
-      //_customerId = customer.partnerId!; //Tomo el id de socio de NovaDaily
-      //_partnerId = customer.partnerId!;
-      //_dependentId = customer.;
+      _partnerId = customer.partnerId!;
+      _dependentId = customer.dependentId!;
     }
 
   }
