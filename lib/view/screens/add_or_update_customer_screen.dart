@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
+import 'package:novafarma_front/model/DTOs/dependent_nova_daily_dto.dart';
 import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -501,7 +502,9 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _changeStateLoading(false);
     }
 
-    if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
+    if (registered == null && mounted) {
+      FocusScope.of(context).requestFocus(_documentFocusNode);
+    }
     return Future.value(registered);
   }
 
@@ -521,7 +524,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       if (error is ErrorObject) {
         if (error.statusCode == HttpStatus.notFound) {
 
-        } else {
+        } else if (mounted){
           await OpenDialog(
               context: context,
               title: 'Error',
@@ -531,20 +534,20 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
           ).view();
         }
       } else {
-        if (error.toString().contains('XMLHttpRequest error')) {
+        if (error.toString().contains('XMLHttpRequest error') && mounted ) {
           await OpenDialog(
             context: context,
             title: 'Error de conexión',
             content: 'No es posible conectar con el servidor',
           ).view();
         } else {
-          if (error.toString().contains('TimeoutException')) {
+          if (error.toString().contains('TimeoutException') && mounted) {
             await OpenDialog(
               context: context,
               title: 'Error de conexión',
               content: 'No es posible conectar con el servidor.\nTiempo expirado.',
             ).view();
-          } else {
+          } else if (mounted){
             await OpenDialog(
               context: context,
               title: 'Error desconocido',
@@ -556,10 +559,6 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     } finally {
       _changeStateLoading(false);
     }
-
-    //if (registered == null) FocusScope.of(context).requestFocus(_documentFocusNode);
-    //return Future.value(registered);
-
   }
 
   /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
@@ -588,6 +587,15 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _notesController.value = TextEditingValue(text: customer.notes!);
 
       _partnerId = customer.partnerId!;
+
+    } else if (customer is DependentNovaDailyDTO) {
+      _dateController.value = TextEditingValue(text: dateNow());
+      _lastnameController.value = TextEditingValue(text: customer.lastname!);
+      _nameController.value = TextEditingValue(text: customer.name!);
+      _paymentNumberController.value = const TextEditingValue(text: '0');
+      _telephoneController.value = const TextEditingValue(text: '');
+      _notesController.value = const TextEditingValue(text: '');
+
       _dependentId = customer.dependentId!;
     }
 
