@@ -6,6 +6,8 @@ const int port = 8080;
 const String socket = '$host:$port';
 const String hostNovaDaily = 'novateksoluciones.dyndns.org';
 const int portNovaDaily = 9091;
+//const String uriDockerNovaDaily = ''; //Habilitar en caso de solucionar CORS en backend
+const String uriProxyCORSNovaDaily = 'http://localhost:8081/'; //Habilitar en caso de no solucionar CORS en backend
 
 //Tokens
 const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1nH1A19CwLuSCHnT3X3DYU2DvfaKnJbp1lZEVXNV0TpjWIzZrAqOTjxcPDxaDInIsdPkLi8QGHfgrQaU3ZIa8sLapH7qgyWU8eIn5AXiXcn5cRVbfh44mljLZr5jvgmtGmvW2CMUHzdrWfxCzNoUQgP6XECm2f3ShGJjXDyjkJOLYaS9fNAamqqqVBm";
@@ -37,9 +39,9 @@ const String superAdminPass = "n0vaF4rm4!";
 
 //NovaDaily
 const String uriNovaDailyFindPartnerDocument = '/socio/cedula';
-//'/socio/cedula?apiToken=$novaDailyToken&cedula';
 const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
-//'/socio/apellido?apiToken=$novaDailyToken&apellido';
+const String uriNovaDailyFindDependentDocument = '/dependiente/cedula';
+const String uriNovaDailyFindDependentLastname = '/dependiente/apellido';
 
 //Role
 const String uriRoleAdd = "/role/add";

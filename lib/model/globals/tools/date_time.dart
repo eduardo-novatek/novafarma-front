@@ -102,7 +102,8 @@ String strDateViewToStrDate(String dateDMY) {
 
 ///Dada una fecha en formato DateTime de tipo String: "yyyy-MM-dd" la devuelve
 ///en formato de visualización de tipo String: "dd/MM/yyyy"
-String strDateToStrDateView(String dateYMD) {
+String? strDateToStrDateView(String? dateYMD) {
+  if (dateYMD == null) return null;
   return DateFormat('dd/MM/yyyy').format(DateFormat('yyyy-MM-dd').parseStrict(dateYMD));
 }
 
