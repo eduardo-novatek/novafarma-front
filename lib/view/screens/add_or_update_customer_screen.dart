@@ -377,7 +377,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       paymentNumber: _buildPaymentNumber(),
       telephone: _telephoneController.text.trim(),
       notes: _notesController.text.trim(),
-      partner: _partnerId != 0,
+      partner: _partnerId != 0 && _dependentId == 0,
       partnerId: _partnerId,
       dependentId: _dependentId,
       deleted: false,
@@ -622,7 +622,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       });
 
     } else if (customer is DependentNovaDailyDTO) {
-      _dateController.value = TextEditingValue(text: dateNow());
+      _dateController.value = TextEditingValue(text: dateNow()); // El json del dependiente viene sin fecha de alta
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name!);
       _paymentNumberController.value = const TextEditingValue(text: '0');
