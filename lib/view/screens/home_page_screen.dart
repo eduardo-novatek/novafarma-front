@@ -322,7 +322,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         const PopupMenuItem<String>(
           value: 'medicine_nursing_report',
           child: ListTile(
-            leading: Icon(Icons.list),
+            leading: Icon(Icons.table_rows),
             title: Text('Informe de enfermería'),
           ),
         ),

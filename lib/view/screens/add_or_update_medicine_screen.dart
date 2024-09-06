@@ -356,7 +356,13 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                       viewCharactersCount: false,
                       textForValidation: 'Requerido',
                       acceptEmpty: false,
-                    ),
+                      onEditingComplete: () {
+                        if (mounted) {
+                          FocusScope.of(context)
+                              .requestFocus(_presentationUnitNameFocusNode);
+                          FocusScope.of(context).nextFocus();
+                        }
+                      }),
                   ),
                   const Spacer(),
                   Flexible(

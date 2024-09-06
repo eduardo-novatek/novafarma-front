@@ -1,26 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 
-///Dada una fecha en formato String (dateStr), devuelve la fecha en formato
-///DateTime. Si el argumento dateStr es "yyyy-MM-dd", devuelve un objeto
-///DateTime con igual formato. Idem para dateStr="dd/MM/yyyy".
-///Si falla la conversión o el año < 1900, retorna null.
+///Dada una fecha en formato String (dd/MM/yyy o yyyy-MM-dd) devuelve la fecha en formato
+///DateTime, respetando el formato de entrada. Si falla la conversión o el año < 1900, retorna null.
 DateTime? strToDate(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return null;
   DateTime? date;
-  // Intentar parsear en formato yyyy-MM-dd
   try {
-    date = DateTime.parse(dateStr);
+    // Intenta parsearla en formato de visualizacion
+     date = DateFormat('dd/MM/yyyy').parseStrict(dateStr);
   } catch (_) {
-    // Si falla, intentar parsear en formato dd/MM/yyyy
     try {
-      date = DateFormat('dd/MM/yyyy').parseStrict(dateStr);
-    } catch (e) {
-      if (kDebugMode) print('Error parseando la fecha: $e');
+      // Intenta parsearla en formato nativo
+      date = DateFormat('yyyy-MM-dd').parseStrict(dateStr);
+    } catch(_) {
+      if (kDebugMode) print('Error parseando la fecha $dateStr');
       return null;
     }
   }
-  if (date.year < 1900) return null;
+  if (date.year < 1900) date = null;
   return date;
 }
 

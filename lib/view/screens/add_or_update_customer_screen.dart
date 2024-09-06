@@ -17,7 +17,6 @@ import 'package:novafarma_front/model/globals/find_partner_by_document_novadaily
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -25,7 +24,6 @@ import '../../model/DTOs/user_dto_1.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/requests/add_or_update_customer.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
-import '../../model/globals/requests/fetch_partner_nova_daily_list.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/date_time.dart';
 import '../../model/globals/tools/floating_message.dart';

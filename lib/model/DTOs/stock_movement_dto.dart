@@ -38,7 +38,7 @@ class StockMovementDTO extends Deserializable<StockMovementDTO> {
     StockMovementDTO fromJson(Map<String, dynamic> json) {
     return StockMovementDTO(
       stockMovementId: json['stockMovementId'],
-      dateTime: strToDate(json['dateTime']),
+      dateTime: strToDateTime(json['dateTime']),
       movementType: nameDBtoMovementTypeEnum(json['movementType']),
       quantity: json['quantity'],
       unitPrice: json['unitPrice'],
