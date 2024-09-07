@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_pageable.dart';
@@ -48,6 +49,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   final _startDateFilterFocusNode = FocusNode();
   final _endDateFilterFocusNode = FocusNode();
 
+  double _total = 0.0;
   bool _loading = false;
 
   @override
@@ -230,8 +232,20 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   }
 
   Widget _buildFooter() {
-    return _pageObjectMap.totalPages != 0
-        ? PaginationBar(
+    final numberFormat = NumberFormat.currency(
+      locale: 'es_ES',
+      symbol: '\$',
+      decimalDigits: 2, // Número de decimales
+    );
+
+    return Row(
+      children: [
+        // Widget vacío para ocupar el espacio de la izquierda
+        const Expanded(child: SizedBox.shrink()),
+
+        // Centrar la PaginationBar
+        if (_pageObjectMap.totalPages != 0)
+          PaginationBar(
             totalPages: _pageObjectMap.totalPages,
             initialPage: _pageObjectMap.pageNumber + 1,
             onPageChanged: (page) {
@@ -240,9 +254,25 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
                 _loadDataPageable();
               });
             },
-          )
-        : const SizedBox.shrink();
+          ),
+        if (_pageObjectMap.totalPages != 0)
+          // Expand para tomar tod@ el espacio sobrante a la derecha
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                margin: const EdgeInsets.only(right: 16.0),
+                child: Text(
+                  'Total: ${numberFormat.format(_total)}',
+                  style: const TextStyle(fontSize: 16, fontWeight: ui.FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
+
 
   Future<void> _loadDataPageable() async {
     _setLoading(true);
@@ -256,6 +286,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
           '/$sizePageCustomerNursingReportList',
     ).then((pageObject) {
       _pageObjectMap.content.clear();
+      _total = 0;
       if (pageObject.totalElements == 0) {
         FloatingMessage.show(
           context: context,
@@ -264,11 +295,22 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
         );
       } else {
         setState(() {
+          (pageObject.content as Map<CustomerDTO2, List<NursingReportDTO>>)
+              .forEach((customer, reports) {
+            _pageObjectMap.content[customer] = reports;
+            for (var report in reports) {
+              _total += report.quantity! * report.unitPrice!;
+            }
+          });
+        });
+        /*setState(() {
           _pageObjectMap.content.addAll(
               pageObject.content as Map<CustomerDTO2, List<NursingReportDTO>>);
           _updatePageObjectMap(pageObject);
-        });
+        });*/
       }
+      _updatePageObjectMap(pageObject);
+
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
