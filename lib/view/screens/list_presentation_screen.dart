@@ -283,25 +283,29 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
       return;
     }
     _setLoading(true);
+    _pageObject.content.clear();
     await fetchDataObject<PresentationDTO>(
       uri: '$uriPresentationFindName/${_nameFilterController.text.trim()}',
       classObject: PresentationDTO.empty(),
     ).then((data) {
-      _pageObject.content.clear();
       _pageObject.content.addAll(
           data as Iterable<PresentationDTO>
       );
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+        if (error.statusCode != 404) {
+          FloatingMessage.show(
+            context: context,
+            text: '${error.message ?? 'Error indeterminado'} (${error
+                .statusCode})',
+            messageTypeEnum: error.message != null
+                ? MessageTypeEnum.warning
+                : MessageTypeEnum.error,
+          );
+          if (kDebugMode) {
+            print('${error.message ?? 'Error indeterminado'} (${error
+                .statusCode})');
+          }
         }
       } else {
         FloatingMessage.show(

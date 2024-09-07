@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/globals/buildTableCell.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
@@ -15,8 +14,8 @@ import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show sizePageCustomerNursingReportList, uriCustomerNursingReportPage;
 import '../../model/globals/tools/create_text_form_field.dart';
-import '../../model/globals/tools/date_time.dart' show dateTimeToStr,
-  strDateViewToStrDate;
+import '../../model/globals/tools/date_time.dart' show dateTimeToStr, dateToStr,
+  strDateViewToStrDate, strToDate;
 import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/page_object_map.dart';
 
@@ -35,6 +34,9 @@ class NursingReportScreen extends StatefulWidget {
 
 class _NursingReportScreenState extends State<NursingReportScreen> {
 
+  final _startDateKey = GlobalKey<FormState>();
+  final _endDateKey = GlobalKey<FormState>();
+
   static const double _spaceMenuAndBorder = 30.0;
 
   final PageObjectMap<CustomerDTO2, List<NursingReportDTO>> _pageObjectMap =
@@ -50,6 +52,14 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
 
   @override
   void initState() {
+    DateTime now = DateTime.now();
+    _startDateFilterController.value = TextEditingValue(
+      text: '01/${'0${now.month}'.substring('0${now.month}'.length-2)}/${now.year}'
+    );
+    _endDateFilterController.value = TextEditingValue(
+      text: dateToStr(now)!
+    );
+    _createListeners();
     super.initState();
   }
 
@@ -138,53 +148,58 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     );
   }
 
-  CreateTextFormField _startDate() {
-    return CreateTextFormField(
-      controller: _startDateFilterController,
-      focusNode: _startDateFilterFocusNode,
-      dataType: DataTypeEnum.date,
-      label: '',
-      initialFocus: true,
-      viewCharactersCount: false,
-      acceptEmpty: false,
-      decoration: InputDecoration(
-          labelStyle: const TextStyle(color: Colors.white),
-          label: const Text('Fecha inicio'),
-          border: const OutlineInputBorder(),
-          filled: true,
-          fillColor: Colors.blue.shade300,
-          suffixIcon: IconButton(
-            onPressed: _clearFilter,
-            icon: const Icon(Icons.clear, color: Colors.white),
-          ),
+  Widget _startDate() {
+    return Form(
+      key: _startDateKey,
+      child: CreateTextFormField(
+        controller: _startDateFilterController,
+        focusNode: _startDateFilterFocusNode,
+        dataType: DataTypeEnum.date,
+        label: '',
+        initialFocus: true,
+        viewCharactersCount: false,
+        acceptEmpty: false,
+        textForValidation: 'Fecha inválida',
+        decoration: InputDecoration(
+            labelStyle: const TextStyle(color: Colors.white),
+            label: const Text('Fecha inicio'),
+            border: const OutlineInputBorder(),
+            filled: true,
+            fillColor: Colors.blue.shade300,
+        ),
+        textStyle: const TextStyle(color: Colors.white),
+        onEditingComplete: () {
+          if (_startDateKey.currentState!.validate()) {
+            FocusScope.of(context).requestFocus(_endDateFilterFocusNode);
+          }
+        }
       ),
-      textStyle: const TextStyle(color: Colors.white),
-      onEditingComplete: () =>
-        FocusScope.of(context).requestFocus(_endDateFilterFocusNode),
     );
   }
 
-  CreateTextFormField _endDate() {
-    return CreateTextFormField(
-      controller: _endDateFilterController,
-      focusNode: _endDateFilterFocusNode,
-      dataType: DataTypeEnum.date,
-      label: '',
-      viewCharactersCount: false,
-      acceptEmpty: false,
-      decoration: InputDecoration(
-        label: const Text('Fecha fin'),
-        labelStyle: const TextStyle(color: Colors.white),
-        border: const OutlineInputBorder(),
-        filled: true,
-        fillColor: Colors.blue.shade300,
-        suffixIcon: IconButton(
-          onPressed: _clearFilter,
-          icon: const Icon(Icons.clear, color: Colors.white),
+  Form _endDate() {
+    return Form(
+      key: _endDateKey,
+      child: CreateTextFormField(
+        controller: _endDateFilterController,
+        focusNode: _endDateFilterFocusNode,
+        dataType: DataTypeEnum.date,
+        label: '',
+        viewCharactersCount: false,
+        acceptEmpty: false,
+        textForValidation: 'Fecha inválida',
+        decoration: InputDecoration(
+          label: const Text('Fecha fin'),
+          labelStyle: const TextStyle(color: Colors.white),
+          border: const OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.blue.shade300,
         ),
+        textStyle: const TextStyle(color: Colors.white),
+        onEditingComplete: () async {
+          if (_validateEndDate()) await _loadDataPageable();
+        },
       ),
-      textStyle: const TextStyle(color: Colors.white),
-      onEditingComplete: () async => await _loadDataPageable(),
     );
   }
 
@@ -230,7 +245,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   }
 
   Future<void> _loadDataPageable() async {
-    _toggleLoading();
+    _setLoading(true);
     String startDate = strDateViewToStrDate(_startDateFilterController.text.trim());
     String endDate = strDateViewToStrDate(_endDateFilterController.text.trim());
     await fetchNursingReportPageable(
@@ -277,22 +292,13 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
         }
       }
     });
-    _toggleLoading();
+    _setLoading(false);
   }
 
-  void _toggleLoading() {
+  void _setLoading(bool loading) {
     setState(() {
-      _loading = !_loading;
+      _loading = loading;
     });
-  }
-
-  void _clearFilter() {
-    if (_startDateFilterController.text.trim().isNotEmpty) {
-      setState(() {
-        _startDateFilterController.clear();
-      });
-      _loadDataPageable();
-    }
   }
 
   Widget _buildReportRow(int index) {
@@ -356,6 +362,44 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     _pageObjectMap.totalElements = pageObjectResult.totalElements;
     _pageObjectMap.first = pageObjectResult.first;
     _pageObjectMap.last = pageObjectResult.last;
+  }
+
+  void _createListeners() {
+    _startDateListener();
+    _endDateListener();
+  }
+
+  void _startDateListener() {
+    _startDateFilterFocusNode.addListener(() {
+      if (! _startDateFilterFocusNode.hasFocus) {
+        _startDateKey.currentState!.validate();
+      }
+    });
+  }
+
+  void _endDateListener() {
+    _endDateFilterFocusNode.addListener(() async {
+      if (! _endDateFilterFocusNode.hasFocus) {
+        if (_validateEndDate()) await _loadDataPageable();
+      }
+    });
+  }
+
+  bool _validateEndDate() {
+    bool ret = false;
+    if (_endDateKey.currentState!.validate()) {
+      if (strToDate(_endDateFilterController.text)!
+        .isBefore(strToDate(_startDateFilterController.text)!)) {
+        FloatingMessage.show(
+          context: context,
+          text: 'La fecha final debe ser mayor o igual a la inicial',
+          messageTypeEnum: MessageTypeEnum.warning
+        );
+      } else {
+        ret = true;
+      }
+    }
+    return ret;
   }
 
 }

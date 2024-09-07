@@ -160,7 +160,6 @@ class _CreateTextFormFieldState extends State<CreateTextFormField> {
                 hasError =
                     inputDate.isAfter(DateTime.now()) ||
                     inputDate.year < 1900;
-
               } catch (e) {
                 hasError = true;
               }

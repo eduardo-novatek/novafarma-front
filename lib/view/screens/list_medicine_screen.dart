@@ -226,16 +226,18 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   }
 
   Widget _buildFooter() {
-    return PaginationBar(
-      totalPages: _pageObject.totalPages,
-      initialPage: _pageObject.pageNumber + 1,
-      onPageChanged: (page) {
-        _pageObject.pageNumber = page - 1;
-        _nameFilterController.text.trim().isNotEmpty
-          ? _loadDataFilterPageable()
-          : _loadDataPageable();
-      },
-    );
+    return _pageObject.totalPages > 0
+        ? PaginationBar(
+            totalPages: _pageObject.totalPages,
+            initialPage: _pageObject.pageNumber + 1,
+            onPageChanged: (page) {
+              _pageObject.pageNumber = page - 1;
+              _nameFilterController.text.trim().isNotEmpty
+                ? _loadDataFilterPageable()
+                : _loadDataPageable();
+            },
+          )
+        : const SizedBox.shrink();
   }
 
   Future<void> _loadDataPageable() async {
@@ -358,7 +360,6 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           color: _highlightedIndex == index
               ? Colors.blue.shade50
               : Colors.white,
-              //: (index % 2 == 0 ? Colors.white : Colors.grey.shade100),
           border: Border(
             bottom: BorderSide(
               color: Colors.grey.shade200,
@@ -412,67 +413,6 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       ),
     );
   }
-
-
-/*
-  Widget _buildMedicineRow(int index) {
-    MedicineDTO1 medicine = _pageObject.content[index];
-    return Container(
-      decoration: BoxDecoration(
-        color: index % 2 == 0 ? Colors.white : Colors.grey.shade100,
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.shade200,
-          ),
-        ),
-      ),
-      child: Table(
-        columnWidths: const {
-          0: FlexColumnWidth(_colControlled),
-          1: FlexColumnWidth(_colName),
-          2: FlexColumnWidth(_colPresentation),
-          3: FlexColumnWidth(_colLastAddDate),
-          4: FlexColumnWidth(_colCostPrice),
-          5: FlexColumnWidth(_colSalePrice),
-          6: FlexColumnWidth(_colStock),
-          7: FlexColumnWidth(_colMenu),
-        },
-        children: [
-          TableRow(
-            children: [
-              _buildControlledIcon(medicine),
-              _buildTableCell(
-                text: medicine.name,
-                isDeleted: medicine.deleted!
-              ),
-              _buildTableCell(
-                text: _buildPresentation(medicine.presentation!),
-                isDeleted: medicine.deleted!
-              ),
-              _buildTableCell(
-                text: dateToStr(medicine.lastAddDate!),
-                isDeleted: medicine.deleted!
-              ),
-              _buildTableCell(
-                text: medicine.lastCostPrice!.toString(),
-                isDeleted: medicine.deleted!
-              ),
-              _buildTableCell(
-                text: medicine.lastSalePrice!.toString(),
-                isDeleted: medicine.deleted!
-              ),
-              _buildTableCell(
-                text: medicine.currentStock!.toString(),
-                isDeleted: medicine.deleted!
-              ),
-              _showMenu(index),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-*/
 
   TableCell _buildControlledIcon(MedicineDTO1 medicine) {
     return TableCell(

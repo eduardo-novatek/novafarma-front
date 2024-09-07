@@ -125,3 +125,38 @@ String? strYMDHMToStrDMY(String inputDate) {
   }
   return formattedDate;
 }
+
+///True si el año es bisiesto
+bool isLeapYear(int year) {
+  if (year % 4 == 0) {
+    if (year % 100 == 0) {
+      return year % 400 == 0;
+    }
+    return true;
+  }
+  return false;
+}
+
+///Devuelve los meses del año (considerando bisisesto)
+List<Map<String, dynamic>> getMonths(int year) {
+  List<Map<String, dynamic>> months = [
+    {'month': 'Enero',    'days': 31},
+    {'month': 'Febrero',  'days': isLeapYear(year) ? 29 : 28},
+    {'month': 'Marzo',    'days': 31},
+    {'month': 'Abril',    'days': 30},
+    {'month': 'Mayo',     'days': 31},
+    {'month': 'Junio',    'days': 30},
+    {'month': 'Julio',    'days': 31},
+    {'month': 'Agosto',   'days': 31},
+    {'month': 'Setiembre','days': 30},
+    {'month': 'Octubre',  'days': 31},
+    {'month': 'Noviembre','days': 30},
+    {'month': 'Diciembre','days': 31},
+  ];
+  return months;
+}
+
+///Devuelve la cantidad de dias que tiene el 'month' del 'year'
+int getDays(int month, int year) {
+  return getMonths(year).elementAt(month-1)['days'];
+}

@@ -13,7 +13,9 @@ import '../../model/DTOs/customer_dto1.dart';
 import '../../model/DTOs/voucher_dto_1.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
-    show sizePageCustomerList, uriCustomerDelete, uriCustomerFindAllPage, uriCustomerFindControlledMedications, uriCustomerFindLastnameName, uriCustomerFindVouchersPage;
+    show sizePageCustomerList, uriCustomerDelete, uriCustomerFindAllPage,
+    uriCustomerFindControlledMedications, uriCustomerFindLastnameName,
+    uriCustomerFindVouchersPage;
 import '../../model/globals/tools/date_time.dart' show dateToStr;
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/fetch_data_object_pageable.dart';
