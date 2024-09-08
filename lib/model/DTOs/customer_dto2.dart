@@ -1,6 +1,4 @@
-import 'package:novafarma_front/model/DTOs/user_dto_1.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
-import 'package:novafarma_front/model/globals/tools/date_time.dart';
 
 class CustomerDTO2 extends Deserializable<CustomerDTO2> {
   int? document;

@@ -117,7 +117,8 @@ String dateNow() {
   return formatter.format(DateTime.now());
 }
 
-String? strYMDHMToStrDMY(String inputDate) {
+String? strYMDHMToStrDMY(String? inputDate) {
+  if (inputDate == null) return null;
   String? formattedDate;
   DateTime? dateTime = DateTime.tryParse(inputDate);
   if (dateTime != null) {

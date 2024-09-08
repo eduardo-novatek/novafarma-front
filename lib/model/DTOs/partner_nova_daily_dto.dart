@@ -51,18 +51,37 @@ class PartnerNovaDailyDTO extends Deserializable<PartnerNovaDailyDTO> {
       partnerId: json['id'],
       name: json['nombre'],
       lastname: json['apellido'],
-      document: int.parse(json['cedula']),
+      document: json['cedula'] is String
+          ? int.parse(json['cedula'])
+          : json['cedula'],
       paymentNumber: json['numeroCobro'] != ''
-          ? int.parse(json['numeroCobro'])
+          ? json['numeroCobro'] is String
+            ? int.parse(json['numeroCobro'])
+            : json['numeroCobro']
           : 0,
       telephone: json['telefono'],
       address: json['direccion'],
-      birthDate: strDateToStrDateView(json['fechaNacimiento']),
-      addDate: strYMDHMToStrDMY(json['fechaAlta']),
-      updateDate: strYMDHMToStrDMY(json['fechaModificacion']),
-      deleteDate: strYMDHMToStrDMY(json['fechaBaja']),
+      birthDate: _dateConvert(json['fechaNacimiento']),
+      addDate: _dateConvert1(json['fechaAlta']),
+      updateDate: _dateConvert1(json['fechaModificacion']),
+      deleteDate: _dateConvert1(json['fechaBaja']),
       notes: json['notas'],
     );
+  }
+
+  String? _dateConvert(String? date) {
+    try {
+      //Intenta devolver la fecha formateada (en caso que date sea YMD)
+      return strDateToStrDateView(date);
+    } catch (e) {
+      //No pudo convertir, con lo cual la fecha ya esta casteada a DMA
+      return date;
+    }
+  }
+
+  String? _dateConvert1(String? date) {
+    String? ret = strYMDHMToStrDMY(date);
+    return ret ?? date;
   }
 
   @override

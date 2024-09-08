@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -182,15 +183,19 @@ class _ListUnitScreenState extends State<ListUnitScreen> {
       _unitList.addAll(data as Iterable<UnitDTO>);
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+        if (error.statusCode != HttpStatus.notFound) {
+          FloatingMessage.show(
+            context: context,
+            text: '${error.message ?? 'Error indeterminado'} (${error
+                .statusCode})',
+            messageTypeEnum: error.message != null
+                ? MessageTypeEnum.warning
+                : MessageTypeEnum.error,
+          );
+          if (kDebugMode) {
+            print('${error.message ?? 'Error indeterminado'} (${error
+                .statusCode})');
+          }
         }
       } else {
         FloatingMessage.show(

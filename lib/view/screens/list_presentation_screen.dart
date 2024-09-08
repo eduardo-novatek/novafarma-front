@@ -211,7 +211,8 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
   }
 
   Widget _buildFooter() {
-    if(_nameFilterController.text.trim().isNotEmpty) {
+    if(_nameFilterController.text.trim().isNotEmpty
+        || _pageObject.totalElements == 0) {
       return const SizedBox.shrink();
     }
     return PaginationBar(

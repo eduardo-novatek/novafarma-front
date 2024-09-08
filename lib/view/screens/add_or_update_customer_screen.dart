@@ -66,7 +66,10 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   final _telephoneFocusNode = FocusNode();
   final _paymentNumberFocusNode = FocusNode();
 
-  int _customerId = 0, _dependentId = 0, _partnerId = 0;
+  //_customerId: -1 => aun no se realizó la busqueda del cliente,
+  // 0 => el cliente no esta registrado en NovaFarma,
+  // > 0 => id del cliente registrado en NovaFarma
+  int _customerId = -1, _dependentId = 0, _partnerId = 0;
   bool? _isAdd; // true: add, false: update, null: hubo error
   bool _isLoading = false;
 
@@ -179,12 +182,13 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
                       textForValidation: 'Ingrese un documento válido',
                       acceptEmpty: false,
                       initialFocus: true,
-                      onEditingComplete: () =>
-                          FocusScope.of(context).requestFocus(_dateFocusNode),
+                      onEditingComplete: () async {
+                        await _handleDocumentValidation();
+                      }
                     ),
                   ),
                 ),
-                _labelNovaDaily()
+                _labelCustomer()
               ],
             ),
             CreateTextFormField(
@@ -366,7 +370,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
 
   CustomerDTO1 _buildCustomer() {
     return CustomerDTO1(
-      customerId: _customerId == 0 ? null : _customerId,
+      customerId: _customerId <= 0 ? null : _customerId,
       user: UserDTO1(userId: userLogged['userId']),
       document: int.parse(_documentController.text.trim()),
       addDate: strToDate(_dateController.text),
@@ -406,64 +410,84 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     ).view();
   }
 
-  void _createListeners() {
-    _documentListener();
-    _dateListener();
+ void _createListeners() {
+    _documentFocusNode.addListener(_documentListener);
+    _dateFocusNode.addListener(_dateListener);
   }
 
-  void _documentListener() {
+  Future<void> _documentListener() async {
+    // Pierde foco
+    if (!_documentFocusNode.hasFocus) {
+      await _handleDocumentValidation();
+      // Recibe foco
+    } else if (_documentFocusNode.hasFocus) {
+      _initialize(initDocument: true);
+    }
+  }
+
+  Future<void> _handleDocumentValidation() async {
+    // Eliminar el listener y quita el foco temporalmente para evitar llamadas duplicadas
+    _documentFocusNode.removeListener(_documentListener);
+    _documentFocusNode.unfocus();
+    bool isValid = await _validateDocument();
+    _documentFocusNode.addListener(_documentListener);
+    if (mounted) {
+      if (isValid) {
+        FocusScope.of(context).requestFocus(_dateFocusNode);
+      } else {
+        FocusScope.of(context).requestFocus(_documentFocusNode);
+      }
+    }
+  }
+
+  Future<bool> _validateDocument() async {
     bool? registered;
     PartnerNovaDailyDTO? partner;
     DependentNovaDailyDTO? dependent;
-    _documentFocusNode.addListener(() async {
-      // Pierde foco
-      if (!_documentFocusNode.hasFocus) {
-        if (_documentController.text.trim().isEmpty) {
-          FocusScope.of(context).requestFocus(_documentFocusNode);
-          return;
-        }
-        if (! _formDocumentKey.currentState!.validate()) {
-          FocusScope.of(context).requestFocus(_documentFocusNode);
-          return;
-        }
-        registered = await _registeredDocument();
-        if (registered != null) {
-          _isAdd = ! registered!;
-          if (! registered! && mounted){
-            //No esta registrado en NovaFarma. Se pregunta si desea buscar en NovaDaily
-            if (await _findInNovaDaily() && mounted) {
-              _changeStateLoading(true);
-              //Busca en Socios
-              partner = await findPartnerByDocumentNovaDaily(
-                  document: _documentController.text.trim(),
-                  context: context
-              );
-              if (partner != null) {
-                  _updateFields(partner!);
-              } else if (mounted) {
-                //busca en dependientes
-                dependent = await findDependentByDocumentNovaDaily(
-                    document: _documentController.text.trim(),
-                    context: context
-                );
-                if (dependent != null) {
-                  _updateFields(dependent!);
-                }
-
-              }
-              _changeStateLoading(false);
+    if (_documentController.text.trim().isEmpty) {
+      return Future.value(false);
+    }
+    if (! _formDocumentKey.currentState!.validate()) {
+      return Future.value(false);
+    }
+    registered = await _registeredDocumentNovaFarma();
+    if (registered != null) {
+      _isAdd = ! registered;
+      if (! registered && mounted){
+        //No esta registrado en NovaFarma. Se pregunta si desea buscar en NovaDaily
+        if (await _findInNovaDaily() && mounted) {
+          _changeStateLoading(true);
+          //Busca en Socios
+          partner = await findPartnerByDocumentNovaDaily(
+              document: _documentController.text.trim(),
+              context: context
+          );
+          if (partner != null) {
+              _updateFields(partner);
+          } else if (mounted) {
+            //busca en dependientes
+            dependent = await findDependentByDocumentNovaDaily(
+                document: _documentController.text.trim(),
+                context: context
+            );
+            if (dependent != null) {
+              _updateFields(dependent);
             } else {
-              //No permite el ingreso del cliente
-              if (mounted) FocusScope.of(context).requestFocus(_documentFocusNode);
+              // Es un cliente nuevo de NovaFarma (no esta en NovaDaily)
+              setState(() {
+                _customerId = 0;
+              });
             }
           }
+          _changeStateLoading(false);
+        } else {
+          return Future.value(false);
         }
-
-        // Recibe foco
-      } else if (_documentFocusNode.hasFocus) {
-        _initialize(initDocument: false);
       }
-    });
+    } else {
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   Future<bool> _findInNovaDaily() async {
@@ -478,25 +502,23 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   }
 
   void _dateListener() {
-    _dateFocusNode.addListener(() {
-      //Recibe foco
-      if (_dateFocusNode.hasFocus) {
-        _dateController.selection = TextSelection(
-          baseOffset: 0,
-          extentOffset: _dateController.text.length,
-        );
-        // Pierde foco
-      } else if (! _dateFocusNode.hasFocus) {
-        if (strToDate(_dateController.text) == null) {
-          _dateController.value = TextEditingValue(text: dateNow());
-        }
+    //Recibe foco
+    if (_dateFocusNode.hasFocus) {
+      _dateController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: _dateController.text.length,
+      );
+      // Pierde foco
+    } else if (! _dateFocusNode.hasFocus) {
+      if (strToDate(_dateController.text) == null) {
+        _dateController.value = TextEditingValue(text: dateNow());
       }
-    });
+    }
   }
 
   /// true si el documento ya existe en la bbdd de novafarma, false si no existe.
   /// null si se lanzó un error.
-  Future<bool?> _registeredDocument() async {
+  Future<bool?> _registeredDocumentNovaFarma() async {
     bool? registered;
     List<CustomerDTO1> customerList = [];
     _changeStateLoading(true);
@@ -528,65 +550,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     } finally {
       _changeStateLoading(false);
     }
-
-    if (registered == null && mounted) {
-      FocusScope.of(context).requestFocus(_documentFocusNode);
-    }
     return Future.value(registered);
   }
-
-  /*Future<void> _findDocumentNovaDaily() async {
-    List<PartnerNovaDailyDTO> partnerNovaDailyList = [];
-    _changeStateLoading(true);
-
-    try {
-      await fetchPartnerNovaDailyList(
-        partnerNovaDailyList: partnerNovaDailyList,
-        searchByDocument: true,
-        value: _documentController.text,
-      );
-      if (partnerNovaDailyList.isNotEmpty) _updateFields(partnerNovaDailyList[0]);
-
-    } catch (error) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-
-        } else if (mounted){
-          await OpenDialog(
-              context: context,
-              title: 'Error',
-              content: error.message != null
-                  ? error.message!
-                  : 'Error ${error.statusCode}'
-          ).view();
-        }
-      } else {
-        if (error.toString().contains('XMLHttpRequest error') && mounted ) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException') && mounted) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else if (mounted){
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }
-      }
-    } finally {
-      _changeStateLoading(false);
-    }
-  }*/
 
   /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
   void _updateFields(Object customer) {
@@ -600,14 +565,18 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _telephoneController.value = TextEditingValue(text: customer.telephone!);
       _notesController.value = TextEditingValue(text: customer.notes!);
 
-      _customerId = customer.customerId!;
       setState(() {
+        _customerId = customer.customerId!;
         _partnerId = customer.partnerId!;
         _dependentId = customer.dependentId!;
       });
 
     } else if (customer is PartnerNovaDailyDTO) {
-      _dateController.value = TextEditingValue(text: customer.addDate!);
+      _dateController.value = TextEditingValue(text:
+        customer.addDate != null
+          ? customer.addDate!
+          : dateNow()
+      );
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name!);
       _paymentNumberController.value = TextEditingValue(
@@ -616,7 +585,9 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _notesController.value = TextEditingValue(text: customer.notes!);
 
       setState(() {
+        _customerId = 0; // indica que no se encontro el cliente en NovaFarma
         _partnerId = customer.partnerId!;
+        _dependentId = 0;
       });
 
     } else if (customer is DependentNovaDailyDTO) {
@@ -628,11 +599,11 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _notesController.value = const TextEditingValue(text: '');
 
       setState(() {
+        _customerId = 0; // indica que no se encontro el cliente en NovaFarma
         _partnerId = customer.partnerNovaDaily!.partnerId!;
         _dependentId = customer.dependentId!;
       });
     }
-
   }
 
   void _initialize({required bool initDocument}) {
@@ -646,8 +617,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _notesController.value = TextEditingValue.empty;
     });
     _isAdd = null;
-    _customerId = 0;
     setState(() {
+      _customerId = -1;
       _dependentId = 0;
       _partnerId = 0;
     });
@@ -660,8 +631,28 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     widget.onBlockedStateChange!(isLoading);
   }
 
-  Widget _labelNovaDaily(){
-    if (_partnerId == 0 && _dependentId == 0) return const SizedBox.shrink();
+  Widget _labelCustomer(){
+    //print('$_customerId - $_partnerId - $_dependentId');
+    if (_customerId == -1) return const SizedBox.shrink();
+    String lbl = '';
+    if (_partnerId == 0) {
+      lbl = 'NovaFarma';
+    } else {
+      lbl = _dependentId != 0 ? 'Dependiente' : 'Socio';
+    }
+
+    return lbl.isNotEmpty
+      ? Row(
+          children: [
+            Text(lbl == 'NovaFarma' ? ' Cliente ' : 'Tomado de NovaDaily: ',
+              style: const TextStyle(fontStyle: FontStyle.italic)
+            ),
+            Text(lbl, style: const TextStyle(fontWeight: ui.FontWeight.bold),)
+          ]
+        )
+      : const SizedBox.shrink();
+
+    /*if (_partnerId == 0 && _dependentId == 0) return const SizedBox.shrink();
     String lbl = 'Socio';
     if (_partnerId != 0 && _dependentId != 0) lbl =  'Dependiente';
     return Row(
@@ -671,7 +662,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         ),
         Text(lbl, style: const TextStyle(fontWeight: ui.FontWeight.bold),)
       ],
-    );
+    );*/
   }
 
   int _buildPaymentNumber() {

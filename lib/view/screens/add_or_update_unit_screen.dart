@@ -1,22 +1,19 @@
+import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
-import 'package:novafarma_front/model/DTOs/unit_dto_1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption,
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
-import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_unit.dart';
 import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
-import 'package:novafarma_front/view/dialogs/presentation_container_quantities_list_dialog.dart';
 
-import '../../model/DTOs/presentation_dto_1.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
@@ -472,7 +469,11 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
       }
 
     }).onError((error, stackTrace) {
-      genericError(error!, context);
+      if (error is ErrorObject) {
+        if (error.statusCode != HttpStatus.notFound) {
+          genericError(error!, context, isFloatingMessage: true);
+        }
+      }
     });
 
     if (isInitState && mounted) {

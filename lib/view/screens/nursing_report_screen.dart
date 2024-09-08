@@ -297,17 +297,12 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
         setState(() {
           (pageObject.content as Map<CustomerDTO2, List<NursingReportDTO>>)
               .forEach((customer, reports) {
-            _pageObjectMap.content[customer] = reports;
-            for (var report in reports) {
-              _total += report.quantity! * report.unitPrice!;
-            }
-          });
+                _pageObjectMap.content[customer] = reports;
+                for (var report in reports) {
+                  _total += report.quantity! * report.unitPrice!;
+                }
+              });
         });
-        /*setState(() {
-          _pageObjectMap.content.addAll(
-              pageObject.content as Map<CustomerDTO2, List<NursingReportDTO>>);
-          _updatePageObjectMap(pageObject);
-        });*/
       }
       _updatePageObjectMap(pageObject);
 
