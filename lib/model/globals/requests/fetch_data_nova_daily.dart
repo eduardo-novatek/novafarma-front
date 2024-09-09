@@ -44,8 +44,7 @@ Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
           "Content-Type": "application/json; charset=UTF-8",
           "Accept": "application/json"
         }
-      )
-          .timeout(const Duration(seconds: timeOutSecondsResponse));
+      ).timeout(const Duration(seconds: timeOutSecondsResponse));
     }
 
     if (response.statusCode == 200) {
@@ -71,15 +70,21 @@ Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
           } else if (decodedData is int) {
             return [decodedData].toList();
           } else {
-            if (kDebugMode) print("Tipo de datos desconocido");
+            String err = 'Tipo de datos desconocido';
+            if (decodedData == null) err = 'No se obtuvo respuesta de NovaDaily';
+            if (kDebugMode) print(err);
             throw ErrorObject(
               statusCode: 0,
-              message: 'Tipo de datos desconocido'
+              message: err
             );
           }
         } catch (e) {
-          //No pudo decodificar el Json, asume que es un String
-          return [response.body];
+          if (e is ErrorObject) {
+            return Future.error(e);
+          } else {
+            //No pudo decodificar el Json, asume que es un String
+            return [response.body];
+          }
 
         }
       } catch (e) {

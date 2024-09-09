@@ -563,14 +563,16 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   /// customer: puede ser un CustomerDTO1 o un PartnerNovaDailyDTO
   void _updateFields(Object customer) {
     if (customer is CustomerDTO1) {
-      _dateController.value =
-          TextEditingValue(text: dateToStr(customer.addDate)!);
+      _dateController.value = TextEditingValue(
+          text: dateToStr(customer.addDate)!);
       _lastnameController.value = TextEditingValue(text: customer.lastname!);
       _nameController.value = TextEditingValue(text: customer.name);
       _paymentNumberController.value = TextEditingValue(
           text: customer.paymentNumber.toString());
-      _telephoneController.value = TextEditingValue(text: customer.telephone!);
-      _notesController.value = TextEditingValue(text: customer.notes!);
+      _telephoneController.value = TextEditingValue(
+          text: _buildTelephone(customer.telephone));
+      _notesController.value = TextEditingValue(
+          text: _buildNotes(customer.notes));
 
       setState(() {
         _customerId = customer.customerId!;
@@ -589,7 +591,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       _paymentNumberController.value = TextEditingValue(
           text: customer.paymentNumber.toString());
       _telephoneController.value = TextEditingValue(text: customer.telephone!);
-      _notesController.value = TextEditingValue(text: customer.notes!);
+      _notesController.value = TextEditingValue(text: _buildNotes(customer.notes));
 
       setState(() {
         _customerId = 0; // indica que no se encontro el cliente en NovaFarma
@@ -611,6 +613,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         _dependentId = customer.dependentId!;
       });
     }
+  }
+
+  String _buildTelephone(String? telephone) {
+    return telephone ?? '';
+  }
+
+  String _buildNotes(String? notes) {
+    return notes ?? '';
   }
 
   void _initialize({required bool initDocument}) {

@@ -495,13 +495,22 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         _presentationId = await addOrUpdatePresentation(
           presentation: presentationDTO1,
           isAdd: true,
-          context: context,
+          context: mounted ? context : context,
         );
         if (kDebugMode) print('Presentación agregada con éxito (id=$_presentationId)');
 
       } catch (error) {
         if (error is ErrorObject) {
-          if (error.message != null &&
+          if (error.message!.contains('ES INCORRECTA')) {
+            if (mounted) {
+              FloatingMessage.show(
+                  context: context,
+                  text: error.message!,
+                  messageTypeEnum: MessageTypeEnum.warning,
+                  secondsDelay: 8
+              );
+            }
+          } else if (error.message != null &&
               error.message!.contains("NO EXISTE UNA UNIDAD DE MEDIDA")) {
 
             String msg = 'La unidad de medida $_unitSelected fué eliminada por '

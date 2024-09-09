@@ -110,13 +110,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
 
-        const PopupMenuItem<String>(
+        /*const PopupMenuItem<String>(
           value: 'balances',
           child: ListTile(
             leading: Icon(Icons.note_alt_sharp),
             title: Text('Balances', style: TextStyle(fontSize: 17.0)),
           ),
-        ),
+        ),*/
 
         /*const PopupMenuItem<String>(
           value: 'users and roles',

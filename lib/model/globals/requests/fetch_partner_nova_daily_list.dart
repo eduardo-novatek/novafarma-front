@@ -56,9 +56,11 @@ Future<void> fetchPartnerNovaDailyList({
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
     if (error is ErrorObject) {
-      throw ErrorObject(statusCode: error.statusCode, message: error.message);
+      //throw ErrorObject(statusCode: error.statusCode, message: error.message);
+      return Future.error(error);
     } else {
-      throw Exception(error);
+      //throw Exception(error);
+      return Future.error(Exception(error));
     }
   });
 }
