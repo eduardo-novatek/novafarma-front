@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
+import 'package:novafarma_front/model/globals/pdfGenereateNursingReport.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
@@ -17,7 +19,6 @@ import '../../model/globals/constants.dart'
 import '../../model/globals/tools/create_text_form_field.dart';
 import '../../model/globals/tools/date_time.dart' show dateTimeToStr, dateToStr,
   strDateViewToStrDate, strToDate;
-import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/page_object_map.dart';
 
 class NursingReportScreen extends StatefulWidget {
@@ -232,6 +233,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   }
 
   Widget _buildFooter() {
+
     final numberFormat = NumberFormat.currency(
       locale: 'es_ES',
       symbol: '\$',
@@ -240,9 +242,9 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
 
     return Row(
       children: [
-        // Widget vacío para ocupar el espacio de la izquierda
+        _pdfButton(),
+        // Widget vacío para ocupar el espacio entre el boton PDF y el total
         const Expanded(child: SizedBox.shrink()),
-
         // *** habilitar si se pagina ***
         // Centrar la PaginationBar
         /*if (_pageObjectMap.totalPages != 0)
@@ -273,7 +275,6 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
       ],
     );
   }
-
 
   Future<void> _loadDataPageable() async {
     _setLoading(true);
@@ -441,4 +442,39 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     return ret;
   }
 
+  Widget _pdfButton() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Tooltip(
+        message: 'Exportar a PDF',
+        child: Material(
+          color: Colors.transparent, // Material transparente para permitir el control del color del botón
+          child: InkWell(
+            onTap: () {
+              pdfGenerateNursingReport(
+                startDate: _startDateFilterController.text,
+                endDate: _endDateFilterController.text,
+                total: _total,
+                pageObjectMap: _pageObjectMap
+              );
+            },
+            //hoverColor: Colors.red[100], // Color al pasar el mouse
+            child: Ink(
+              decoration: const BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: Colors.transparent, // Sin color de fondo
+              ),
+              child: const Icon(
+                Icons.picture_as_pdf, // Ícono de PDF
+                color: Colors.red,  // Color del ícono en rojo
+                size: 35, // Tamaño del ícono
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
 }
+
