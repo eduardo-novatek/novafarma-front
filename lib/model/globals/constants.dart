@@ -14,7 +14,7 @@ const String novaDailyToken = "ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1
 
 const int timeOutSecondsResponse = 15;
 const int sizePageCustomerList = 20;
-const int sizePageCustomerNursingReportList = 15;
+const int sizePageCustomerNursingReportList = 10000; // Se muestra en 1 sola pagina
 const int sizePageMedicineList = 20;
 const int sizePageMedicineStockMovements = 20;
 const int sizePagePresentationList = 20;

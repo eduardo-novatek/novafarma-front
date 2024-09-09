@@ -62,6 +62,6 @@ Future<DependentNovaDailyDTO?> findDependentByDocumentNovaDaily({
         }
       }
     }
+    return Future.error(error);
   }
-  return null;
 }

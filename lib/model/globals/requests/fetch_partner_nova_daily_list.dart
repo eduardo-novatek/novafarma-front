@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_nova_daily.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_data_nova_daily_prueba.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../constants.dart' show hostNovaDaily, novaDailyToken, portNovaDaily, uriNovaDailyFindPartnerDocument, uriNovaDailyFindPartnerLastname, uriProxyCORSNovaDaily;
@@ -33,7 +32,11 @@ Future<void> fetchPartnerNovaDailyList({
     if (data[0] == "null") return null;
     partnerNovaDailyList.clear();
     partnerNovaDailyList.addAll(
-        data.cast<PartnerNovaDailyDTO>().map((e) => e.fromJson(e.toJson())
+
+        data.cast<PartnerNovaDailyDTO>().map((e) => e)
+        //data.cast<PartnerNovaDailyDTO>().map((e) => e.fromJson(e.toJson())
+
+
       /*data.cast<PartnerNovaDailyDTO>().map((e) => PartnerNovaDailyDTO(
         partnerId: e.partnerId,
         name: e.name,
@@ -49,7 +52,7 @@ Future<void> fetchPartnerNovaDailyList({
         notes: e.notes,
       )),
       */
-    ));
+    );
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
     if (error is ErrorObject) {

@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -188,7 +189,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
   }
 
   Future<void> _loadData() async {
-    _toggleLoading();
+    _setLoading(true);
     await fetchDataObject<SupplierDTO>(
       uri: uriSupplierFindAll,
       classObject: SupplierDTO.empty(),
@@ -199,6 +200,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
       });
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) return;
         FloatingMessage.show(
           context: context,
           text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
@@ -220,12 +222,12 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
         }
       }
     });
-    _toggleLoading();
+    _setLoading(false);
   }
 
-  void _toggleLoading() {
+  void _setLoading(bool loading) {
     setState(() {
-      _loading = !_loading;
+      _loading = loading;
     });
   }
 
@@ -350,7 +352,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
   }
 
   Future<void> _vouchersSupplier(int index) async {
-    _toggleLoading();
+    _setLoading(true);
     //Verifico la existencia de por lo menos un voucher
     await fetchDataObjectPageable(
         uri: '$uriSupplierFindVouchers/${_supplierList[index].supplierId}/0/1',
@@ -394,7 +396,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
         if (kDebugMode) print(error);
       }
     });
-    _toggleLoading();
+    _setLoading(false);
   }
 
   Future<void> _delete(int index) async {
@@ -410,7 +412,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     ).view();
 
     if (option == 1) {
-      _toggleLoading();
+      _setLoading(true);
       try {
         await fetchDataObject<SupplierDTO>(
           uri: '$uriSupplierDelete/${supplierSelected.supplierId}/true',
@@ -447,7 +449,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
           }
         }
       } finally {
-        _toggleLoading();
+        _setLoading(false);
       }
     }
   }

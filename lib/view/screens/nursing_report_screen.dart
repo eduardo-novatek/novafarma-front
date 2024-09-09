@@ -243,8 +243,9 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
         // Widget vacío para ocupar el espacio de la izquierda
         const Expanded(child: SizedBox.shrink()),
 
+        // *** habilitar si se pagina ***
         // Centrar la PaginationBar
-        if (_pageObjectMap.totalPages != 0)
+        /*if (_pageObjectMap.totalPages != 0)
           PaginationBar(
             totalPages: _pageObjectMap.totalPages,
             initialPage: _pageObjectMap.pageNumber + 1,
@@ -254,14 +255,14 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
                 _loadDataPageable();
               });
             },
-          ),
+          ),*/
         if (_pageObjectMap.totalPages != 0)
           // Expand para tomar tod@ el espacio sobrante a la derecha
           Expanded(
             child: Align(
               alignment: Alignment.centerRight,
               child: Container(
-                margin: const EdgeInsets.only(right: 16.0),
+                margin: const EdgeInsets.only(right: 16.0, bottom: 16.0),
                 child: Text(
                   'Total: ${numberFormat.format(_total)}',
                   style: const TextStyle(fontSize: 16, fontWeight: ui.FontWeight.bold),
@@ -282,7 +283,8 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
       uri: '$uriCustomerNursingReportPage'
           '/${startDate}T00:00'
           '/${endDate}T23:59'
-          '/${_pageObjectMap.pageNumber}'
+          '/0' //Se muestra solo la primer pagina. Deshabilitar si se pagina
+          //'/${_pageObjectMap.pageNumber}' // Habilitar si se pagina
           '/$sizePageCustomerNursingReportList',
     ).then((pageObject) {
       _pageObjectMap.content.clear();

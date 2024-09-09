@@ -458,28 +458,35 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
         if (await _findInNovaDaily() && mounted) {
           _changeStateLoading(true);
           //Busca en Socios
-          partner = await findPartnerByDocumentNovaDaily(
-              document: _documentController.text.trim(),
-              context: context
-          );
-          if (partner != null) {
-              _updateFields(partner);
-          } else if (mounted) {
-            //busca en dependientes
-            dependent = await findDependentByDocumentNovaDaily(
+          try {
+            partner = await findPartnerByDocumentNovaDaily(
                 document: _documentController.text.trim(),
                 context: context
             );
-            if (dependent != null) {
-              _updateFields(dependent);
-            } else {
-              // Es un cliente nuevo de NovaFarma (no esta en NovaDaily)
-              setState(() {
-                _customerId = 0;
-              });
+            if (partner != null) {
+              _updateFields(partner);
+            } else if (mounted) {
+              //busca en dependientes
+              dependent = await findDependentByDocumentNovaDaily(
+                  document: _documentController.text.trim(),
+                  context: context
+              );
+              if (dependent != null) {
+                _updateFields(dependent);
+              } else {
+                // Es un cliente nuevo de NovaFarma (no esta en NovaDaily)
+                setState(() {
+                  _customerId = 0;
+                });
+              }
             }
+            _changeStateLoading(false);
+
+          } catch (e) {
+            _changeStateLoading(false);
+            return Future.value(false);
           }
-          _changeStateLoading(false);
+
         } else {
           return Future.value(false);
         }

@@ -60,6 +60,6 @@ Future<PartnerNovaDailyDTO?> findPartnerByDocumentNovaDaily({
         }
       }
     }
+    return Future.error(error);
   }
-  return null;
 }

@@ -1,5 +1,6 @@
 
 import 'dart:html';
+import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -81,7 +82,8 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   bool _isLoading = false;
 
   final List<UnitDTO> _unitList = [
-    UnitDTO(unitId: 0, name: defaultFirstOption)
+    UnitDTO(unitId: 0, name: defaultFirstOption),
+    UnitDTO(unitId: -1, name: defaultLastOption)
   ];
   String _unitSelected = defaultFirstOption;
 
@@ -916,7 +918,13 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       }
 
     }).onError((error, stackTrace) {
-      genericError(error!, context);
+      if (error is ErrorObject){
+        if (error.statusCode != HttpStatus.notFound) {
+          genericError(error, isFloatingMessage: true, context);
+        }
+      } else {
+        genericError(error!, context);
+      }
     });
 
     if (isInitState) {
