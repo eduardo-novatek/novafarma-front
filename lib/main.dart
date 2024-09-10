@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/view/screens.dart';
+import 'package:novafarma_front/view/screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.lightBlueAccent,
         ),
       ),
-      home: const HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
+      home: LoginScreen(), //const HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
     );
   }
 }

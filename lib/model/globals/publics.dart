@@ -1,15 +1,8 @@
+import 'package:novafarma_front/model/DTOs/user_dto_2.dart';
 import '../enums/movement_type_enum.dart';
 import 'constants.dart';
 
-Map<String, dynamic> userLogged = {
-  'userId': 1,
-  'name': 'JUAN',
-  'surname': 'PEREZ',
-  'role': {
-    'roleId': 2,
-    'name': 'ADMIN',
-  }
-};
+UserDTO2? userLogged = UserDTO2.empty();
 
 final List<String> movementTypes = [
   defaultFirstOption,

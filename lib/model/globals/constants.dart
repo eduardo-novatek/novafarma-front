@@ -25,7 +25,6 @@ const int sizePageMedicineAndPresentationList = 8;
 const String defaultFirstOption = "Seleccione...";
 const String defaultLastOption = "Nuevo...";
 const double menuMaxHeight = 300.0;
-const double menuMaxWeight = 300.0;
 
 const String imagesPath = "assets/images/";
 
@@ -55,6 +54,7 @@ const String uriUserAdd = "/user/add";
 const String uriUserFindAll = "/user/findAll";
 const String uriUserFindId = "/user/findId";
 const String uriUserNameExist = "/user/userNameExist";
+const String uriUserLogin = "user/login";
 
 //Customer
 const String uriCustomerFindAll = "/customer/findAll";

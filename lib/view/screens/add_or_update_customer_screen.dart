@@ -371,7 +371,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
   CustomerDTO1 _buildCustomer() {
     return CustomerDTO1(
       customerId: _customerId <= 0 ? null : _customerId,
-      user: UserDTO1(userId: userLogged['userId']),
+      user: UserDTO1(userId: userLogged!.userId),
       document: int.parse(_documentController.text.trim()),
       addDate: strToDate(_dateController.text),
       lastname: _lastnameController.text.trim(),

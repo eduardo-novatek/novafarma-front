@@ -579,7 +579,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
   MedicineDTO1 _buildMedicine() {
     return MedicineDTO1(
       medicineId: _medicineId == 0 ? null : _medicineId,
-      userId: userLogged['userId'],
+      userId: userLogged!.userId,
       barCode: _barCodeController.text.trim(),
       name: _nameController.text.trim(),
       presentation: _buildPresentation(),

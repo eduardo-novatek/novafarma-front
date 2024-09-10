@@ -517,7 +517,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
   VoucherDTO _createVoucher() {
     return VoucherDTO(
       movementType: toMovementTypeEnum(_selectedMovementType)?.index,
-      user: UserDTO1(userId: userLogged['userId']),
+      user: UserDTO1(userId: userLogged!.userId),
       customer: _customer != null
         ? CustomerDTO(customerId: _customer!.customerId)
         : null,
