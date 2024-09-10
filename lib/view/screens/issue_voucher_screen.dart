@@ -26,7 +26,7 @@ import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
 import '../../model/globals/publics.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
-import '../../model/globals/tools/create_text_form_field.dart';
+import '../../model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
     defaultFirstOption, uriVoucherAdd;
 
@@ -783,7 +783,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
   Widget _buildDateTimeBox() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: CreateTextFormField(
+      child: CustomTextFormField(
         controller: _dateController,
         focusNode: _dateFocusNode,
         label: 'Fecha',
@@ -837,7 +837,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
             title: const Text('Notas'),
             content: SizedBox(
               width: MediaQuery.of(context).size.width * 0.2,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                 controller: _notesController,
                 label: '',
                 dataType: DataTypeEnum.text,

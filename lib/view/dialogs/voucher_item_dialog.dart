@@ -27,7 +27,7 @@ import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/controlled_icon.dart';
 import '../../model/globals/tools/message.dart';
-import '../../model/globals/tools/create_text_form_field.dart';
+import '../../model/globals/tools/custom_text_form_field.dart';
 import 'controlled_medication_dialog.dart';
 
 class VoucherItemDialog extends StatefulWidget {
@@ -140,7 +140,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           widget.modifyVoucherItem == null //Si es un Alta
-                            ? CreateTextFormField(
+                            ? CustomTextFormField(
                                 controller: _barCodeController,
                                 focusNode: _barCodeFocusNode,
                                 label: 'Código',
@@ -169,7 +169,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
 
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.15,
-                            child: CreateTextFormField(
+                            child: CustomTextFormField(
                               controller: _quantityController,
                               focusNode: _quantityFocusNode,
                               label: 'Cantidad',
@@ -340,7 +340,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
             baselineType: TextBaseline.alphabetic,
             child: SizedBox(
               width: 80,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                 label: '',
                 controller: _costPriceController,
                 focusNode: _costPriceFocusNode,
@@ -385,7 +385,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
             baselineType: TextBaseline.alphabetic,
             child: SizedBox(
               width: 80,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                 label: '',
                 controller: _costPriceController,
                 focusNode: _costPriceFocusNode,

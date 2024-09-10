@@ -4,7 +4,7 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:intl/intl.dart';
 
-class CreateTextFormField extends StatefulWidget {
+class CustomTextFormField extends StatefulWidget {
   final bool validate;
   final bool enabled;
   final bool acceptEmpty;
@@ -26,7 +26,7 @@ class CreateTextFormField extends StatefulWidget {
   final Function(String)? onFieldSubmitted;
   final VoidCallback? onEditingComplete; //Se utiliza VoidCallBack para funciones sin paramentros que no devuelven un valor
 
-  const CreateTextFormField({
+  const CustomTextFormField({
     super.key,
     required this.controller,
     required this.label,
@@ -51,10 +51,10 @@ class CreateTextFormField extends StatefulWidget {
   });
 
   @override
-  State<CreateTextFormField> createState() => _CreateTextFormFieldState();
+  State<CustomTextFormField> createState() => _CustomTextFormFieldState();
 }
 
-class _CreateTextFormFieldState extends State<CreateTextFormField> {
+class _CustomTextFormFieldState extends State<CustomTextFormField> {
   late int _index;
   bool _isObscureText = false;
   //bool _focusForward = true;

@@ -8,7 +8,7 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriSupplierFindName;
-import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -153,7 +153,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           children: [
             Form(
               key: _formNameKey,
-              child:  CreateTextFormField(
+              child:  CustomTextFormField(
                 label: 'Nombre',
                 controller: _nameController,
                 focusNode: _nameFocusNode,
@@ -166,7 +166,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
                     FocusScope.of(context).requestFocus(_telephone1FocusNode),
               ),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Teléfono 1',
               controller: _telephone1Controller,
               focusNode: _telephone1FocusNode,
@@ -178,7 +178,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_telephone2FocusNode),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Teléfono 2',
               controller: _telephone2Controller,
               focusNode: _telephone2FocusNode,
@@ -189,7 +189,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_addressFocusNode),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Dirección',
               controller: _addressController,
               focusNode: _addressFocusNode,
@@ -201,7 +201,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_emailFocusNode),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'email',
               controller: _emailController,
               focusNode: _emailFocusNode,
@@ -213,7 +213,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_notesFocusNode),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Notas',
               controller: _notesController,
               focusNode: _notesFocusNode,

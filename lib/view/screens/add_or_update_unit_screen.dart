@@ -10,7 +10,7 @@ import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstO
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_unit.dart';
-import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -142,7 +142,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
           children: [
             SizedBox(
               width: 190,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                 label: 'Unidad',
                 controller: _currentNameController,
                 focusNode: _currentNameFocusNode,
@@ -164,7 +164,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
             const SizedBox(height: 16,),
             SizedBox(
               width: 190,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                   label: 'Nueva unidad',
                   controller: _newNameController,
                   focusNode: _newNameFocusNode,

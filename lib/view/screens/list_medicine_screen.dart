@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/pdf_genereate_medicine_list.dart';
+import 'package:novafarma_front/model/globals/tools/custom_icon_button.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
@@ -226,18 +228,25 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   }
 
   Widget _buildFooter() {
-    return _pageObject.totalPages > 0
-        ? PaginationBar(
-            totalPages: _pageObject.totalPages,
-            initialPage: _pageObject.pageNumber + 1,
-            onPageChanged: (page) {
-              _pageObject.pageNumber = page - 1;
-              _nameFilterController.text.trim().isNotEmpty
-                ? _loadDataFilterPageable()
-                : _loadDataPageable();
-            },
-          )
-        : const SizedBox.shrink();
+    return Row(
+      children: [
+        _pdfButton(),
+        const Spacer(),
+        _pageObject.totalPages > 0
+          ? PaginationBar(
+              totalPages: _pageObject.totalPages,
+              initialPage: _pageObject.pageNumber + 1,
+              onPageChanged: (page) {
+                _pageObject.pageNumber = page - 1;
+                _nameFilterController.text.trim().isNotEmpty
+                  ? _loadDataFilterPageable()
+                  : _loadDataPageable();
+              },
+            )
+          : const SizedBox.shrink(),
+        const Spacer(),
+      ],
+    );
   }
 
   Future<void> _loadDataPageable() async {
@@ -584,6 +593,20 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       },
     );
     _setLoading(false);
+  }
+
+  CustomIconButton _pdfButton() {
+    return CustomIconButton(
+      onTap: () {
+        pdfGenerateMedicineList(
+            medicineList: _pageObject.content,
+            filter: _nameFilterController.text.trim()
+        );
+      },
+      tooltipMessage: 'Exportar a PDF',
+      icon: Icons.picture_as_pdf,
+      iconSize: 35
+    );
   }
 
 }

@@ -7,7 +7,7 @@ import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/add_or_update_unit.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
-import '../../model/globals/tools/create_text_form_field.dart';
+import '../../model/globals/tools/custom_text_form_field.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../../model/globals/tools/open_dialog.dart';
 
@@ -103,7 +103,7 @@ class _UnitDialogState extends State<_UnitDialog> {
                             ),
                           Container(
                             padding: const EdgeInsets.only(right: 170),
-                            child: CreateTextFormField(
+                            child: CustomTextFormField(
                               label: _isAdd ? 'Unidad' : 'Nueva',
                               controller: _unitNameController,
                               focusNode: _unitNameFocusNode,

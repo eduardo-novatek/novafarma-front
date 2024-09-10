@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
-import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/customer_dto1.dart';
@@ -88,7 +88,7 @@ class CustomerBoxState extends State<CustomerBox> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          CreateTextFormField(
+          CustomTextFormField(
             controller: _documentController,
             focusNode: _documentFocusNode,
             label: 'Documento',
@@ -102,7 +102,7 @@ class CustomerBoxState extends State<CustomerBox> {
               await _findByDocument();
             },
           ),
-          CreateTextFormField(
+          CustomTextFormField(
             controller: _lastnameController,
             focusNode: _lastnameFocusNode,
             label: 'Apellido',

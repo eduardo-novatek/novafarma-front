@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -6,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/globals/pdfGenereateNursingReport.dart';
+import 'package:novafarma_front/model/globals/pdf_genereate_nursing_report.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_pageable.dart';
+import 'package:novafarma_front/model/globals/tools/custom_icon_button.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -16,7 +16,7 @@ import '../../model/DTOs/customer_dto2.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show sizePageCustomerNursingReportList, uriCustomerNursingReportPage;
-import '../../model/globals/tools/create_text_form_field.dart';
+import '../../model/globals/tools/custom_text_form_field.dart';
 import '../../model/globals/tools/date_time.dart' show dateTimeToStr, dateToStr,
   strDateViewToStrDate, strToDate;
 import '../../model/objects/page_object_map.dart';
@@ -154,7 +154,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   Widget _startDate() {
     return Form(
       key: _startDateKey,
-      child: CreateTextFormField(
+      child: CustomTextFormField(
         controller: _startDateFilterController,
         focusNode: _startDateFilterFocusNode,
         dataType: DataTypeEnum.date,
@@ -183,7 +183,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   Form _endDate() {
     return Form(
       key: _endDateKey,
-      child: CreateTextFormField(
+      child: CustomTextFormField(
         controller: _endDateFilterController,
         focusNode: _endDateFilterFocusNode,
         dataType: DataTypeEnum.date,
@@ -244,7 +244,6 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
       children: [
         if (_pageObjectMap.totalElements > 0)
           _pdfButton(),
-
         // Widget vacío para ocupar el espacio entre el boton PDF y el total
         const Expanded(child: SizedBox.shrink()),
         // *** habilitar si se pagina ***
@@ -444,8 +443,21 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
     return ret;
   }
 
-  Widget _pdfButton() {
-    return Padding(
+  CustomIconButton _pdfButton() {
+    return CustomIconButton(
+        onTap: () {
+          pdfGenerateNursingReport(
+              startDate: _startDateFilterController.text,
+              endDate: _endDateFilterController.text,
+              total: _total,
+              pageObjectMap: _pageObjectMap
+          );
+        },
+        tooltipMessage: 'Exportar a PDF',
+        icon: Icons.picture_as_pdf,
+        iconSize: 35
+    );
+    /*return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Tooltip(
         message: 'Exportar a PDF',
@@ -475,7 +487,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
           ),
         ),
       ),
-    );
+    );*/
   }
 
 }

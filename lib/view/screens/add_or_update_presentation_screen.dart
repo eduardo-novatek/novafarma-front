@@ -12,7 +12,7 @@ import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstO
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
-import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -157,7 +157,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
           children: [
             SizedBox(
               width: 190,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                 label: 'Envase',
                 controller: _currentContainerController,
                 focusNode: _currentContainerFocusNode,
@@ -179,7 +179,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
             const SizedBox(height: 16,),
             SizedBox(
               width: 190,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                   label: 'Nuevo envase',
                   controller: _newContainerNameController,
                   focusNode: _newContainerNameFocusNode,
@@ -197,7 +197,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
             const SizedBox(height: 16,),
             SizedBox(
               width: 160,
-              child: CreateTextFormField(
+              child: CustomTextFormField(
                 label: 'Cantidad',
                 controller: _quantityController,
                 focusNode: _quantityFocusNode,

@@ -5,7 +5,7 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
-import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 
 import '../../model/DTOs/role_dto.dart';
@@ -81,7 +81,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  CreateTextFormField(
+                  CustomTextFormField(
                     controller: _nameController,
                     focusNode: _nameFocusNode,
                     label: 'Nombre',
@@ -91,7 +91,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                   ),
                   const SizedBox(height: 10.0,),
 
-                  CreateTextFormField(
+                  CustomTextFormField(
                     controller: _lastNameController,
                     focusNode: _lastNameFocusNode,
                     label: 'Apellido',
@@ -101,7 +101,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                   ),
                   const SizedBox(height: 10.0,),
 
-                  CreateTextFormField(
+                  CustomTextFormField(
                     controller: _userNameController,
                     focusNode: _userNameFocusNode,
                     label: 'Nombre de usuario',
@@ -111,7 +111,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                   ),
                   const SizedBox(height: 10.0,),
 
-                  CreateTextFormField(
+                  CustomTextFormField(
                     controller: _passController,
                     focusNode: _passFocusNode,
                     label: 'Contraseña',

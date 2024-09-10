@@ -18,7 +18,7 @@ import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.da
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_presentation_id.dart';
-import 'package:novafarma_front/model/globals/tools/create_text_form_field.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -190,7 +190,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
           children: [
             Form(
               key: _formBarCodeKey,
-              child:  CreateTextFormField(
+              child:  CustomTextFormField(
                 label: 'Código',
                 controller: _barCodeController,
                 focusNode: _barCodeFocusNode,
@@ -204,7 +204,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                     FocusScope.of(context).requestFocus(_nameFocusNode),
               ),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Nombre',
               controller: _nameController,
               focusNode: _nameFocusNode,
@@ -218,7 +218,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               }
             ),
             _buildFormPresentation(),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Precio de costo',
               controller: _lastCostPriceController,
               focusNode: _lastCostPriceFocusNode,
@@ -231,7 +231,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               onEditingComplete: () =>
                   FocusScope.of(context).requestFocus(_lastSalePriceFocusNode),
             ),
-            CreateTextFormField(
+            CustomTextFormField(
               label: 'Precio de venta',
               controller: _lastSalePriceController,
               focusNode: _lastSalePriceFocusNode,
@@ -244,7 +244,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                   FocusScope.of(context).requestFocus(_currentStockFocusNode),
             ),
             _isAdd != null && _isAdd! //Si es un alta, permite la edicion del Stock
-              ? CreateTextFormField(
+              ? CustomTextFormField(
                   label: 'Stock',
                   controller: _currentStockController,
                   focusNode: _currentStockFocusNode,
@@ -332,7 +332,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                 children: [
                   SizedBox(
                     width: 190,
-                    child: CreateTextFormField(
+                    child: CustomTextFormField(
                       label: 'Envase',
                       controller: _presentationContainerController,
                       focusNode: _presentationContainerFocusNode,
@@ -348,7 +348,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
                   const Spacer(),
                   SizedBox(
                     width: 60,
-                    child: CreateTextFormField(
+                    child: CustomTextFormField(
                       label: 'Cantidad',
                       controller: _presentationQuantityController,
                       focusNode: _presentationQuantityFocusNode,
