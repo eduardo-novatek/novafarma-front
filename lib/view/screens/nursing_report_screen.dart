@@ -242,7 +242,9 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
 
     return Row(
       children: [
-        _pdfButton(),
+        if (_pageObjectMap.totalElements > 0)
+          _pdfButton(),
+
         // Widget vacío para ocupar el espacio entre el boton PDF y el total
         const Expanded(child: SizedBox.shrink()),
         // *** habilitar si se pagina ***
@@ -258,7 +260,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
               });
             },
           ),*/
-        if (_pageObjectMap.totalPages != 0)
+        if (_pageObjectMap.totalPages > 0)
           // Expand para tomar tod@ el espacio sobrante a la derecha
           Expanded(
             child: Align(
@@ -450,7 +452,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
         child: Material(
           color: Colors.transparent, // Material transparente para permitir el control del color del botón
           child: InkWell(
-            onTap: () {
+            onTap: ()  {
               pdfGenerateNursingReport(
                 startDate: _startDateFilterController.text,
                 endDate: _endDateFilterController.text,
