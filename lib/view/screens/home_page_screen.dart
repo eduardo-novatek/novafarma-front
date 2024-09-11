@@ -118,13 +118,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),*/
 
-        /*const PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'users and roles',
           child: ListTile(
             leading: Icon(Icons.people),
             title: Text('Usuarios y roles', style: TextStyle(fontSize: 17.0)),
           ),
-        ),*/
+        ),
       ],
     ).then((String? result) {
       if (result != null) {

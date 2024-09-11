@@ -245,7 +245,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
 
   //"document" Debe incluir el digito verificador
   bool _validateDocument(String? document) {
-    if (document == "00000000") return true; //valida este documento para fines especificos
+    //if (document == "00000000") return true; //valida este documento para fines especificos
     if (document!.length < 7 || document.length > 8) return false;
     if (double.tryParse(document) == null) return false;
     if (_equalDigits(document)) return false;
@@ -307,7 +307,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       return [FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*$')),];
     } else if (widget.dataType == DataTypeEnum.text) {
       return [FilteringTextInputFormatter.allow(
-        RegExp(r'[a-zA-Z0-9\s().:,!\-_ñÑ]')
+        RegExp(r'[a-zA-Z0-9\s().:,!\-_ñÑáéíóúÁÉÍÓÚ]')
       )];
     }
     return [];
