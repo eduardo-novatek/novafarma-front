@@ -6,7 +6,6 @@ import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import '../../model/DTOs/user_dto_1.dart';
 import 'home_page_screen.dart'; // Asegúrate de importar la pantalla principal
 
 class LoginScreen extends StatefulWidget {
@@ -18,6 +17,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final FocusNode _usernameFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -48,10 +49,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: _usernameController,
+                      focusNode: _usernameFocusNode,
                       decoration: const InputDecoration(
                         labelText: 'Usuario',
                         border: OutlineInputBorder(),
                       ),
+                      onEditingComplete: () =>
+                          FocusScope.of(context).requestFocus(_passwordFocusNode),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, ingrese su usuario';
@@ -62,11 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16.0),
                     TextFormField(
                       controller: _passwordController,
+                      focusNode: _passwordFocusNode,
                       obscureText: true,
                       decoration: const InputDecoration(
                         labelText: 'Contraseña',
                         border: OutlineInputBorder(),
                       ),
+                      onEditingComplete: _login,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, ingrese su contraseña';
