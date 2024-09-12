@@ -88,6 +88,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           controller: widget.controller,
           enabled: widget.enabled,
           autofocus: widget.initialFocus!,
+          autofillHints: _determinateAutofill(),
           keyboardType: _determinateInputType(),
           maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
           maxLength: _maxLength(),
@@ -311,6 +312,29 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       )];
     }
     return [];
+  }
+
+  List<String>? _determinateAutofill() {
+    if (widget.dataType == DataTypeEnum.password ||
+        widget.dataType == DataTypeEnum.date ||
+        widget.dataType == DataTypeEnum.time
+    ) {
+      return null; // No se sugiere autocompletar
+    }
+
+    switch (widget.dataType) {
+      case DataTypeEnum.email:
+        return [AutofillHints.email];
+      case DataTypeEnum.number || DataTypeEnum.identificationDocument:
+        return [AutofillHints.transactionAmount];
+      //case DataTypeEnum.date:
+      //  return [AutofillHints.birthday];
+      case DataTypeEnum.telephone:
+        return [AutofillHints.telephoneNumber];
+      case DataTypeEnum.text:
+      default:
+        return [AutofillHints.name]; // Texto generico
+    }
   }
 
 /*List<MaskTextInputFormatter> _determinateMask() {

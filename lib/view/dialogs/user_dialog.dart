@@ -85,9 +85,12 @@ class _AddUserDialogState extends State<AddUserDialog> {
                     controller: _nameController,
                     focusNode: _nameFocusNode,
                     label: 'Nombre',
+                    initialFocus: true,
                     dataType: DataTypeEnum.text,
                     maxValueForValidation: 25,
                     textForValidation: 'El nombre es requerido',
+                    onEditingComplete: () =>
+                      FocusScope.of(context).requestFocus(_lastNameFocusNode),
                   ),
                   const SizedBox(height: 10.0,),
 
@@ -98,6 +101,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
                     dataType: DataTypeEnum.text,
                     maxValueForValidation: 25,
                     textForValidation: 'El apellido es requerido',
+                    onEditingComplete: () =>
+                        FocusScope.of(context).requestFocus(_userNameFocusNode),
                   ),
                   const SizedBox(height: 10.0,),
 
@@ -108,6 +113,8 @@ class _AddUserDialogState extends State<AddUserDialog> {
                     dataType: DataTypeEnum.text,
                     maxValueForValidation: 10,
                     textForValidation: 'El nombre de usuario es requerido',
+                    onEditingComplete: () =>
+                        FocusScope.of(context).requestFocus(_passFocusNode),
                   ),
                   const SizedBox(height: 10.0,),
 

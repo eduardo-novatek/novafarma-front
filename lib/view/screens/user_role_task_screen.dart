@@ -7,32 +7,34 @@ import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
+import 'package:novafarma_front/model/objects/error_object.dart';
 import '../dialogs/user_dialog.dart';
 
 class UserRoleTaskScreen extends StatefulWidget {
-
-  //final GlobalKey<ScaffoldState> scaffoldKey;
-  const UserRoleTaskScreen({super.key}); // required this.scaffoldKey});
+  const UserRoleTaskScreen({super.key});
 
   @override
-  UserRoleTaskScreenState createState() => UserRoleTaskScreenState();
+  State<UserRoleTaskScreen> createState() => UserRoleTaskScreenState();
 }
 
 class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
-  final List<RoleDTO> _roleList = [];
   final List<UserDTO> _userList = [];
-  bool _loadingRoles = false;
-  bool _loadingUsers = false;
+    final List<RoleDTO> _roleList = [];
+    bool _loadingUsers = false;
+    bool _loadingRoles = false;
+    int? _hoveredUserIndex;  // Índice de hover para el panel de usuarios
+    int? _hoveredRoleIndex;  // Índice de hover para el panel de roles
 
   @override
   void initState() {
     super.initState();
-    _fetchUsers();
-    _fetchRoles();
+    _loadUsers();
+    _loadRoles();
   }
 
   @override
@@ -75,13 +77,14 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                         Text(
                           title,
                           style: const TextStyle(
-                              fontSize: 20, color: Colors.white),
+                              fontSize: 20, color: Colors.white
+                          ),
                         ),
                       ],
                     ),
                     IconButton(
                       icon: const Icon(Icons.refresh),
-                      onPressed: title == 'Roles' ? _fetchRoles : _fetchUsers,
+                      onPressed: title == 'Roles' ? _loadRoles : _loadUsers,
                       color: Colors.white,
                       tooltip: "Actualizar",
                     ),
@@ -96,9 +99,9 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                   child: ListView.builder(
                     itemCount: dataList.length,
                     itemBuilder: (context, index) {
-                      return title == 'Roles'
-                          ? _buildRoleData(dataList[index])
-                          : _buildUserData(dataList[index]);
+                      return title == 'Usuarios'
+                          ? _buildUserData(dataList[index], index)
+                          : _buildRoleData(dataList[index], index);
                     },
                   ),
                 ),
@@ -116,26 +119,14 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.add),
+                    iconSize: 30.0,
+                    tooltip: 'Agregar $title',
                     onPressed: () {
                       if (title == 'Usuarios') {
                         _addUsers();
                       } else if (title == 'roles') {
                         _addRoles();
                       }
-                    },
-                    color: Colors.white,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      // Acción para modificar
-                    },
-                    color: Colors.white,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      // Acción para eliminar
                     },
                     color: Colors.white,
                   ),
@@ -148,118 +139,184 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     );
   }
 
-  Widget _buildRoleData(RoleDTO role) {
-    return ListTile(
-      title: Text(role.name),
+  Widget _buildRoleData(RoleDTO role, int index) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          _hoveredRoleIndex = index;  // Establece el índice del elemento en hover para roles
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          _hoveredRoleIndex = null;  // Desactiva el hover
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: _hoveredRoleIndex == index ? Colors.grey.shade300 : Colors.white,  // Cambia de color en hover
+          border: Border(
+            left: BorderSide(
+              color: _hoveredRoleIndex == index ? Colors.blue : Colors.transparent,  // Cambia de color el borde en hover
+              width: 5,
+            ),
+          ),
+        ),
+        child: ListTile(
+          title: Text(role.name),
+          trailing: PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'Editar':
+                // Lógica para editar rol
+                  break;
+                case 'Eliminar':
+                // Lógica para eliminar rol
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'Editar',
+                child: Text('Editar'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Eliminar',
+                child: Text('Eliminar'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildUserData(UserDTO user) {
-    return ListTile(
-      title: Text('${user.name} ${user.lastname} (${user.role.name})'),
-      subtitle: user.active!
-          ? const Text("Activo", style: TextStyle(color: Colors.green))
-          : const Text("Inactivo", style: TextStyle(color: Colors.red))
+  Widget _buildUserData(UserDTO user, int index) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          _hoveredUserIndex = index;  // Establece el índice del elemento en hover para usuarios
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          _hoveredUserIndex = null;  // Desactiva el hover
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: _hoveredUserIndex == index ? Colors.grey.shade300 : Colors.white,  // Cambia de color en hover
+          border: Border(
+            left: BorderSide(
+              color: _hoveredUserIndex == index ? Colors.blue : Colors.transparent,  // Cambia de color el borde en hover
+              width: 5,
+            ),
+          ),
+        ),
+        child: ListTile(
+          title: Text('${user.name} ${user.lastname} (${user.role.name})'),
+          subtitle: user.active!
+              ? const Text("Activo", style: TextStyle(color: Colors.green))
+              : const Text("Inactivo", style: TextStyle(color: Colors.red)),
+          trailing: PopupMenuButton<String>(
+            onSelected: (value) {
+              switch (value) {
+                case 'Editar':
+                  _editUser(user);
+                  break;
+                case 'Activar':
+                // Lógica para activar usuario
+                  break;
+                case 'Reestablecer Contraseña':
+                // Lógica para reestablecer contraseña
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'Editar',
+                child: Text('Editar'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Activar',
+                child: Text('Activar'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Reestablecer Contraseña',
+                child: Text('Reestablecer Contraseña'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Future<void> _fetchRoles() async {
+  Future<void> _loadRoles() async {
     setState(() {
       _loadingRoles = true;
     });
-
-    try {
-      fetchDataObject<RoleDTO>(
-          uri: uriRoleFindAll,
-          classObject: RoleDTO.empty(),
-          requestType: RequestTypeEnum.get)
-          .then((data) => {
-        setState(() {
-          _roleList.clear();
-          _roleList.addAll(data.cast<RoleDTO>().map((e) =>
-              RoleDTO(roleId: e.roleId, name: e.name)));
-          _loadingRoles = false;
-        })
-      });
-    } catch (e) {
+    fetchDataObject<RoleDTO>(
+      uri: uriRoleFindAll,
+      classObject: RoleDTO.empty(),
+      requestType: RequestTypeEnum.get
+    ).then((data) {
+      _roleList.clear();
+      _roleList.addAll(data.cast<RoleDTO>().map((e) =>
+          e.fromJson(e.toJson())));
+       setState(() {
+       _loadingRoles = false;
+       });
+    }).onError((error, stackTrace) {
       setState(() {
         _loadingRoles = false;
       });
-      FloatingMessage.show(
-          context: context,
-          text: "Error de conexión",
-          messageTypeEnum: MessageTypeEnum.error
-      );
-      /*floatingMessage(
-          context: context,
-          text: "Error de conexión",
-          messageTypeEnum: MessageTypeEnum.error
-      );*/
-    }
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+            context: context,
+            text: error.message ?? 'Error ${error.statusCode}',
+            messageTypeEnum: MessageTypeEnum.error
+        );
+      } else {
+        genericError(error!, context);
+      }
+    });
   }
 
-  Future<void> _fetchUsers() async {
+  Future<void> _loadUsers() async {
     setState(() {
       _loadingUsers = true;
     });
-
-    try {
-      fetchDataObject<UserDTO>(
-          uri: uriUserFindAll,
-          classObject: UserDTO.empty(),
-          requestType: RequestTypeEnum.get
-      ).then((data) => {
-        setState(() {
-          _userList.clear();
-          if (data.isNotEmpty) {
-            _userList.addAll(data.cast<UserDTO>().map((e) =>
-                UserDTO(
-                  userId: e.userId,
-                  name: e.name,
-                  lastname: e.lastname,
-                  active: e.active,
-                  role: e.role,
-                )
-            ));
-          }
-          _loadingUsers = false;
-        })
-      }).onError((error, stackTrace) {
-        FloatingMessage.show(
-            context: context,
-            text: "Error de conexión",
-            messageTypeEnum: MessageTypeEnum.error
-        );
-        /*floatingMessage(
-            context: context,
-            text: "Error de conexión",
-            messageTypeEnum: MessageTypeEnum.error
-        );*/
+    fetchDataObject<UserDTO>(
+        uri: uriUserFindAll,
+        classObject: UserDTO.empty(),
+        requestType: RequestTypeEnum.get
+    ).then((data) {
+      _userList.clear();
+      if (data.isNotEmpty) {
+        _userList.addAll(data.cast<UserDTO>().map(
+                (e) => e.fromJson(e.toJson())
+        ));
         setState(() {
           _loadingUsers = false;
         });
-        return <void>{};
-      });
-
-    } catch (e) {
+      }
+    }).onError((error, stackTrace) {
       setState(() {
         _loadingUsers = false;
       });
-      FloatingMessage.show(
-          context: context,
-          text: "Error: $e",
-          messageTypeEnum: MessageTypeEnum.error
-      );
-      /*floatingMessage(
-          context: context,
-          text: "Error: $e",
-          messageTypeEnum: MessageTypeEnum.error
-      );*/
-    }
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+            context: context,
+            text: error.message ?? 'Error ${error.statusCode}',
+            messageTypeEnum: MessageTypeEnum.error
+        );
+      } else {
+        genericError(error!, context);
+      }
+    });
   }
 
   Future<void> _addUsers() async {
-
     UserDTO? newUser;
     do {
         // Muestra un diálogo para ingresar los datos del nuevo usuario
@@ -291,7 +348,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
               // Si está la opcion "Seleccione...", la elimina de la lista
               if (_roleList[0].isFirst! == true) _roleList.removeAt(0);
               // Actualiza la lista de usuarios
-              _fetchUsers();
+              _loadUsers();
             });
           } catch (e) {
             FloatingMessage.show(
@@ -333,6 +390,9 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   }
 
+  void _editUser(UserDTO user) {
 
+
+  }
 
 }
