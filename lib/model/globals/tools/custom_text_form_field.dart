@@ -88,7 +88,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           controller: widget.controller,
           enabled: widget.enabled,
           autofocus: widget.initialFocus!,
-          autofillHints: _determinateAutofill(),
+          //autofillHints: _determinateAutofill(),
           keyboardType: _determinateInputType(),
           maxLines: widget.dataType == DataTypeEnum.text ? widget.maxLines : 1,
           maxLength: _maxLength(),
@@ -200,7 +200,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
 
         Positioned(
           right: 0,
-          top: 10,
+          top: 7,
           child: widget.dataType == DataTypeEnum.password
               ? IconButton(
                     onPressed: () {
@@ -226,6 +226,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             labelText: widget.label,
             labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
             counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
+            contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
             border: widget.isUnderline!
               ? const UnderlineInputBorder()
               : OutlineInputBorder(
@@ -314,7 +315,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
     return [];
   }
 
-  List<String>? _determinateAutofill() {
+  /*List<String>? _determinateAutofill() {
     if (widget.dataType == DataTypeEnum.password ||
         widget.dataType == DataTypeEnum.date ||
         widget.dataType == DataTypeEnum.time
@@ -335,7 +336,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       default:
         return [AutofillHints.name]; // Texto generico
     }
-  }
+  }*/
 
 /*List<MaskTextInputFormatter> _determinateMask() {
     if (widget.dataType == DataTypeEnum.date) {

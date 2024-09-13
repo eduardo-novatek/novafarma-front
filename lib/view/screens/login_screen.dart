@@ -72,44 +72,33 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: <Widget>[
                     const Text(
                       'Inicio de sesión',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
-                    TextFormField(
+                    CustomTextFormField(
                       controller: _usernameController,
                       focusNode: _usernameFocusNode,
-                      autofocus: true,
-                      autofillHints: null,
-                      decoration: const InputDecoration(
-                        labelText: 'Usuario',
-                        border: OutlineInputBorder(),
-                      ),
-                      onEditingComplete: () =>
-                          FocusScope.of(context).requestFocus(_passwordFocusNode),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, ingrese su usuario';
-                        }
-                        return null;
-                      },
+                      label: 'Usuario',
+                      initialFocus: true,
+                      textForValidation: 'Por favor, ingrese su usuario',
+                      viewCharactersCount: false,
+                      isUnderline: false,
+                      acceptEmpty: false,
+                      dataType: DataTypeEnum.text,
+                      onEditingComplete:  () =>
+                        FocusScope.of(context).requestFocus(_passwordFocusNode),
                     ),
-                    const SizedBox(height: 16.0),
-                    TextFormField(
+                    const SizedBox(height: 20.0),
+                    CustomTextFormField(
                       controller: _passwordController,
                       focusNode: _passwordFocusNode,
-                      autofillHints: null,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Contraseña',
-                        border: OutlineInputBorder(),
-                      ),
+                      label: 'Contraseña',
+                      textForValidation: 'Por favor, ingrese su contraseña',
+                      viewCharactersCount: false,
+                      isUnderline: false,
+                      acceptEmpty: false,
+                      dataType: DataTypeEnum.password,
                       onEditingComplete: _login,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, ingrese su contraseña';
-                        }
-                        return null;
-                      },
                     ),
                     const SizedBox(height: 24.0),
                     ElevatedButton(
