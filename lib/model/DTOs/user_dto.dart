@@ -3,30 +3,33 @@ import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
 class UserDTO extends Deserializable<UserDTO> {
   int? userId;
-  String name;
-  String lastname;
+  String? name;
+  String? lastname;
   String? userName;
   String? pass;
   bool? active;
-  RoleDTO role;
+  bool? changeCredentials;
+  RoleDTO? role;
 
   UserDTO.empty():
         userId = null,
-        name = "",
-        lastname = "",
-        userName = "",
-        pass = "",
-        active = false,
+        name = null,
+        lastname = null,
+        userName = null,
+        pass = null,
+        active = null,
+        changeCredentials = null,
         role = RoleDTO.empty();
 
   UserDTO({
     this.userId,
-    this.active,
+    this.name,
+    this.lastname,
     this.userName,
     this.pass,
-    required this.name,
-    required this.lastname,
-    required this.role
+    this.active,
+    this.changeCredentials,
+    this.role,
   });
 
   @override
@@ -38,7 +41,8 @@ class UserDTO extends Deserializable<UserDTO> {
       userName: json['userName'],
       pass: json['pass'],
       active: json['active'],
-      role: role.fromJson(json['role']),
+      changeCredentials: json['changeCredentials'],
+      role: role?.fromJson(json['role']),
     );
   }
 
@@ -51,7 +55,8 @@ class UserDTO extends Deserializable<UserDTO> {
       'userName': userName,
       'pass': pass,
       'active': active,
-      'role': role.toJson(),
+      'changeCredentials': changeCredentials,
+      'role': role?.toJson(),
     };
   }
 }

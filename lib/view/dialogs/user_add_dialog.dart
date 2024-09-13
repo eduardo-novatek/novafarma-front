@@ -12,18 +12,18 @@ import '../../model/DTOs/role_dto.dart';
 import '../../model/DTOs/user_dto.dart';
 import '../../model/globals/tools/floating_message.dart';
 
-class AddUserDialog extends StatefulWidget {
+class UserAddDialog extends StatefulWidget {
 
   //final GlobalKey<ScaffoldState> scaffoldKey;
   final List<RoleDTO> roleList;
 
-  const AddUserDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
+  const UserAddDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
 
   @override
-  State<AddUserDialog> createState() => _AddUserDialogState();
+  State<UserAddDialog> createState() => _UserAddDialogState();
 }
 
-class _AddUserDialogState extends State<AddUserDialog> {
+class _UserAddDialogState extends State<UserAddDialog> {
 
   final _formKey = GlobalKey<FormState>();
 
@@ -163,6 +163,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
                 lastname: _lastNameController.text,
                 userName: _userNameController.text,
                 pass: _passController.text,
+
                 role: widget.roleList.firstWhere(
                         (role) => role.name == selectedRole),
               );

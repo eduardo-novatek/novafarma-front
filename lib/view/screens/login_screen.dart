@@ -142,11 +142,13 @@ class _LoginScreenState extends State<LoginScreen> {
         userLogged!.userId = user.userId;
         userLogged!.name = user.name;
         userLogged!.lastname = user.lastname;
-        userLogged!.role = RoleDTO1(roleId: user.role.roleId, name: user.role.name);
+        userLogged!.role = RoleDTO1(
+            roleId: user.role!.roleId, name: user.role!.name);
 
         Navigator.pushReplacement(
           mounted ? context : context,
-          MaterialPageRoute(builder: (context) => const HomePageScreen(title: 'NovaFarma')),
+          MaterialPageRoute(builder: (context) =>
+            const HomePageScreen(title: 'NovaFarma')),
         );
       }).onError((error, stackTrace) {
         setState(() {

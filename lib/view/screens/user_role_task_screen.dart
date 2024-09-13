@@ -13,7 +13,8 @@ import 'package:novafarma_front/model/globals/constants.dart' show
   uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
-import '../dialogs/user_dialog.dart';
+import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
+import '../dialogs/user_add_dialog.dart';
 
 class UserRoleTaskScreen extends StatefulWidget {
   const UserRoleTaskScreen({super.key});
@@ -213,7 +214,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
           ),
         ),
         child: ListTile(
-          title: Text('${user.name} ${user.lastname} (${user.role.name})'),
+          title: Text('${user.name} ${user.lastname} (${user.role!.name})'),
           subtitle: user.active!
               ? const Text("Activo", style: TextStyle(color: Colors.green))
               : const Text("Inactivo", style: TextStyle(color: Colors.red)),
@@ -323,7 +324,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         newUser = await showDialog<UserDTO>(
           context: context,
           builder: (BuildContext context) {
-            return AddUserDialog(_roleList);
+            return UserAddDialog(_roleList);
           },
         );
 
@@ -387,12 +388,20 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
           messageTypeEnum: MessageTypeEnum.error
       );*/
     }
-
   }
 
   void _editUser(UserDTO user) {
-
-
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return UserEditDialog(
+          isUser: false,
+          user: user,
+          roleList: _roleList,
+        );
+      },
+    );
   }
+
 
 }
