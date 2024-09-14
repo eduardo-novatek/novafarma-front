@@ -9,11 +9,11 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show
-  uriRoleFindAll, uriRoleAdd, uriUserFindAll, uriUserAdd;
+import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleFindAll, uriUserAdd, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
+import '../../model/globals/tools/build_circular_progress.dart';
 import '../dialogs/user_add_dialog.dart';
 
 class UserRoleTaskScreen extends StatefulWidget {
@@ -52,6 +52,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       String title, IconData icon, List<dynamic> dataList, bool loading) {
     return Expanded(
       child: Container(
+        height: MediaQuery.of(context).size.height * 0.8,
         margin: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           border: Border.all(width: 2.0, color: Colors.black54),
@@ -60,82 +61,105 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(18.0),
-                topRight: Radius.circular(18.0),
-              ),
-              child: Container(
-                color: title == 'Roles' ? Colors.blue : Colors.green,
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(icon, color: Colors.white),
-                        const SizedBox(width: 8),
-                        Text(
-                          title,
-                          style: const TextStyle(
-                              fontSize: 20, color: Colors.white
-                          ),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: title == 'Roles' ? _loadRoles : _loadUsers,
-                      color: Colors.white,
-                      tooltip: "Actualizar",
-                    ),
-                  ],
-                ),
+            _buildHead(title, icon),
+            Expanded(
+              child: IgnorePointer(
+                ignoring: loading,
+                child: _buildBody(dataList, loading),
               ),
             ),
-            const SizedBox(height: 10),
-            loading
-                ? const Center(child: CircularProgressIndicator())
-                : Expanded(
-                  child: ListView.builder(
-                    itemCount: dataList.length,
-                    itemBuilder: (context, index) {
-                      return title == 'Usuarios'
-                          ? _buildUserData(dataList[index], index)
-                          : _buildRoleData(dataList[index], index);
-                    },
-                  ),
-                ),
-            Container(
-              height: 40,
-              decoration: BoxDecoration(
-                color: title == 'Roles' ? Colors.blue : Colors.green,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(18.0),
-                  bottomRight: Radius.circular(18.0),
-                ),
-              ),
+            _buildFooter(title),
+          ],
+        ),
+      ),
+    );
+  }
+
+  ClipRRect _buildHead(String title, IconData icon) {
+    return ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(18.0),
+              topRight: Radius.circular(18.0),
+            ),
+            child: Container(
+              color: title == 'Roles' ? Colors.blue : Colors.green,
+              padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.add),
-                    iconSize: 30.0,
-                    tooltip: 'Agregar $title',
-                    onPressed: () {
-                      if (title == 'Usuarios') {
-                        _addUsers();
-                      } else if (title == 'roles') {
-                        _addRoles();
-                      }
-                    },
-                    color: Colors.white,
+                  Row(
+                    children: [
+                      Icon(icon, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Text(
+                        title,
+                        style: const TextStyle(
+                            fontSize: 20, color: Colors.white
+                        ),
+                      ),
+                    ],
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: title == 'Roles' ? _loadRoles : _loadUsers,
+                    color: Colors.white,
+                    tooltip: "Actualizar",
+                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
-          ],
+          );
+  }
+
+  Widget _buildBody(List<dynamic> dataList, bool loading) {
+    return Stack(
+      children: [
+        ListView.builder(
+          itemCount: dataList.length,
+          itemBuilder: (context, index) {
+            return dataList is List<UserDTO>
+                ? _buildUserData(dataList[index], index)
+                : _buildRoleData(dataList[index], index);
+          },
         ),
+        // AbsorbPointer para bloquear la interacción cuando está cargando
+        if (loading)
+          AbsorbPointer(
+            absorbing: loading,
+            child: buildCircularProgress(size: 30.0), //CircularProgressIndicator(),
+          )
+      ],
+    );
+  }
+
+  Container _buildFooter(String title) {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: title == 'Roles' ? Colors.blue : Colors.green,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(18.0),
+          bottomRight: Radius.circular(18.0),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            iconSize: 30.0,
+            tooltip: 'Agregar $title',
+            onPressed: () {
+              if (title == 'Usuarios') {
+                _addUser();
+              } else if (title == 'roles') {
+                _saveRole();
+              }
+            },
+            color: Colors.white,
+          ),
+        ],
       ),
     );
   }
@@ -165,6 +189,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         child: ListTile(
           title: Text(role.name),
           trailing: PopupMenuButton<String>(
+            tooltip: '',
             onSelected: (value) {
               switch (value) {
                 case 'Editar':
@@ -215,35 +240,47 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         ),
         child: ListTile(
           title: Text('${user.name} ${user.lastname} (${user.role!.name})'),
-          subtitle: user.active!
-              ? const Text("Activo", style: TextStyle(color: Colors.green))
-              : const Text("Inactivo", style: TextStyle(color: Colors.red)),
+          subtitle: _buildSubtitle(user),
           trailing: PopupMenuButton<String>(
+            tooltip: '',
             onSelected: (value) {
               switch (value) {
                 case 'Editar':
                   _editUser(user);
                   break;
-                case 'Activar':
-                // Lógica para activar usuario
+                case 'Activar/Desactivar':
+                  _activateOrDeactivate(user);
                   break;
                 case 'Reestablecer Contraseña':
-                // Lógica para reestablecer contraseña
+                  break;
+                case 'Eliminar':
                   break;
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                enabled: false,
+                child: Text(
+                  '${user.name} ${user.lastname} (${user.role!.name})',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const PopupMenuDivider(height: 0,),
               const PopupMenuItem<String>(
                 value: 'Editar',
                 child: Text('Editar'),
               ),
-              const PopupMenuItem<String>(
-                value: 'Activar',
-                child: Text('Activar'),
+              PopupMenuItem<String>(
+                value: 'Activar/Desactivar',
+                child: Text(user.active! ? 'Inactivar' : 'Activar'),
               ),
               const PopupMenuItem<String>(
                 value: 'Reestablecer Contraseña',
                 child: Text('Reestablecer Contraseña'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Eliminar',
+                child: Text('Eliminar', style: TextStyle(color: Colors.red),),
               ),
             ],
           ),
@@ -317,7 +354,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     });
   }
 
-  Future<void> _addUsers() async {
+  Future<void> _addUser() async {
     UserDTO? newUser;
     do {
         // Muestra un diálogo para ingresar los datos del nuevo usuario
@@ -329,69 +366,50 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
 
         if (newUser != null) {
-          try {
-            fetchDataObject(
-                uri: uriUserAdd,
-                classObject: newUser,
-                requestType: RequestTypeEnum.post,
-                body: newUser
-            ).then((newUserId) {
-              FloatingMessage.show(
-                  context: context,
-                  text: "Usuario agregado con éxito",
-                  messageTypeEnum: MessageTypeEnum.info
-              );
-              /*floatingMessage(
-                  context: context,
-                  text: "Usuario agregado con éxito",
-                  messageTypeEnum: MessageTypeEnum.info
-              );*/
-              // Si está la opcion "Seleccione...", la elimina de la lista
-              if (_roleList[0].isFirst! == true) _roleList.removeAt(0);
-              // Actualiza la lista de usuarios
-              _loadUsers();
-            });
-          } catch (e) {
-            FloatingMessage.show(
-                context: context,
-                text: 'Error: $e',
-                messageTypeEnum: MessageTypeEnum.error
-            );
-            /*floatingMessage(
-                context: context,
-                text: 'Error: $e',
-                messageTypeEnum: MessageTypeEnum.error
-            );*/
-          }
+          await _saveUser(newUser, isAdd: true);
+          _loadUsers();
         }
     } while (newUser != null);
   }
 
-  Future<void> _addRoles() async {
+  ///isAdd=true: es agregar el usuario. false: es modificar el usuario
+  Future<void> _saveUser(UserDTO user, {required bool isAdd}) async {
+    _setLoading(isUsers: true, loading: true);
+    await fetchDataObject<UserDTO>(
+        uri: _getUri(isAdd: isAdd),
+        classObject: user,
+        requestType: _getRequestType(isAdd: isAdd),
+        body: user
+    ).then((savedUserId) {
+      FloatingMessage.show(
+          context: context,
+          text: _getMessageSuccess(isAdd: isAdd),
+          messageTypeEnum: MessageTypeEnum.info
+      );
+      // Si está la opcion "Seleccione...", la elimina de la lista
+      if (_roleList[0].isFirst! == true) _roleList.removeAt(0);
+    }).catchError((error) {
+      genericError(error, context, isFloatingMessage: true);
+    });
+    _setLoading(isUsers: true, loading: false);
+  }
+
+  Future<void> _saveRole() async {
+    _setLoading(isUsers: false, loading: true);
     try {
       fetchDataObject(
         uri: uriRoleAdd,
         classObject: RoleDTO.empty(),
         requestType: RequestTypeEnum.post,
       );
-      //@2
-
     } catch(e) {
-      FloatingMessage.show(
-          context: context,
-          text: 'Error: $e',
-          messageTypeEnum: MessageTypeEnum.error
-      );
-      /*floatingMessage(
-          context: context,
-          text: 'Error: $e',
-          messageTypeEnum: MessageTypeEnum.error
-      );*/
+      genericError(e, context, isFloatingMessage: true);
     }
+    _setLoading(isUsers: false, loading: false);
   }
 
-  void _editUser(UserDTO user) {
-    showDialog(
+  Future<void> _editUser(UserDTO user) async {
+    UserDTO? userChanged = await showDialog<UserDTO>(
       context: context,
       builder: (BuildContext context) {
         return UserEditDialog(
@@ -401,7 +419,48 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
       },
     );
+    if (userChanged != null) {
+      try {
+        await _saveUser(userChanged, isAdd: false);
+        _loadUsers();
+      } finally {}
+    }
   }
 
+  void _activateOrDeactivate(UserDTO user) {
+
+  }
+
+  Column _buildSubtitle(UserDTO user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Usuario: ${user.userName}'),
+        user.active!
+          ? const Text("Activo", style: TextStyle(color: Colors.green))
+          : const Text("Inactivo", style: TextStyle(color: Colors.red)),
+      ],
+    );
+  }
+
+  ///isAdd=true: es agregar el usuario. false: es modificar el usuario
+  String _getUri({required bool isAdd}) => isAdd ? uriUserAdd : uriUserUpdate;
+
+  ///isAdd=true: es agregar el usuario. false: es modificar el usuario
+  RequestTypeEnum _getRequestType({required bool isAdd}) =>
+      isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch;
+
+  String _getMessageSuccess({required bool isAdd}) =>
+    isAdd ? 'Usuario agregado con éxito' : 'Usuario modificado con éxito';
+
+  void _setLoading({required bool isUsers, required bool loading}) {
+    setState(() {
+      if (isUsers) {
+        _loadingUsers = loading;
+      } else {
+        _loadingRoles = loading;
+      }
+    });
+  }
 
 }

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto2.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';

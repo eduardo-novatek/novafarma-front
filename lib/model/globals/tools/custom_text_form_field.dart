@@ -226,7 +226,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
             labelText: widget.label,
             labelStyle: TextStyle(fontSize: themeData.textTheme.bodyMedium?.fontSize),
             counter: widget.viewCharactersCount! ? null : const SizedBox.shrink(),
-            contentPadding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
+            //contentPadding: const EdgeInsets.symmetric(horizontal: 15.0),
             border: widget.isUnderline!
               ? const UnderlineInputBorder()
               : OutlineInputBorder(

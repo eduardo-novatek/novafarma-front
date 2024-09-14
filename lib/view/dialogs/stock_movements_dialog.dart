@@ -7,7 +7,7 @@ import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/buildTableCell.dart';
+import '../../model/globals/build_table_cell.dart';
 import '../../model/globals/tools/pagination_bar.dart';
 import '../../model/objects/error_object.dart';
 import '../../model/globals/constants.dart' show host, port,

@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.lightBlueAccent,
         ),
       ),
-      home: LoginScreen(), //const HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
+      home: const LoginScreen(), //const HomePageScreen(title: 'NovaFarma'), // scaffoldKey: _scaffoldKey),
     );
   }
 }

@@ -1,12 +1,8 @@
-
-
 import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:novafarma_front/model/DTOs/dependent_nova_daily_dto.dart';
-import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_dependent_nova_daily_list.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_partner_nova_daily_list.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 

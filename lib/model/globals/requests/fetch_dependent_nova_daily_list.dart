@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/dependent_nova_daily_dto.dart';
-import 'package:novafarma_front/model/DTOs/partner_nova_daily_dto.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_data_nova_daily.dart';
-import 'package:novafarma_front/model/globals/requests/fetch_data_nova_daily_prueba.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
-import '../constants.dart' show hostNovaDaily, novaDailyToken, portNovaDaily, uriNovaDailyFindDependentDocument, uriNovaDailyFindDependentLastname, uriNovaDailyFindPartnerDocument, uriNovaDailyFindPartnerLastname, uriProxyCORSNovaDaily;
+import '../constants.dart' show hostNovaDaily, novaDailyToken, portNovaDaily,
+  uriNovaDailyFindDependentDocument, uriNovaDailyFindDependentLastname,
+  uriProxyCORSNovaDaily;
 
 /// searchByDocument: true=buscar por documento. false=buscar por apellido
 Future<void> fetchDependentNovaDailyList({

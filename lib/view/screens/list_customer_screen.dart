@@ -557,7 +557,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     ).then((value) {
       _toggleLoading();
       showDialog(
-        context: context,
+        context: mounted ? context : context,
         builder: (BuildContext context) {
           return ControlledMedicationListFromCustomerDialog(
               customerName: '${_customerList[index].lastname}, '

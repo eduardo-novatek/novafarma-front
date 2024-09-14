@@ -470,8 +470,8 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
 
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
-        if (error.statusCode != HttpStatus.notFound) {
-          genericError(error!, context, isFloatingMessage: true);
+        if (error.statusCode != HttpStatus.notFound && mounted) {
+          genericError(error, context, isFloatingMessage: true);
         }
       }
     });

@@ -1,5 +1,3 @@
-
-import 'dart:html';
 import 'dart:html';
 import 'dart:ui' as ui;
 

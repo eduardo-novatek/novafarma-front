@@ -1,4 +1,3 @@
-import 'package:novafarma_front/model/DTOs/presentation_dto.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
 import '../globals/tools/date_time.dart';

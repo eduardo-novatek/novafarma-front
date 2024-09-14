@@ -1,7 +1,5 @@
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
-import 'medicine_dto2.dart';
-
 class VoucherItemDTO3 extends Deserializable<VoucherItemDTO3> {
   int? voucherItemId;
 

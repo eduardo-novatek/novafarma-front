@@ -1,12 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/customer_dto2.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
-import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
-import 'package:novafarma_front/model/globals/controlled_icon.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
-import 'package:novafarma_front/model/objects/page_object_map.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';

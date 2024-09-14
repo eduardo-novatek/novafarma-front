@@ -163,9 +163,12 @@ class _UserEditDialogState extends State<UserEditDialog> {
             if (await _validatedForm(userName: _userNameController.text)) {
               if (!context.mounted) return;
               UserDTO userUpdated = UserDTO(
-                name: _nameController.text,
-                lastname: _lastnameController.text,
+                userId: widget.user.userId,
+                name: _nameController.text.trim(),
+                lastname: _lastnameController.text.trim(),
                 userName: _userNameController.text,
+                active: widget.user.active,
+                changeCredentials: widget.user.changeCredentials,
                 role: widget.roleList.firstWhere(
                         (role) => role.name == _selectedRole),
               );
@@ -177,7 +180,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
         TextButton(
           child: const Text('Cancelar'),
           onPressed: () {
-            Navigator.of(context).pop(); // Cierra el diálogo sin agregar usuario
+            Navigator.of(context).pop(null); // Cierra el diálogo sin agregar usuario
           },
         ),
       ],
@@ -187,7 +190,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
   Future<bool> _validatedForm({required String userName}) async {
     if (!_formKey.currentState!.validate()) return false;
     try {
-      if (!widget.isUser || _sameUsername()) {
+      if (!_sameUsername()) {
         if (await userNameExist(userName: userName)) {
           if (context.mounted) {
             FloatingMessage.show(
@@ -219,9 +222,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
 
   ///true si el nombre de usuario ingresado es el mismo que el seleccionado
   ///siempre que sea un usuario quien esté editando
-  bool _sameUsername() =>
-    widget.isUser &&
-    widget.user.userName == _nameController.text.trim();
+  bool _sameUsername() => widget.user.userName == _userNameController.text.trim();
 
   int _getSelectedRole() =>
     widget.roleList.indexWhere((role) => role.name == _selectedRole);

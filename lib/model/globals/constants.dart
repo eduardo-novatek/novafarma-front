@@ -51,6 +51,7 @@ const String uriRoleFindId = "/role/findId";
 
 //User
 const String uriUserAdd = "/user/add";
+const String uriUserUpdate = "/user/update";
 const String uriUserFindAll = "/user/findAll";
 const String uriUserFindId = "/user/findId";
 const String uriUserNameExist = "/user/userNameExist";
