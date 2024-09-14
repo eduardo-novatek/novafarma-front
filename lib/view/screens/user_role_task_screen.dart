@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
+import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
@@ -12,6 +13,7 @@ import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleFindAll, uriUserAdd, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
+import 'package:novafarma_front/view/dialogs/role_add_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../dialogs/user_add_dialog.dart';
@@ -154,7 +156,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
               if (title == 'Usuarios') {
                 _addUser();
               } else if (title == 'roles') {
-                _saveRole();
+                _addRole();
               }
             },
             color: Colors.white,
@@ -372,6 +374,24 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     } while (newUser != null);
   }
 
+  Future<void> _addRole() async {
+    RoleDTO1? newRole;
+    do {
+      // Muestra un diálogo para ingresar los datos del nuevo usuario
+      newRole = await showDialog<RoleDTO1>(
+        context: context,
+        builder: (BuildContext context) {
+          return RoleAddDialog();
+        },
+      );
+
+      if (newRole != null) {
+        await _saveRole(newRole, isAdd: true);
+        _loadUsers();
+      }
+    } while (newRole != null);
+  }
+
   ///isAdd=true: es agregar el usuario. false: es modificar el usuario
   Future<void> _saveUser(UserDTO user, {required bool isAdd}) async {
     _setLoading(isUsers: true, loading: true);
@@ -394,13 +414,14 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     _setLoading(isUsers: true, loading: false);
   }
 
-  Future<void> _saveRole() async {
+  Future<void> _saveRole(RoleDTO1 role, {required bool isAdd}) async {
     _setLoading(isUsers: false, loading: true);
     try {
-      fetchDataObject(
+      await fetchDataObject<RoleDTO1>(
         uri: uriRoleAdd,
-        classObject: RoleDTO.empty(),
+        classObject: RoleDTO1.empty(),
         requestType: RequestTypeEnum.post,
+        body: role
       );
     } catch(e) {
       genericError(e, context, isFloatingMessage: true);
