@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
@@ -103,20 +104,13 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
         ElevatedButton(
           child: const Text('Aceptar'),
           onPressed: () async {
-            if (await _validatedForm(rolName: _userNameController.text)) {
-              if (!context.mounted) return;
-              UserDTO newUser = UserDTO(
-                name: _nameController.text,
-                lastname: _lastNameController.text,
-                userName: _userNameController.text,
-                pass: _passController.text,
-
-                role: widget.roleList.firstWhere(
-                        (role) => role.name == selectedRole),
-              );
-              // Cierra el diálogo y devuelve el nuevo usuario
-              Navigator.of(context).pop(newUser);
-            }
+            if (!_formKey.currentState!.validate() || !context.mounted) return;
+            RoleDTO1 newRole = RoleDTO1(
+              roleId: null,
+              name: _nameController.text,
+            );
+            // Cierra el diálogo y devuelve el nuevo usuario
+            Navigator.of(context).pop(newRole);
           }
         ),
         TextButton(
@@ -130,46 +124,6 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
     );
 
   }
-
-  Future<bool> _validatedForm({required String rolName}) async {
-
-    //Valida el formulario
-    if (!_formKey.currentState!.validate()) return false;
-
-    try {
-      if (await userNameExist(userName: rolName)) {
-        if (context.mounted) {
-          FloatingMessage.show(
-              context: context,
-              text: 'Usuario ya registrado: $rolName',
-              messageTypeEnum: MessageTypeEnum.warning
-          );
-          _userNameFocusNode.requestFocus();
-        }
-        return false;
-      }
-
-      if (selectedRole == defaultFirstOption) {
-        if (context.mounted) {
-          FloatingMessage.show(
-              context: context,
-              text: 'Por favor, seleccione el rol',
-              messageTypeEnum: MessageTypeEnum.warning
-          );
-        }
-        return false;
-      }
-    } catch (e) {
-      FloatingMessage.show(
-          context: context,
-          text: "Error de conexión",
-          messageTypeEnum: MessageTypeEnum.error
-      );
-      return false;
-    }
-    return true;  // Validacion correcta
-  }
-
 
 }
 

@@ -155,7 +155,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             onPressed: () {
               if (title == 'Usuarios') {
                 _addUser();
-              } else if (title == 'roles') {
+              } else if (title == 'Roles') {
                 _addRole();
               }
             },
@@ -292,9 +292,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   }
 
   Future<void> _loadRoles() async {
-    setState(() {
-      _loadingRoles = true;
-    });
+    _setLoading(isUsers: false, loading: true);
     fetchDataObject<RoleDTO>(
       uri: uriRoleFindAll,
       classObject: RoleDTO.empty(),
@@ -303,13 +301,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       _roleList.clear();
       _roleList.addAll(data.cast<RoleDTO>().map((e) =>
           e.fromJson(e.toJson())));
-       setState(() {
-       _loadingRoles = false;
-       });
+      setState(() {});
     }).onError((error, stackTrace) {
-      setState(() {
-        _loadingRoles = false;
-      });
       if (error is ErrorObject) {
         FloatingMessage.show(
             context: context,
@@ -320,12 +313,11 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         genericError(error!, context);
       }
     });
+    _setLoading(isUsers: false, loading: false);
   }
 
   Future<void> _loadUsers() async {
-    setState(() {
-      _loadingUsers = true;
-    });
+    _setLoading(isUsers: true, loading: true);
     fetchDataObject<UserDTO>(
         uri: uriUserFindAll,
         classObject: UserDTO.empty(),
@@ -336,14 +328,9 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         _userList.addAll(data.cast<UserDTO>().map(
                 (e) => e.fromJson(e.toJson())
         ));
-        setState(() {
-          _loadingUsers = false;
-        });
+        setState(() {});
       }
     }).onError((error, stackTrace) {
-      setState(() {
-        _loadingUsers = false;
-      });
       if (error is ErrorObject) {
         FloatingMessage.show(
             context: context,
@@ -354,6 +341,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         genericError(error!, context);
       }
     });
+    _setLoading(isUsers: true, loading: false);
   }
 
   Future<void> _addUser() async {
@@ -381,13 +369,12 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       newRole = await showDialog<RoleDTO1>(
         context: context,
         builder: (BuildContext context) {
-          return RoleAddDialog();
+          return const RoleAddDialog();
         },
       );
-
       if (newRole != null) {
         await _saveRole(newRole, isAdd: true);
-        _loadUsers();
+        _loadRoles();
       }
     } while (newRole != null);
   }
@@ -403,7 +390,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     ).then((savedUserId) {
       FloatingMessage.show(
           context: context,
-          text: _getMessageSuccess(isAdd: isAdd),
+          text: _getMessageSuccess(isAdd: isAdd, isUser: true),
           messageTypeEnum: MessageTypeEnum.info
       );
       // Si está la opcion "Seleccione...", la elimina de la lista
@@ -422,7 +409,13 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         classObject: RoleDTO1.empty(),
         requestType: RequestTypeEnum.post,
         body: role
-      );
+      ).then((value) {
+        FloatingMessage.show(
+            context: context,
+            text: _getMessageSuccess(isAdd: isAdd, isUser: false),
+            messageTypeEnum: MessageTypeEnum.info
+        );
+      });
     } catch(e) {
       genericError(e, context, isFloatingMessage: true);
     }
@@ -471,8 +464,13 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   RequestTypeEnum _getRequestType({required bool isAdd}) =>
       isAdd ? RequestTypeEnum.post : RequestTypeEnum.patch;
 
-  String _getMessageSuccess({required bool isAdd}) =>
-    isAdd ? 'Usuario agregado con éxito' : 'Usuario modificado con éxito';
+  String _getMessageSuccess({required bool isAdd, required isUser}) {
+    if (isAdd) {
+      return isUser ? 'Usuario agregado con éxito' : 'Rol agregado con éxito';
+    } else {
+      return isUser ? 'Usuario modificado con éxito' : 'Rol modificado con éxito';
+    }
+  }
 
   void _setLoading({required bool isUsers, required bool loading}) {
     setState(() {
