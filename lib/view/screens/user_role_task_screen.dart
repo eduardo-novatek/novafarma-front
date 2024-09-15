@@ -14,6 +14,7 @@ import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, u
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/role_add_dialog.dart';
+import 'package:novafarma_front/view/dialogs/role_edit_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../dialogs/user_add_dialog.dart';
@@ -87,7 +88,6 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
               color: title == 'Roles' ? Colors.blue : Colors.green,
               padding: const EdgeInsets.all(8.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
@@ -101,6 +101,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                       ),
                     ],
                   ),
+                  const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.refresh),
                     onPressed: title == 'Roles' ? _loadRoles : _loadUsers,
@@ -195,10 +196,9 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             onSelected: (value) {
               switch (value) {
                 case 'Editar':
-                // Lógica para editar rol
+                  _editRole(role);
                   break;
                 case 'Eliminar':
-                // Lógica para eliminar rol
                   break;
               }
             },
@@ -209,7 +209,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
               ),
               const PopupMenuItem<String>(
                 value: 'Eliminar',
-                child: Text('Eliminar'),
+                child: Text('Eliminar', style: TextStyle(color: Colors.red),),
               ),
             ],
           ),
@@ -274,7 +274,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
               ),
               PopupMenuItem<String>(
                 value: 'Activar/Desactivar',
-                child: Text(user.active! ? 'Inactivar' : 'Activar'),
+                child: Text(user.active! ? 'Desactivar' : 'Activar'),
               ),
               const PopupMenuItem<String>(
                 value: 'Reestablecer Contraseña',
@@ -293,7 +293,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   Future<void> _loadRoles() async {
     _setLoading(isUsers: false, loading: true);
-    fetchDataObject<RoleDTO>(
+    await fetchDataObject<RoleDTO>(
       uri: uriRoleFindAll,
       classObject: RoleDTO.empty(),
       requestType: RequestTypeEnum.get
@@ -310,7 +310,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             messageTypeEnum: MessageTypeEnum.error
         );
       } else {
-        genericError(error!, context);
+        genericError(error!, context, isFloatingMessage: true);
       }
     });
     _setLoading(isUsers: false, loading: false);
@@ -318,7 +318,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   Future<void> _loadUsers() async {
     _setLoading(isUsers: true, loading: true);
-    fetchDataObject<UserDTO>(
+    await fetchDataObject<UserDTO>(
         uri: uriUserFindAll,
         classObject: UserDTO.empty(),
         requestType: RequestTypeEnum.get
@@ -338,7 +338,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             messageTypeEnum: MessageTypeEnum.error
         );
       } else {
-        genericError(error!, context);
+        genericError(error!, context, isFloatingMessage: true);
       }
     });
     _setLoading(isUsers: true, loading: false);
@@ -373,8 +373,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         },
       );
       if (newRole != null) {
-        await _saveRole(newRole, isAdd: true);
-        _loadRoles();
+        if (await _saveRole(newRole, isAdd: true)) _loadRoles();
       }
     } while (newRole != null);
   }
@@ -401,7 +400,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     _setLoading(isUsers: true, loading: false);
   }
 
-  Future<void> _saveRole(RoleDTO1 role, {required bool isAdd}) async {
+  Future<bool> _saveRole(RoleDTO1 role, {required bool isAdd}) async {
+    bool ok = true;
     _setLoading(isUsers: false, loading: true);
     try {
       await fetchDataObject<RoleDTO1>(
@@ -417,9 +417,19 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
       });
     } catch(e) {
-      genericError(e, context, isFloatingMessage: true);
+      if (e is ErrorObject) {
+        FloatingMessage.show(
+          context: context,
+          text: e.message!,
+          messageTypeEnum: MessageTypeEnum.warning
+        );
+      } else {
+        genericError(e, context, isFloatingMessage: true);
+      }
+      ok = false;
     }
     _setLoading(isUsers: false, loading: false);
+    return Future.value(ok);
   }
 
   Future<void> _editUser(UserDTO user) async {
@@ -437,6 +447,22 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       try {
         await _saveUser(userChanged, isAdd: false);
         _loadUsers();
+      } finally {}
+    }
+  }
+
+  Future<void> _editRole(RoleDTO role) async {
+    RoleDTO1? roleChanged = await showDialog<RoleDTO1>(
+      context: context,
+      builder: (BuildContext context) {
+        return RoleEditDialog(
+          role: RoleDTO1(roleId: role.roleId, name: role.name)
+        );
+      },
+    );
+    if (roleChanged != null && role.name != roleChanged.name) {
+      try {
+        if (await _saveRole(roleChanged, isAdd: false)) _loadRoles();
       } finally {}
     }
   }

@@ -35,6 +35,7 @@ class UserEditDialog extends StatefulWidget {
 class _UserEditDialogState extends State<UserEditDialog> {
 
   final _formKey = GlobalKey<FormState>();
+  final ThemeData _themeData = ThemeData();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
@@ -45,7 +46,6 @@ class _UserEditDialogState extends State<UserEditDialog> {
   final FocusNode _userNameFocusNode = FocusNode();
 
   late String _selectedRole;
-  ThemeData _themeData = ThemeData();
 
   @override
   void initState() {

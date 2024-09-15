@@ -5,6 +5,7 @@ import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
@@ -13,25 +14,26 @@ import '../../model/DTOs/role_dto.dart';
 import '../../model/DTOs/user_dto.dart';
 import '../../model/globals/tools/floating_message.dart';
 
-class RoleAddDialog extends StatefulWidget {
-  const RoleAddDialog({super.key});
-  // const UserAddDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
+///Permite la edicion del role.
+class RoleEditDialog extends StatefulWidget {
+  final RoleDTO1 role;
 
-  //final List<RoleDTO> roleList;
+  const RoleEditDialog({
+    required this.role,
+    super.key
+  });
 
   @override
-  State<RoleAddDialog> createState() => _RoleAddDialogState();
+  State<RoleEditDialog> createState() => _RoleEditDialogState();
 }
 
-class _RoleAddDialogState extends State<RoleAddDialog> {
+class _RoleEditDialogState extends State<RoleEditDialog> {
 
   final _formKey = GlobalKey<FormState>();
-  final ThemeData themeData = ThemeData();
+  final ThemeData _themeData = ThemeData();
 
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
-
-  //String selectedRole = defaultFirstOption;
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
               isFirst: true, roleId: null, name: defaultFirstOption)
       );
     }*/
+    _nameController.value = TextEditingValue(text: widget.role.name!);
   }
 
   @override
@@ -56,7 +59,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Agregar rol'),
+      title: const Text('Editar rol'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -83,47 +86,89 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
                         child: Text("Rol:"),
                       ),
                       CustomDropdown<RoleDTO>(
-                        themeData: themeData,
+                        themeData: _themeData,
                         optionList: widget.roleList,
-                        selectedOption: widget.roleList[0],
+                        selectedOption: widget.roleList[_getSelectedRole()],
                         isSelected: true,
                         callback: (role) {
-                          selectedRole = role!.name;
+                          setState(() {
+                            _selectedRole = role!.name;
+                          });
                         },
                       ),
                     ],
                   )*/
-                ],
+              ],
               ),
             ),
           ),
         ),
       ),
-
       actions: <Widget>[
         ElevatedButton(
           child: const Text('Aceptar'),
           onPressed: () async {
-            if (!_formKey.currentState!.validate() || !context.mounted) return;
-            RoleDTO1 newRole = RoleDTO1(
-              roleId: null,
-              name: _nameController.text,
-            );
-            // Cierra el diálogo y devuelve el nuevo usuario
-            Navigator.of(context).pop(newRole);
+            if (await _validatedForm(roleName: _nameController.text)) {
+              if (!context.mounted) return;
+              RoleDTO1 roleUpdated = RoleDTO1(
+                roleId: widget.role.roleId,
+                name: _nameController.text.trim(),
+              );
+              // Cierra el diálogo y devuelve el usuario actualizado
+              Navigator.of(context).pop(roleUpdated);
+            }
           }
         ),
         TextButton(
           child: const Text('Cancelar'),
           onPressed: () {
-            Navigator.of(context)
-                .pop(); // Cierra el diálogo sin agregar usuario
+            Navigator.of(context).pop(null); // Cierra el diálogo devolviendo null
           },
         ),
       ],
     );
-
   }
+
+  Future<bool> _validatedForm({required String roleName}) async {
+    if (!_formKey.currentState!.validate()) return false;
+    /*try {
+      if (!_sameRoleName()) {
+        /*if (await userNameExist(userName: roleName)) {
+          if (context.mounted) {
+            FloatingMessage.show(
+                context: context,
+                text: 'Usuario ya registrado: $roleName',
+                messageTypeEnum: MessageTypeEnum.warning
+            );
+            _userNameFocusNode.requestFocus();
+          }
+          return false;
+        }*/
+      }
+      /*if (_selectedRole == defaultFirstOption) {
+        if (context.mounted) {
+          FloatingMessage.show(
+              context: context,
+              text: 'Por favor, seleccione el rol',
+              messageTypeEnum: MessageTypeEnum.warning
+          );
+        }
+        return false;
+      }*/
+    } catch (e) {
+      genericError(e, isFloatingMessage: true, context);
+      return false;
+    }*/
+    return true;  // Validacion correcta
+  }
+
+  ///true si el nombre de usuario ingresado es el mismo que el seleccionado
+  ///siempre que sea un usuario quien esté editando
+  bool _sameRoleName() => widget.role.name == _nameController.text.trim();
+
+  //int _getSelectedRole() =>
+  //  widget.roleList.indexWhere((role) => role.name == _selectedRole);
+
 
 }
 
