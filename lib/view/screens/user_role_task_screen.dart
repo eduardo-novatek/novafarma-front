@@ -10,13 +10,16 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleFindAll, uriUserAdd, uriUserFindAll, uriUserUpdate;
+import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleFindAll, uriUserAdd, uriUserDelete, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
+import 'package:novafarma_front/model/globals/tools/message.dart';
+import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/role_add_dialog.dart';
 import 'package:novafarma_front/view/dialogs/role_edit_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
+import '../../model/globals/tools/fetch_data.dart';
 import '../dialogs/user_add_dialog.dart';
 
 class UserRoleTaskScreen extends StatefulWidget {
@@ -199,6 +202,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                   _editRole(role);
                   break;
                 case 'Eliminar':
+                  _deleteRole(role);
                   break;
               }
             },
@@ -256,6 +260,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                 case 'Reestablecer Contraseña':
                   break;
                 case 'Eliminar':
+                  _deleteUser(user);
                   break;
               }
             },
@@ -470,6 +475,90 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   void _activateOrDeactivate(UserDTO user) {
 
   }
+
+  Future<void> _deleteUser(UserDTO user) async {
+    if (await OpenDialog(
+      title: 'Confirmación',
+      content:
+        'Nombre: ${user.name} ${user.lastname}\n'
+        'Rol: ${user.role!.name}\n'
+        'Usuario: ${user.userName}\n\n'
+        '¿Confirma?',
+      textButton1: 'Si',
+      textButton2: 'No',
+      context: context).view() == 1) {
+        await fetchDataObject<UserDTO>(
+          uri: '$uriUserDelete/${user.userId}',
+          classObject: UserDTO.empty(),
+          requestType: RequestTypeEnum.delete
+        ).then((value) {
+          FloatingMessage.show(
+            context: context, 
+            text: 'Usuario eliminado con éxito', 
+            messageTypeEnum: MessageTypeEnum.info
+          );
+          _loadUsers();
+        }).onError((error, stackTrace) {
+          if (error is ErrorObject) {
+            String msg = 'El usuario está siendo utilizado.\n'
+                'No es posible eliminarlo.';
+            if (! error.message!.contains('Cannot delete'))  {
+              msg = error.message!;
+            }
+            FloatingMessage.show(
+              context: context,
+              text: msg,
+              messageTypeEnum: MessageTypeEnum.info,
+              secondsDelay: 8
+            );
+          } else {
+            genericError(error!, context, isFloatingMessage: true);
+          }
+        });
+    }
+  }
+
+  Future<void> _deleteRole(RoleDTO role) async {
+    if (await OpenDialog(
+        title: 'Confirmación',
+        content:
+        'Eliminar rol ${role.name}.\n'
+        '¿Confirma?',
+        textButton1: 'Si',
+        textButton2: 'No',
+        context: context).view() == 1) {
+      await fetchDataObject<RoleDTO>(
+          uri: '$uriRoleDelete/${role.roleId}',
+          classObject: RoleDTO.empty(),
+          requestType: RequestTypeEnum.delete
+      ).then((value) {
+        FloatingMessage.show(
+            context: context,
+            text: 'Rol eliminado con éxito',
+            messageTypeEnum: MessageTypeEnum.info
+        );
+        _loadRoles();
+      }).onError((error, stackTrace) {
+        if (error is ErrorObject) {
+          String msg = 'El rol está siendo utilizado.\n'
+              'No es posible eliminarlo.';
+          if (! error.message!.contains('Cannot delete'))  {
+            msg = error.message!;
+          }
+          FloatingMessage.show(
+              context: context,
+              text: msg,
+              messageTypeEnum: MessageTypeEnum.info,
+              secondsDelay: 8
+          );
+        } else {
+          genericError(error!, context, isFloatingMessage: true);
+        }
+      });
+    }
+  }
+
+
 
   Column _buildSubtitle(UserDTO user) {
     return Column(
