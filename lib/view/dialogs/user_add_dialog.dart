@@ -37,8 +37,7 @@ class _UserAddDialogState extends State<UserAddDialog> {
   final FocusNode _userNameFocusNode = FocusNode();
   final FocusNode _passFocusNode = FocusNode();
 
-  String selectedRole = defaultFirstOption;
-  ThemeData themeData = ThemeData();
+  String _selectedRole = defaultFirstOption;
 
   @override
   void initState() {
@@ -135,12 +134,14 @@ class _UserAddDialogState extends State<UserAddDialog> {
                         child: Text("Rol:"),
                       ),
                       CustomDropdown<RoleDTO>(
-                        themeData: themeData,
+                        themeData: ThemeData(),
                         optionList: widget.roleList,
-                        selectedOption: widget.roleList[0],
+                        selectedOption: _getSelectedRole(),
                         isSelected: true,
                         callback: (role) {
-                          selectedRole = role!.name;
+                          setState(() {
+                            _selectedRole = role!.name;
+                          });
                         },
                       ),
                     ],
@@ -156,7 +157,7 @@ class _UserAddDialogState extends State<UserAddDialog> {
         ElevatedButton(
           child: const Text('Aceptar'),
           onPressed: () async {
-            if (await _validatedForm(userName: _userNameController.text)) {
+            if (await _validatedForm()) {
               if (!context.mounted) return;
               UserDTO newUser = UserDTO(
                 name: _nameController.text,
@@ -165,7 +166,7 @@ class _UserAddDialogState extends State<UserAddDialog> {
                 pass: _passController.text,
 
                 role: widget.roleList.firstWhere(
-                        (role) => role.name == selectedRole),
+                        (role) => role.name == _selectedRole),
               );
               // Cierra el diálogo y devuelve el nuevo usuario
               Navigator.of(context).pop(newUser);
@@ -184,25 +185,28 @@ class _UserAddDialogState extends State<UserAddDialog> {
 
   }
 
-  Future<bool> _validatedForm({required String userName}) async {
+  Future<bool> _validatedForm() async {
 
-    //Valida el formulario
-    if (!_formKey.currentState!.validate()) return false;
+    if(_userNameIsSuperAdmin()) {
+      _userNameController.value = TextEditingValue.empty;
+      _passController.value = TextEditingValue.empty;
+    }
+    if (!_formKey.currentState!.validate()) return Future.value(false);
 
     try {
-      if (await userNameExist(userName: userName)) {
+      if (await userNameExist(userName: _userNameController.text.trim())) {
         if (context.mounted) {
           FloatingMessage.show(
               context: context,
-              text: 'Usuario ya registrado: $userName',
+              text: 'Usuario ya registrado: ${_userNameController.text.trim()}',
               messageTypeEnum: MessageTypeEnum.warning
           );
           _userNameFocusNode.requestFocus();
         }
-        return false;
+        return Future.value(false);
       }
 
-      if (selectedRole == defaultFirstOption) {
+      if (_selectedRole == defaultFirstOption) {
         if (context.mounted) {
           FloatingMessage.show(
               context: context,
@@ -210,7 +214,7 @@ class _UserAddDialogState extends State<UserAddDialog> {
               messageTypeEnum: MessageTypeEnum.warning
           );
         }
-        return false;
+        return Future.value(false);
       }
     } catch (e) {
       FloatingMessage.show(
@@ -218,11 +222,16 @@ class _UserAddDialogState extends State<UserAddDialog> {
           text: "Error de conexión",
           messageTypeEnum: MessageTypeEnum.error
       );
-      return false;
+      return Future.value(false);
     }
-    return true;  // Validacion correcta
+    return Future.value(true);  // Validacion correcta
   }
 
+  bool _userNameIsSuperAdmin() =>
+    _userNameController.text.trim().toUpperCase() == superAdminUser.toUpperCase();
+
+  RoleDTO _getSelectedRole() =>
+      widget.roleList.firstWhere((role) =>  role.name == _selectedRole);
 
 }
 

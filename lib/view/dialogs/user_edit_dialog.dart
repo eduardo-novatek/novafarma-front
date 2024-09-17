@@ -188,7 +188,9 @@ class _UserEditDialogState extends State<UserEditDialog> {
   }
 
   Future<bool> _validatedForm({required String userName}) async {
+    if (_userNameIsSuperAdmin()) _userNameController.value = TextEditingValue.empty;
     if (!_formKey.currentState!.validate()) return false;
+
     try {
       if (!_sameUsername()) {
         if (await userNameExist(userName: userName)) {
@@ -227,6 +229,8 @@ class _UserEditDialogState extends State<UserEditDialog> {
   int _getSelectedRole() =>
     widget.roleList.indexWhere((role) => role.name == _selectedRole);
 
+  bool _userNameIsSuperAdmin() =>
+      _userNameController.text.trim().toUpperCase() == superAdminUser.toUpperCase();
 
 }
 

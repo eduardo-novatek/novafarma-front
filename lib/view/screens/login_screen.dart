@@ -24,7 +24,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _usernameFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 20),
                     CustomTextFormField(
-                      controller: _usernameController,
+                      controller: _userNameController,
                       focusNode: _usernameFocusNode,
                       label: 'Usuario',
                       initialFocus: true,
@@ -115,56 +115,68 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-      await fetchDataObject<UserDTO>(
-        uri: '$uriUserLogin/${_usernameController.text}/${_passwordController.text}',
-        classObject: UserDTO.empty(),
-      ).then((userDb) {
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        UserDTO user = userDb[0] as UserDTO;
-        if (!user.active! && mounted) {
-          FloatingMessage.show(
-            context: context,
-            text: 'Usuario inactivo',
-            messageTypeEnum: MessageTypeEnum.warning
-          );
-          return;
-        }
-
-        // Actualiza el usuario logueado
-        userLogged!.userId = user.userId;
-        userLogged!.name = user.name;
-        userLogged!.lastname = user.lastname;
-        userLogged!.role = RoleDTO1(
-            roleId: user.role!.roleId, name: user.role!.name);
-
-        Navigator.pushReplacement(
-          mounted ? context : context,
-          MaterialPageRoute(builder: (context) =>
-            const HomePageScreen(title: 'NovaFarma')),
-        );
-      }).onError((error, stackTrace) {
-        setState(() {
-          _isLoading = false;
-        });
-        if (error is ErrorObject && error.statusCode == HttpStatus.notFound) {
-          FloatingMessage.show(
-              context: mounted ? context : context,
-              text: 'Usuario o contraseña incorrecta',
-              messageTypeEnum: MessageTypeEnum.warning
-          );
-        } else if (mounted) {
-          genericError(error!, isFloatingMessage: true, context);
-        }
-      });
+    if (! _formKey.currentState!.validate()) return;
+    if (_userNameController.text.trim() == superAdminUser &&
+      _passwordController.text.trim() == superAdminPass) {
+      userLogged!.userId = 0;
+      userLogged!.name = 'Super';
+      userLogged!.lastname = 'Administrador';
+      userLogged!.role = RoleDTO1(name: 'Super Administrador', roleId: 0);
+      Navigator.pushReplacement(
+        mounted ? context : context,
+        MaterialPageRoute(builder: (context) =>
+        const HomePageScreen(title: 'NovaFarma - administración')),
+      );
+      return;
     }
+    setState(() {
+      _isLoading = true;
+    });
+    await fetchDataObject<UserDTO>(
+      uri: '$uriUserLogin/${_userNameController.text}/${_passwordController.text}',
+      classObject: UserDTO.empty(),
+    ).then((userDb) {
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      UserDTO user = userDb[0] as UserDTO;
+      if (!user.active! && mounted) {
+        FloatingMessage.show(
+          context: context,
+          text: 'Usuario inactivo',
+          messageTypeEnum: MessageTypeEnum.warning
+        );
+        return;
+      }
+
+      // Actualiza el usuario logueado
+      userLogged!.userId = user.userId;
+      userLogged!.name = user.name;
+      userLogged!.lastname = user.lastname;
+      userLogged!.role = RoleDTO1(
+          roleId: user.role!.roleId, name: user.role!.name);
+
+      Navigator.pushReplacement(
+        mounted ? context : context,
+        MaterialPageRoute(builder: (context) =>
+          const HomePageScreen(title: 'NovaFarma')),
+      );
+    }).onError((error, stackTrace) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (error is ErrorObject && error.statusCode == HttpStatus.notFound) {
+        FloatingMessage.show(
+            context: mounted ? context : context,
+            text: 'Usuario o contraseña incorrecta',
+            messageTypeEnum: MessageTypeEnum.warning
+        );
+      } else if (mounted) {
+        genericError(error!, isFloatingMessage: true, context);
+      }
+    });
   }
 
 }

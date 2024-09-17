@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/view/screens.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen> {
   static const Widget msgHomeScreen = Text('Bienvenido a NovaFarma');
 
-  final GlobalKey _menuButton = GlobalKey();
+  final GlobalKey _menuButtonKey = GlobalKey();
   bool _enableMenu = true;
   Widget _currentWidget = msgHomeScreen;
 
@@ -23,7 +24,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         leading: IconButton(
-          key: _menuButton,
+          key: _menuButtonKey,
           onPressed: () => _enableMenu ? _openMenu(context) : null,
           icon: const Icon(Icons.menu),
           color: _enableMenu ? Colors.black : Colors.grey,
@@ -37,8 +38,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   void _openMenu(BuildContext context) {
-    //final RenderBox button = _menuButton.currentContext!.findRenderObject() as RenderBox;
-    //final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     const RelativeRect position = RelativeRect.fromLTRB(
       0, // Left
       kToolbarHeight, // Top
@@ -52,7 +51,22 @@ class _HomePageScreenState extends State<HomePageScreen> {
       context: context,
       position: position,
       elevation: 8.0,
-      items: [
+      items: _buildItems(context, tilePosition),
+    ).then((String? result) {
+      if (result != null) {
+        if (result == 'users and roles') {
+          setState(() {
+            _currentWidget = _buildUsersAndRolesWidget();
+          });
+        }
+      }
+    });
+  }
+
+  List<PopupMenuEntry<String>> _buildItems(BuildContext context, Offset tilePosition) {
+
+    return [
+      if (! _isSuperAdmin())
         PopupMenuItem<String>(
           value: 'vouchers',
           child: ListTile(
@@ -66,6 +80,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
 
+      if (! _isSuperAdmin())
         PopupMenuItem<String>(
           value: 'customers',
           child: ListTile(
@@ -79,6 +94,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
 
+      if (! _isSuperAdmin())
         PopupMenuItem<String>(
           value: 'suppliers',
           child: ListTile(
@@ -92,6 +108,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
 
+      if (! _isSuperAdmin())
         PopupMenuItem<String>(
           value: 'articles',
           child: ListTile(
@@ -105,14 +122,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           ),
         ),
 
-        /*const PopupMenuItem<String>(
-          value: 'balances',
-          child: ListTile(
-            leading: Icon(Icons.note_alt_sharp),
-            title: Text('Balances', style: TextStyle(fontSize: 17.0)),
-          ),
-        ),*/
-
+      if (_isSuperAdmin())
         const PopupMenuItem<String>(
           value: 'users and roles',
           child: ListTile(
@@ -120,20 +130,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
             title: Text('Usuarios y roles', style: TextStyle(fontSize: 17.0)),
           ),
         ),
-      ],
-    ).then((String? result) {
-      if (result != null) {
-        if (result == 'balances') {
-          setState(() {
-            _currentWidget = _buildBalancesWidget();
-          });
-        } else if (result == 'users and roles') {
-          setState(() {
-            _currentWidget = _buildUsersAndRolesWidget();
-          });
-        }
-      }
-    });
+    ];
   }
 
   void _openSubMenuVouchers(BuildContext context, Offset position) {
@@ -581,12 +578,10 @@ class _HomePageScreenState extends State<HomePageScreen> {
     });
   }
 
-
-  Widget _buildBalancesWidget() {
-    return const BalanceScreen();
-  }
-
   Widget _buildUsersAndRolesWidget() {
     return const UserRoleTaskScreen();
   }
+
+  bool _isSuperAdmin() =>
+      userLogged?.userId == 0 && userLogged?.role!.name! == 'Super Administrador';
 }

@@ -39,7 +39,7 @@ class CustomTextFormField extends StatefulWidget {
     this.validate = true,  //si desea validar el campo
     this.acceptEmpty = false, //si acepta el campo vacío (si validar=true, lo valida solo si no es vacio)
     this.initialFocus = false,
-    this.textForValidation = "Por favor, ingrese el dato correcto",
+    this.textForValidation = "Requerido",
     this.minValueForValidation,
     this.maxValueForValidation,
     this.onChange,
@@ -307,9 +307,10 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       return [MaskTextInputFormatter(mask: '##/##/####')];
     } else if (widget.dataType == DataTypeEnum.number) {
       return [FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*$')),];
-    } else if (widget.dataType == DataTypeEnum.text) {
+    } else if (widget.dataType == DataTypeEnum.text ||
+        widget.dataType == DataTypeEnum.password) {
       return [FilteringTextInputFormatter.allow(
-        RegExp(r'[a-zA-Z0-9\s().:,!\-_ñÑáéíóúÁÉÍÓÚ]')
+        RegExp(r'[a-zA-Z0-9\s().:,!@\-_ñÑáéíóúÁÉÍÓÚ]')
       )];
     }
     return [];

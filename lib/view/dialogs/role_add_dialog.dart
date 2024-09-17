@@ -104,6 +104,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
         ElevatedButton(
           child: const Text('Aceptar'),
           onPressed: () async {
+            if (_invalidRoleName()) _nameController.value = TextEditingValue.empty;
             if (!_formKey.currentState!.validate() || !context.mounted) return;
             RoleDTO1 newRole = RoleDTO1(
               roleId: null,
@@ -125,6 +126,9 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
 
   }
 
+  bool _invalidRoleName() =>
+    _nameController.text.toUpperCase().contains('SUP') &&
+    _nameController.text.toUpperCase().contains('AD');
 }
 
 

@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
+import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleFindAll, uriUserAdd, uriUserDelete, uriUserFindAll, uriUserUpdate;
+import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import 'package:novafarma_front/model/globals/tools/message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/role_add_dialog.dart';
 import 'package:novafarma_front/view/dialogs/role_edit_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
-import '../../model/globals/tools/fetch_data.dart';
 import '../dialogs/user_add_dialog.dart';
 
 class UserRoleTaskScreen extends StatefulWidget {
@@ -257,7 +257,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                 case 'Activar/Desactivar':
                   _activateOrDeactivate(user);
                   break;
-                case 'Reestablecer Contraseña':
+                case 'Restablecer Contraseña':
+                  _resetPass(user);
                   break;
                 case 'Eliminar':
                   _deleteUser(user);
@@ -282,8 +283,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                 child: Text(user.active! ? 'Desactivar' : 'Activar'),
               ),
               const PopupMenuItem<String>(
-                value: 'Reestablecer Contraseña',
-                child: Text('Reestablecer Contraseña'),
+                value: 'Restablecer Contraseña',
+                child: Text('Restablecer Contraseña'),
               ),
               const PopupMenuItem<String>(
                 value: 'Eliminar',
@@ -467,13 +468,52 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     );
     if (roleChanged != null && role.name != roleChanged.name) {
       try {
-        if (await _saveRole(roleChanged, isAdd: false)) _loadRoles();
+        if (await _saveRole(roleChanged, isAdd: false)) {
+          _loadRoles();
+          _loadUsers();
+        }
       } finally {}
     }
   }
 
-  void _activateOrDeactivate(UserDTO user) {
-
+  Future<void> _activateOrDeactivate(UserDTO user) async {
+    if (await OpenDialog(
+        title: '${user.active! ? 'Desactivar ' : 'Activar '} usuario',
+        content:
+        'Nombre: ${user.name} ${user.lastname}\n'
+            'Rol: ${user.role!.name}\n'
+            'Usuario: ${user.userName}\n'
+            'Estado: ${user.active! ? 'activo' : 'inactivo'}\n\n'
+            '¿Confirma la ${user.active! ? 'desactivación' : 'activación'} del usuario?',
+        textButton1: 'Si',
+        textButton2: 'No',
+        context: context).view() == 1) {
+      _setLoading(isUsers: true, loading: true);
+      await fetchDataObject<UserDTO>(
+          uri: '$uriUserActivate/${user.userId}/${!user.active!}',
+          classObject: UserDTO.empty(),
+          requestType: RequestTypeEnum.patch
+      ).then((value) {
+        FloatingMessage.show(
+            context: context,
+            text: 'Usuario ${user.active! ? 'desactivado' : 'activado'} con éxito',
+            messageTypeEnum: MessageTypeEnum.info
+        );
+        _loadUsers();
+      }).onError((error, stackTrace) {
+        if (error is ErrorObject) {
+          FloatingMessage.show(
+              context: context,
+              text: error.message!,
+              messageTypeEnum: MessageTypeEnum.warning,
+              secondsDelay: 8
+          );
+        } else {
+          genericError(error!, context, isFloatingMessage: true);
+        }
+      });
+      _setLoading(isUsers: true, loading: false);
+    }
   }
 
   Future<void> _deleteUser(UserDTO user) async {
@@ -487,6 +527,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       textButton1: 'Si',
       textButton2: 'No',
       context: context).view() == 1) {
+        _setLoading(isUsers: true, loading: true);
         await fetchDataObject<UserDTO>(
           uri: '$uriUserDelete/${user.userId}',
           classObject: UserDTO.empty(),
@@ -515,6 +556,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             genericError(error!, context, isFloatingMessage: true);
           }
         });
+        _setLoading(isUsers: true, loading: false);
     }
   }
 
@@ -527,6 +569,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         textButton1: 'Si',
         textButton2: 'No',
         context: context).view() == 1) {
+      _setLoading(isUsers: false, loading: true);
       await fetchDataObject<RoleDTO>(
           uri: '$uriRoleDelete/${role.roleId}',
           classObject: RoleDTO.empty(),
@@ -555,10 +598,118 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
           genericError(error!, context, isFloatingMessage: true);
         }
       });
+      _setLoading(isUsers: false, loading: false);
     }
   }
 
+  Future<void> _resetPass(UserDTO user) async {
+    final formKey = GlobalKey<FormState>();
+    final TextEditingController passController = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Restablecer Contraseña'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Usuario: ${user.name} ${user.lastname}'),
+              const SizedBox(height: 8.0,),
+              Form(
+                key: formKey,
+                child: CustomTextFormField(
+                  controller: passController,
+                  label: 'Nueva contraseña',
+                  dataType: DataTypeEnum.password,
+                  acceptEmpty: false,
+                  initialFocus: true,
+                  isUnderline: true,
+                  viewCharactersCount: true,
+                  maxValueForValidation: 10,
+                  onEditingComplete: () => _acceptNewPass(
+                    user: user,
+                    pass: passController.text,
+                    form: formKey,
+                    context: context
+                  ),
+                ),
+              )
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                await _acceptNewPass(
+                  user: user,
+                  pass: passController.text,
+                  form: formKey,
+                  context: context
+                );
+              },
+              child: const Text('Aceptar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
+  Future<void> _acceptNewPass(
+      { required UserDTO user,
+        required String pass,
+        required GlobalKey<FormState> form,
+        required BuildContext context}) async {
+
+    if (! form.currentState!.validate()) return;
+    await _resetPassConfirm(
+      user: user,
+      newPass: pass,
+      context: context
+    );
+    Navigator.of(context).pop();
+  }
+
+  Future<void> _resetPassConfirm({
+    required UserDTO user,
+    required String newPass,
+    required BuildContext context}) async {
+
+    _setLoading(isUsers: true, loading: true);
+    await fetchDataObject<UserDTO>(
+        uri: '$uriUserChangeCredentials/'
+            '${user.userId}/'
+            '${user.userName!}/'
+            '$newPass',
+        classObject: UserDTO.empty(),
+        requestType: RequestTypeEnum.put
+    ).then((value) {
+      FloatingMessage.show(
+          context: context,
+          text: 'Contraseña restablecida con éxito',
+          messageTypeEnum: MessageTypeEnum.info
+      );
+      _loadUsers();
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+            context: context,
+            text: error.message!,
+            messageTypeEnum: MessageTypeEnum.warning,
+            secondsDelay: 8
+        );
+      } else {
+        genericError(error!, context, isFloatingMessage: true);
+      }
+    });
+    _setLoading(isUsers: true, loading: false);
+  }
 
   Column _buildSubtitle(UserDTO user) {
     return Column(
@@ -596,5 +747,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       }
     });
   }
+
+
 
 }
