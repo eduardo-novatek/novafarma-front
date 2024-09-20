@@ -35,7 +35,7 @@ class VoucherDTO1 extends Deserializable<VoucherDTO1> {
       voucherId: json['voucherId'],
       voucherNumber: json['voucherNumber'],
       dateTime: strToDateTime(json['dateTime']),
-      movementType: nameDBtoMovementTypeEnum(json['movementType']!),
+      movementType: nameDBtoMovementTypeEnum(json['movementTypeEnum']!),
       total: json['total'],
       notes: json['notes'],
     );
@@ -47,7 +47,7 @@ class VoucherDTO1 extends Deserializable<VoucherDTO1> {
       'voucherId': voucherId,
       'voucherNumber': voucherNumber,
       'date': dateTime?.toIso8601String(),
-      'movementType': movementType,
+      'movementTypeEnum': movementType,
       'total': total,
       'notes': notes,
     };

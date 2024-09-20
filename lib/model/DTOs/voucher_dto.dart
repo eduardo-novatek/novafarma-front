@@ -49,7 +49,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
   VoucherDTO fromJson(Map<String, dynamic> json) {
     return VoucherDTO(
       voucherId: json['voucherId'],
-      movementType: json['movementType'],
+      movementType: json['movementTypeEnum'],
       voucherNumber: json['voucherNumber'],
       user: json['user']['userId'],
       customer: json['customer']['customerId'],
@@ -65,7 +65,7 @@ class VoucherDTO extends Deserializable<VoucherDTO> {
   Map<String, dynamic> toJson() {
     return {
       'voucherId': voucherId,
-      'movementType': movementType,
+      'movementTypeEnum': movementType,
       'voucherNumber': voucherNumber,
       'user': user?.toJson(),
       'customer': customer?.toJson(),

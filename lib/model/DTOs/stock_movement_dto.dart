@@ -39,7 +39,7 @@ class StockMovementDTO extends Deserializable<StockMovementDTO> {
     return StockMovementDTO(
       stockMovementId: json['stockMovementId'],
       dateTime: strToDateTime(json['dateTime']),
-      movementType: nameDBtoMovementTypeEnum(json['movementType']),
+      movementType: nameDBtoMovementTypeEnum(json['movementTypeEnum']),
       quantity: json['quantity'],
       unitPrice: json['unitPrice'],
       medicine: medicine.fromJson(json),

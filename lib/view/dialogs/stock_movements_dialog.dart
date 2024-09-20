@@ -120,22 +120,9 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
                   decoration: widget.deleted ? TextDecoration.lineThrough : null
                 )
               ),
-              /*widget.deleted
-                ? _msgDeleted()
-                : const SizedBox.shrink(),
-               */
             ],
           ),
         ),
-      ],
-    );
-  }
-
-  Row _msgDeleted() {
-    return const Row(
-      children: [
-        SizedBox(width: 8.0,),
-        Text('(eliminado)', style: TextStyle(color: Colors.red),)
       ],
     );
   }
