@@ -1,5 +1,8 @@
+import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
+
+import '../enums/task_enum.dart';
 
 class UserDTO extends Deserializable<UserDTO> {
   int? userId;
@@ -42,7 +45,7 @@ class UserDTO extends Deserializable<UserDTO> {
       pass: json['pass'],
       active: json['active'],
       changeCredentials: json['changeCredentials'],
-      role: role?.fromJson(json['role']),
+      role: json['role'] != null ? getRoleDTO(json) : null,
     );
   }
 
@@ -58,5 +61,23 @@ class UserDTO extends Deserializable<UserDTO> {
       'changeCredentials': changeCredentials,
       'role': role?.toJson(),
     };
+  }
+
+  RoleDTO getRoleDTO(Map<String, dynamic> json) {
+    return RoleDTO(
+      roleId: json['role']['roleId'],
+      name: json['role']['name'],
+      taskList: json['role']['taskList'] != null ? _getTaskDTOList(json) : null,
+    );
+  }
+
+  List<TaskDTO> _getTaskDTOList(Map<String, dynamic> json) {
+    return List<TaskDTO>.from(
+        json['role']['taskList'].map((item) => TaskDTO(
+          taskId: item['taskId'],
+          task: toTaskEnumFromBackend(item['task']),
+          description: item['description'],
+        ))
+    );
   }
 }

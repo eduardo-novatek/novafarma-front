@@ -1,6 +1,8 @@
 import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
+import '../enums/task_enum.dart';
+
 class RoleDTO extends Deserializable<RoleDTO> {
   int? roleId;
   String name;
@@ -25,7 +27,7 @@ class RoleDTO extends Deserializable<RoleDTO> {
     return RoleDTO(
       roleId: json['roleId'],
       name: json['name'],
-      taskList: json['taskList']
+      taskList: json['taskList'] != null ? _getTaskDTOList(json) : null,
     );
   }
 
@@ -36,6 +38,16 @@ class RoleDTO extends Deserializable<RoleDTO> {
       'name': name,
       'taskList': taskList?.map((item) => item.toJson()).toList(),
     };
+  }
+
+  List<TaskDTO> _getTaskDTOList(Map<String, dynamic> json) {
+    return List<TaskDTO>.from(
+      json['taskList'].map((item) => TaskDTO(
+        taskId: item['taskId'],
+        task: toTaskEnumFromBackend(item['task']),
+        description: item['description'],
+      ))
+    );
   }
 
   @override

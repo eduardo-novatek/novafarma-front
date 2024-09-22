@@ -34,7 +34,7 @@ class TaskDTO extends Deserializable<TaskDTO> {
   Map<String, dynamic> toJson() {
     return {
       'roleId': taskId,
-      'task': task,
+      'task': task?.toString().split('.').last,
       'description': description
     };
   }
