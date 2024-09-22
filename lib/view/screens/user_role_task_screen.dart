@@ -462,7 +462,11 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       context: context,
       builder: (BuildContext context) {
         return RoleEditDialog(
-          role: RoleDTO1(roleId: role.roleId, name: role.name)
+          role: RoleDTO1(
+            roleId: role.roleId,
+            name: role.name,
+            taskList: []
+          )
         );
       },
     );

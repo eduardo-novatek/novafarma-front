@@ -3,16 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
-import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
-import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 
-import '../../model/DTOs/role_dto.dart';
-import '../../model/DTOs/user_dto.dart';
-import '../../model/globals/tools/floating_message.dart';
 
 ///Permite la edicion del role.
 class RoleEditDialog extends StatefulWidget {
@@ -30,7 +22,6 @@ class RoleEditDialog extends StatefulWidget {
 class _RoleEditDialogState extends State<RoleEditDialog> {
 
   final _formKey = GlobalKey<FormState>();
-  final ThemeData _themeData = ThemeData();
 
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
@@ -113,6 +104,7 @@ class _RoleEditDialogState extends State<RoleEditDialog> {
               RoleDTO1 roleUpdated = RoleDTO1(
                 roleId: widget.role.roleId,
                 name: _nameController.text.trim(),
+                taskList: []
               );
               // Cierra el diálogo y devuelve el usuario actualizado
               Navigator.of(context).pop(roleUpdated);

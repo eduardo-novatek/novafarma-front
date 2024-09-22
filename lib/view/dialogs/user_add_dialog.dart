@@ -14,10 +14,9 @@ import '../../model/globals/tools/floating_message.dart';
 
 class UserAddDialog extends StatefulWidget {
 
-  //final GlobalKey<ScaffoldState> scaffoldKey;
   final List<RoleDTO> roleList;
 
-  const UserAddDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
+  const UserAddDialog(this.roleList, {super.key});
 
   @override
   State<UserAddDialog> createState() => _UserAddDialogState();
@@ -46,7 +45,11 @@ class _UserAddDialogState extends State<UserAddDialog> {
       widget.roleList.insert(
           0,
           RoleDTO(
-              isFirst: true, roleId: null, name: defaultFirstOption)
+            isFirst: true,
+            roleId: null,
+            name: defaultFirstOption,
+            taskList: []
+          )
       );
     }
   }

@@ -54,7 +54,11 @@ class _UserEditDialogState extends State<UserEditDialog> {
       widget.roleList.insert(
           0,
           RoleDTO(
-              isFirst: true, roleId: null, name: defaultFirstOption)
+            isFirst: true,
+            roleId: null,
+            name: defaultFirstOption,
+            taskList: []
+          )
       );
     }
     _nameController.value = TextEditingValue(text: widget.user.name!);

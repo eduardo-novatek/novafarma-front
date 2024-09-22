@@ -121,7 +121,11 @@ class _LoginScreenState extends State<LoginScreen> {
       userLogged!.userId = 0;
       userLogged!.name = 'Super';
       userLogged!.lastname = 'Administrador';
-      userLogged!.role = RoleDTO1(name: 'Super Administrador', roleId: 0);
+      userLogged!.role = RoleDTO1(
+        name: 'Super Administrador',
+        roleId: 0,
+        taskList: []
+      );
       Navigator.pushReplacement(
         mounted ? context : context,
         MaterialPageRoute(builder: (context) =>
@@ -156,7 +160,10 @@ class _LoginScreenState extends State<LoginScreen> {
       userLogged!.name = user.name;
       userLogged!.lastname = user.lastname;
       userLogged!.role = RoleDTO1(
-          roleId: user.role!.roleId, name: user.role!.name);
+        roleId: user.role!.roleId,
+        name: user.role!.name,
+        taskList: []
+      );
 
       Navigator.pushReplacement(
         mounted ? context : context,

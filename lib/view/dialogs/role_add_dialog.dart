@@ -3,15 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart';
-import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
-import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 
-import '../../model/DTOs/role_dto.dart';
-import '../../model/DTOs/user_dto.dart';
-import '../../model/globals/tools/floating_message.dart';
 
 class RoleAddDialog extends StatefulWidget {
   const RoleAddDialog({super.key});
@@ -109,6 +102,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
             RoleDTO1 newRole = RoleDTO1(
               roleId: null,
               name: _nameController.text,
+              taskList: []
             );
             // Cierra el diálogo y devuelve el nuevo usuario
             Navigator.of(context).pop(newRole);

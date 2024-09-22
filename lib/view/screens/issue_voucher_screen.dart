@@ -359,8 +359,8 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                   icon: const Icon(Icons.add),
                   tooltip: 'Agregar items',
                   style: const ButtonStyle(
-                    iconSize: MaterialStatePropertyAll(40.0),
-                    iconColor: MaterialStatePropertyAll(Colors.blue),
+                    iconSize: WidgetStatePropertyAll(40.0),
+                    iconColor: WidgetStatePropertyAll(Colors.blue),
                   ),
                   onPressed: () {
                     showDialog(
@@ -396,8 +396,8 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                     tooltip: _notesController.text.trim().isEmpty
                       ? 'Agregar notas' : 'Modificar notas',
                     style: const ButtonStyle(
-                      iconSize: MaterialStatePropertyAll(20.0),
-                      iconColor: MaterialStatePropertyAll(Colors.blue),
+                      iconSize: WidgetStatePropertyAll(20.0),
+                      iconColor: WidgetStatePropertyAll(Colors.blue),
                     ),
                     onPressed: () {
                       _showNotes();
