@@ -237,18 +237,41 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   Widget _buildTaskList(List<TaskDTO> tasks) {
     return Column(
       children: tasks.map((task) {
-        return ListTile(
-          title: Text(task.description!),
-          trailing: IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
-            onPressed: () {
-             // _removeTaskFromRole(task);
-            },
+        return Container(
+          padding: const EdgeInsets.only(left: 16.0, right: 30.0),
+          height: 25,  // Altura mínima para cada tarea
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  task.description!,
+                  style: const TextStyle(fontSize: 16.0),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                  size: 18.0,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 24,
+                  minHeight: 24,
+                ),
+                onPressed: () {
+                  // _removeTaskFromRole(task);
+                },
+              ),
+            ],
           ),
         );
       }).toList(),
     );
   }
+
 
 
   Widget _buildUserData(UserDTO user, int index) {

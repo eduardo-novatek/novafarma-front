@@ -111,8 +111,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
         TextButton(
           child: const Text('Cancelar'),
           onPressed: () {
-            Navigator.of(context)
-                .pop(); // Cierra el diálogo sin agregar usuario
+            Navigator.of(context).pop(); // Cierra el diálogo sin agregar usuario
           },
         ),
       ],
