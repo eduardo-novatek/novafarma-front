@@ -46,11 +46,15 @@ class _UserEditDialogState extends State<UserEditDialog> {
   final FocusNode _userNameFocusNode = FocusNode();
 
   late String _selectedRole;
+  final List<String> roles = [];
 
   @override
   void initState() {
     super.initState();
-    if (!widget.roleList[0].isFirst!) {
+    roles.add(defaultFirstOption);
+    roles.addAll(widget.roleList.map((e) => e.name));
+    _selectedRole = widget.user.role!.name;
+    /*if (!widget.roleList[0].isFirst!) {
       widget.roleList.insert(
           0,
           RoleDTO(
@@ -60,17 +64,16 @@ class _UserEditDialogState extends State<UserEditDialog> {
             taskList: []
           )
       );
-    }
+    }*/
     _nameController.value = TextEditingValue(text: widget.user.name!);
     _lastnameController.value = TextEditingValue(text: widget.user.lastname!);
     _userNameController.value = TextEditingValue(text: widget.user.userName!);
-    _selectedRole = widget.user.role!.name;
   }
 
   @override
   void dispose() {
     super.dispose();
-    widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
+    //widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
     _nameController.dispose();
     _lastnameController.dispose();
     _userNameController.dispose();
@@ -140,7 +143,18 @@ class _UserEditDialogState extends State<UserEditDialog> {
                           padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text("Rol:"),
                         ),
-                        CustomDropdown<RoleDTO>(
+                        CustomDropdown<String>(
+                          themeData: ThemeData(),
+                          optionList: roles,
+                          selectedOption: _selectedRole,
+                          isSelected: true,
+                          callback: (role) {
+                            setState(() {
+                              _selectedRole = role!;
+                            });
+                          },
+                        ),
+                        /*CustomDropdown<RoleDTO>(
                           themeData: _themeData,
                           optionList: widget.roleList,
                           selectedOption: widget.roleList[_getSelectedRole()],
@@ -150,7 +164,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
                               _selectedRole = role!.name;
                             });
                           },
-                        ),
+                        ),*/
                       ],
                     )
                 ],
@@ -166,6 +180,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
           onPressed: () async {
             if (await _validatedForm(userName: _userNameController.text)) {
               if (!context.mounted) return;
+              //_removeDefaultFirstOption();
               UserDTO userUpdated = UserDTO(
                 userId: widget.user.userId,
                 name: _nameController.text.trim(),
@@ -184,12 +199,20 @@ class _UserEditDialogState extends State<UserEditDialog> {
         TextButton(
           child: const Text('Cancelar'),
           onPressed: () {
+           // _removeDefaultFirstOption();
             Navigator.of(context).pop(null); // Cierra el diálogo sin agregar usuario
           },
         ),
       ],
     );
   }
+  /*/// Si está la opcion "Seleccione...", la elimina de la lista
+  void _removeDefaultFirstOption() {
+    if (widget.roleList[0].isFirst! == true) {
+      widget.roleList.removeAt(0);
+      //if (mounted) setState(() {});
+    }
+  }*/
 
   Future<bool> _validatedForm({required String userName}) async {
     if (_userNameIsSuperAdmin()) _userNameController.value = TextEditingValue.empty;

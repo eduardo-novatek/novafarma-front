@@ -37,8 +37,13 @@ enum TaskEnum {
 
 /// Convertir desde el enum (flutter) al formato del backend (mayúsculas)
 String toBackendFormat(TaskEnum taskEnum) {
-  return taskEnum.toString().split('.').last.toUpperCase();
+  return taskEnum
+    .toString().split('.').last.replaceAllMapped(
+      RegExp(r'([a-z])([A-Z])'), // Encuentra los lugares donde una minúscula precede a una mayúscula
+        (Match match) => '${match.group(1)}_${match.group(2)}' // Inserta un guion bajo entre ellas
+  ).toUpperCase();
 }
+
 
 /// Convertir desde el formato del backend al formato camelCase de Flutter
 String toFlutterFormat(String backendEnum) {

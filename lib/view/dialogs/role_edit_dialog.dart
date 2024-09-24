@@ -104,7 +104,7 @@ class _RoleEditDialogState extends State<RoleEditDialog> {
               RoleDTO1 roleUpdated = RoleDTO1(
                 roleId: widget.role.roleId,
                 name: _nameController.text.trim(),
-                taskList: []
+                //taskList: []
               );
               // Cierra el diálogo y devuelve el usuario actualizado
               Navigator.of(context).pop(roleUpdated);

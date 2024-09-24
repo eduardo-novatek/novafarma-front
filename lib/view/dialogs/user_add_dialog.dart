@@ -37,11 +37,14 @@ class _UserAddDialogState extends State<UserAddDialog> {
   final FocusNode _passFocusNode = FocusNode();
 
   String _selectedRole = defaultFirstOption;
+  final List<String> roles = [];
 
   @override
   void initState() {
     super.initState();
-    if (!widget.roleList[0].isFirst!) {
+    roles.add(defaultFirstOption);
+    roles.addAll(widget.roleList.map((e) => e.name));
+    /*if (!widget.roleList[0].isFirst!) {
       widget.roleList.insert(
           0,
           RoleDTO(
@@ -51,13 +54,13 @@ class _UserAddDialogState extends State<UserAddDialog> {
             taskList: []
           )
       );
-    }
+    }*/
   }
 
   @override
   void dispose() {
     super.dispose();
-    widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
+    //widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
     _nameController.dispose();
     _lastNameController.dispose();
     _userNameController.dispose();
@@ -136,7 +139,18 @@ class _UserAddDialogState extends State<UserAddDialog> {
                         padding: EdgeInsets.symmetric(horizontal: 10.0),
                         child: Text("Rol:"),
                       ),
-                      CustomDropdown<RoleDTO>(
+                      CustomDropdown<String>(
+                        themeData: ThemeData(),
+                        optionList: roles,
+                        selectedOption: _selectedRole,
+                        isSelected: true,
+                        callback: (role) {
+                          setState(() {
+                            _selectedRole = role!;
+                          });
+                        },
+                      ),
+                      /*CustomDropdown<RoleDTO>(
                         themeData: ThemeData(),
                         optionList: widget.roleList,
                         selectedOption: _getSelectedRole(),
@@ -146,7 +160,7 @@ class _UserAddDialogState extends State<UserAddDialog> {
                             _selectedRole = role!.name;
                           });
                         },
-                      ),
+                      ),*/
                     ],
                   )
                 ],
@@ -162,14 +176,14 @@ class _UserAddDialogState extends State<UserAddDialog> {
           onPressed: () async {
             if (await _validatedForm()) {
               if (!context.mounted) return;
+              //await _removeDefaultFirstOption();
               UserDTO newUser = UserDTO(
                 name: _nameController.text,
                 lastname: _lastNameController.text,
                 userName: _userNameController.text,
                 pass: _passController.text,
-
                 role: widget.roleList.firstWhere(
-                        (role) => role.name == _selectedRole),
+                  (role) => role.name == _selectedRole),
               );
               // Cierra el diálogo y devuelve el nuevo usuario
               Navigator.of(context).pop(newUser);
@@ -178,15 +192,23 @@ class _UserAddDialogState extends State<UserAddDialog> {
         ),
         TextButton(
           child: const Text('Cancelar'),
-          onPressed: () {
-            Navigator.of(context)
-                .pop(); // Cierra el diálogo sin agregar usuario
+          onPressed: () async {
+            //await _removeDefaultFirstOption();
+            Navigator.of(context).pop(); // Cierra el diálogo sin agregar usuario
           },
         ),
       ],
     );
 
   }
+
+  /*
+  /// Si está la opcion "Seleccione...", la elimina de la lista
+  Future<void> _removeDefaultFirstOption() async {
+    if (widget.roleList[0].isFirst! == true) {
+        widget.roleList.removeAt(0);
+    }
+  }*/
 
   Future<bool> _validatedForm() async {
 

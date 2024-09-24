@@ -33,7 +33,7 @@ class TaskDTO extends Deserializable<TaskDTO> {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'roleId': taskId,
+      'taskId': taskId,
       'task': task?.name, //task?.toString().split('.').last,
       'description': description
     };

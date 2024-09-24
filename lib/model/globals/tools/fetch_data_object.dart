@@ -55,12 +55,23 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else if (requestType == RequestTypeEnum.delete){
-      response = await http.delete(url)
-          .timeout(const Duration(seconds: timeOutSecondsResponse));
+      response = await http.delete(
+          url,
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            'Accept': 'application/json; charset=utf-8',
+          },
+          body: json.encode(body)
+      ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else {
-      response = await http.get(url)
-          .timeout(const Duration(seconds: timeOutSecondsResponse));
+      response = await http.get(
+          url,
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            'Accept': 'application/json; charset=utf-8',
+          },
+      ).timeout(const Duration(seconds: timeOutSecondsResponse));
     }
 
     if (response.statusCode == 200) {

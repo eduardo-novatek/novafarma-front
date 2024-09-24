@@ -124,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
       userLogged!.role = RoleDTO1(
         name: 'Super Administrador',
         roleId: 0,
-        taskList: []
+        //taskList: []
       );
       Navigator.pushReplacement(
         mounted ? context : context,
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
       userLogged!.role = RoleDTO1(
         roleId: user.role!.roleId,
         name: user.role!.name,
-        taskList: []
+        //taskList: []
       );
 
       Navigator.pushReplacement(

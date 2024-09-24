@@ -46,6 +46,7 @@ const String uriNovaDailyFindDependentLastname = '/dependiente/apellido';
 const String uriRoleAdd = '/role/add';
 const String uriRoleUpdate = '/role/update';
 const String uriRoleDelete = '/role/delete';
+const String uriRoleDeleteTasks = "/role/deleteTasks";
 const String uriRoleFindAll = '/role/findAll';
 const String uriRoleFindId = '/role/findId';
 

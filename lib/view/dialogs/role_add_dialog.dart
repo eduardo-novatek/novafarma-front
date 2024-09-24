@@ -102,7 +102,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
             RoleDTO1 newRole = RoleDTO1(
               roleId: null,
               name: _nameController.text,
-              taskList: []
+              //taskList: []
             );
             // Cierra el diálogo y devuelve el nuevo usuario
             Navigator.of(context).pop(newRole);
