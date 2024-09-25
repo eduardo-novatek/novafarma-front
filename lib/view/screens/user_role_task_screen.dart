@@ -13,7 +13,7 @@ import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
+import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriTaskFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -35,16 +35,19 @@ class UserRoleTaskScreen extends StatefulWidget {
 class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   final List<UserDTO> _userList = [];
   final List<RoleDTO> _roleList = [];
+  final List<TaskDTO> _taskList = [];
+
   bool _loadingUsers = false;
-  bool _loadingRoles = false;
+  bool _loadingRolesAndTasks = false;
   int? _hoveredUserIndex;  // Índice de hover para el panel de usuarios
-  int? _hoveredRoleIndex;  // Índice de hover para el panel de roles
+  int? _hoveredRoleAndTaskIndex;  // Índice de hover para el panel de roles
 
   @override
   void initState() {
     super.initState();
     _loadUsers();
     _loadRoles();
+    _loadTasks();
   }
 
   @override
@@ -52,7 +55,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     return Row(
       children: [
         _buildContainer('Usuarios', Icons.person, _userList, _loadingUsers),
-        _buildContainer('Roles y tareas', Icons.group, _roleList, _loadingRoles),
+        _buildContainer('Roles y tareas', Icons.group, _roleList, _loadingRolesAndTasks),
       ],
     );
   }
@@ -177,20 +180,20 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     return MouseRegion(
       onEnter: (_) {
         setState(() {
-          _hoveredRoleIndex = index;  // Establece el índice del elemento en hover para roles
+          _hoveredRoleAndTaskIndex = index;  // Establece el índice del elemento en hover para roles
         });
       },
       onExit: (_) {
         setState(() {
-          _hoveredRoleIndex = null;  // Desactiva el hover
+          _hoveredRoleAndTaskIndex = null;  // Desactiva el hover
         });
       },
       child: Container(
         decoration: BoxDecoration(
-          color: _hoveredRoleIndex == index ? Colors.grey.shade300 : Colors.white,  // Cambia de color en hover
+          color: _hoveredRoleAndTaskIndex == index ? Colors.grey.shade300 : Colors.white,  // Cambia de color en hover
           border: Border(
             left: BorderSide(
-              color: _hoveredRoleIndex == index ? Colors.blue : Colors.transparent,  // Cambia de color el borde en hover
+              color: _hoveredRoleAndTaskIndex == index ? Colors.blue : Colors.transparent,  // Cambia de color el borde en hover
               width: 5,
             ),
           ),
@@ -389,6 +392,30 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     _setLoading(isUsers: false, loading: false);
   }
 
+  Future<void> _loadTasks() async {
+    _setLoading(isUsers: false, loading: true);
+    await fetchDataObject<TaskDTO>(
+        uri: uriTaskFindAll,
+        classObject: TaskDTO.empty(),
+        requestType: RequestTypeEnum.get
+    ).then((data) {
+      _taskList.clear();
+      if (data.isNotEmpty) _taskList.addAll(data.cast<TaskDTO>());
+      setState(() {});
+    }).onError((error, stackTrace) {
+      if (error is ErrorObject) {
+        FloatingMessage.show(
+            context: context,
+            text: error.message ?? 'Error ${error.statusCode}',
+            messageTypeEnum: MessageTypeEnum.error
+        );
+      } else {
+        genericError(error!, context, isFloatingMessage: true);
+      }
+    });
+    _setLoading(isUsers: false, loading: false);
+  }
+
   Future<void> _loadUsers() async {
     _setLoading(isUsers: true, loading: true);
     await fetchDataObject<UserDTO>(
@@ -438,7 +465,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       newRole = await showDialog<RoleDTO1>(
         context: context,
         builder: (BuildContext context) {
-          return const RoleAddDialog();
+          return RoleAddDialog(taskList: _taskList);
         },
       );
       if (newRole != null) {
@@ -861,7 +888,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       if (isUsers) {
         _loadingUsers = loading;
       } else {
-        _loadingRoles = loading;
+        _loadingRolesAndTasks = loading;
       }
     });
   }

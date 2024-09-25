@@ -2,15 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
+import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 
 
 class RoleAddDialog extends StatefulWidget {
-  const RoleAddDialog({super.key});
-  // const UserAddDialog(this.roleList, {super.key}); //, required this.scaffoldKey});
+  final List<TaskDTO> taskList;
 
-  //final List<RoleDTO> roleList;
+  const RoleAddDialog({super.key, required this.taskList});
 
   @override
   State<RoleAddDialog> createState() => _RoleAddDialogState();
@@ -24,26 +24,16 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
 
-  //String selectedRole = defaultFirstOption;
-
   @override
   void initState() {
     super.initState();
-    /*if (!widget.roleList[0].isFirst!) {
-      widget.roleList.insert(
-          0,
-          RoleDTO(
-              isFirst: true, roleId: null, name: defaultFirstOption)
-      );
-    }*/
   }
 
   @override
   void dispose() {
-    super.dispose();
-    //widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
     _nameController.dispose();
     _nameFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -69,23 +59,6 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
                     maxValueForValidation: 19,
                     textForValidation: 'El nombre es requerido',
                   ),
-                  /*Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text("Rol:"),
-                      ),
-                      CustomDropdown<RoleDTO>(
-                        themeData: themeData,
-                        optionList: widget.roleList,
-                        selectedOption: widget.roleList[0],
-                        isSelected: true,
-                        callback: (role) {
-                          selectedRole = role!.name;
-                        },
-                      ),
-                    ],
-                  )*/
                 ],
               ),
             ),
@@ -102,10 +75,8 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
             RoleDTO1 newRole = RoleDTO1(
               roleId: null,
               name: _nameController.text,
-              //taskList: []
             );
-            // Cierra el diálogo y devuelve el nuevo usuario
-            Navigator.of(context).pop(newRole);
+            Navigator.of(context).pop(newRole); // Cierra el diálogo y devuelve el nuevo usuario
           }
         ),
         TextButton(
@@ -118,7 +89,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
     );
 
   }
-
+  ///True si el nombre del rol es inválido (si contiene SUP y AD). Indicios que contiene super admin o similiar
   bool _invalidRoleName() =>
     _nameController.text.toUpperCase().contains('SUP') &&
     _nameController.text.toUpperCase().contains('AD');

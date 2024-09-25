@@ -35,7 +35,6 @@ class UserEditDialog extends StatefulWidget {
 class _UserEditDialogState extends State<UserEditDialog> {
 
   final _formKey = GlobalKey<FormState>();
-  final ThemeData _themeData = ThemeData();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
@@ -54,17 +53,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
     roles.add(defaultFirstOption);
     roles.addAll(widget.roleList.map((e) => e.name));
     _selectedRole = widget.user.role!.name;
-    /*if (!widget.roleList[0].isFirst!) {
-      widget.roleList.insert(
-          0,
-          RoleDTO(
-            isFirst: true,
-            roleId: null,
-            name: defaultFirstOption,
-            taskList: []
-          )
-      );
-    }*/
+
     _nameController.value = TextEditingValue(text: widget.user.name!);
     _lastnameController.value = TextEditingValue(text: widget.user.lastname!);
     _userNameController.value = TextEditingValue(text: widget.user.userName!);
@@ -73,7 +62,6 @@ class _UserEditDialogState extends State<UserEditDialog> {
   @override
   void dispose() {
     super.dispose();
-    //widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
     _nameController.dispose();
     _lastnameController.dispose();
     _userNameController.dispose();
@@ -154,17 +142,6 @@ class _UserEditDialogState extends State<UserEditDialog> {
                             });
                           },
                         ),
-                        /*CustomDropdown<RoleDTO>(
-                          themeData: _themeData,
-                          optionList: widget.roleList,
-                          selectedOption: widget.roleList[_getSelectedRole()],
-                          isSelected: true,
-                          callback: (role) {
-                            setState(() {
-                              _selectedRole = role!.name;
-                            });
-                          },
-                        ),*/
                       ],
                     )
                 ],
@@ -180,7 +157,6 @@ class _UserEditDialogState extends State<UserEditDialog> {
           onPressed: () async {
             if (await _validatedForm(userName: _userNameController.text)) {
               if (!context.mounted) return;
-              //_removeDefaultFirstOption();
               UserDTO userUpdated = UserDTO(
                 userId: widget.user.userId,
                 name: _nameController.text.trim(),
@@ -191,28 +167,19 @@ class _UserEditDialogState extends State<UserEditDialog> {
                 role: widget.roleList.firstWhere(
                         (role) => role.name == _selectedRole),
               );
-              // Cierra el diálogo y devuelve el usuario actualizado
-              Navigator.of(context).pop(userUpdated);
+              Navigator.of(context).pop(userUpdated); // Cierra el diálogo y devuelve el usuario actualizado
             }
           }
         ),
         TextButton(
           child: const Text('Cancelar'),
           onPressed: () {
-           // _removeDefaultFirstOption();
             Navigator.of(context).pop(null); // Cierra el diálogo sin agregar usuario
           },
         ),
       ],
     );
   }
-  /*/// Si está la opcion "Seleccione...", la elimina de la lista
-  void _removeDefaultFirstOption() {
-    if (widget.roleList[0].isFirst! == true) {
-      widget.roleList.removeAt(0);
-      //if (mounted) setState(() {});
-    }
-  }*/
 
   Future<bool> _validatedForm({required String userName}) async {
     if (_userNameIsSuperAdmin()) _userNameController.value = TextEditingValue.empty;
@@ -252,9 +219,6 @@ class _UserEditDialogState extends State<UserEditDialog> {
   ///true si el nombre de usuario ingresado es el mismo que el seleccionado
   ///siempre que sea un usuario quien esté editando
   bool _sameUsername() => widget.user.userName == _userNameController.text.trim();
-
-  int _getSelectedRole() =>
-    widget.roleList.indexWhere((role) => role.name == _selectedRole);
 
   bool _userNameIsSuperAdmin() =>
       _userNameController.text.trim().toUpperCase() == superAdminUser.toUpperCase();

@@ -42,14 +42,6 @@ const String uriNovaDailyFindPartnerLastname = '/socio/apellido';
 const String uriNovaDailyFindDependentDocument = '/dependiente/cedula';
 const String uriNovaDailyFindDependentLastname = '/dependiente/apellido';
 
-//Role
-const String uriRoleAdd = '/role/add';
-const String uriRoleUpdate = '/role/update';
-const String uriRoleDelete = '/role/delete';
-const String uriRoleDeleteTasks = "/role/deleteTasks";
-const String uriRoleFindAll = '/role/findAll';
-const String uriRoleFindId = '/role/findId';
-
 //User
 const String uriUserAdd = '/user/add';
 const String uriUserUpdate = '/user/update';
@@ -60,6 +52,17 @@ const String uriUserNameExist = '/user/userNameExist';
 const String uriUserLogin = 'user/login';
 const String uriUserActivate = 'user/activate';
 const String uriUserChangeCredentials = 'user/changeCredentials';
+
+//Role
+const String uriRoleAdd = '/role/add';
+const String uriRoleUpdate = '/role/update';
+const String uriRoleDelete = '/role/delete';
+const String uriRoleDeleteTasks = "/role/deleteTasks";
+const String uriRoleFindAll = '/role/findAll';
+const String uriRoleFindId = '/role/findId';
+
+//Task
+const String uriTaskFindAll = '/task/findAll';
 
 //Customer
 const String uriCustomerFindAll = '/customer/findAll';
