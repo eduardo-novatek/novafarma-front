@@ -6,6 +6,9 @@ import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 
+import '../../model/DTOs/role_dto.dart';
+import '../../model/globals/task_selection.dart';
+
 
 class RoleAddDialog extends StatefulWidget {
   final List<TaskDTO> taskList;
@@ -17,17 +20,10 @@ class RoleAddDialog extends StatefulWidget {
 }
 
 class _RoleAddDialogState extends State<RoleAddDialog> {
-
   final _formKey = GlobalKey<FormState>();
-  final ThemeData themeData = ThemeData();
-
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  List<TaskDTO> _selectedTasks = [];
 
   @override
   void dispose() {
@@ -46,7 +42,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
           child: Padding(
             padding: const EdgeInsets.only(right: 30.0),
             child: Container(
-              constraints: const BoxConstraints(minWidth:300),
+              constraints: const BoxConstraints(minWidth: 300),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -59,40 +55,50 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
                     maxValueForValidation: 19,
                     textForValidation: 'El nombre es requerido',
                   ),
+                  const SizedBox(height: 20),
+                  TaskSelection(
+                    taskList: widget.taskList,
+                    onTaskSelectionChanged: (selectedTasks) {
+                      _selectedTasks = selectedTasks;
+                    },
+                  ),
                 ],
               ),
             ),
           ),
         ),
       ),
-
       actions: <Widget>[
         ElevatedButton(
           child: const Text('Aceptar'),
           onPressed: () async {
-            if (_invalidRoleName()) _nameController.value = TextEditingValue.empty;
-            if (!_formKey.currentState!.validate() || !context.mounted) return;
-            RoleDTO1 newRole = RoleDTO1(
+            if (_invalidRoleName()) {
+              _nameController.value = TextEditingValue.empty;
+            }
+            if (!_formKey.currentState!.validate()) return;
+            RoleDTO newRole = RoleDTO(
               roleId: null,
               name: _nameController.text,
+              taskList: _selectedTasks,
             );
-            Navigator.of(context).pop(newRole); // Cierra el diálogo y devuelve el nuevo usuario
-          }
+            Navigator.of(context).pop(newRole);
+          },
         ),
         TextButton(
           child: const Text('Cancelar'),
           onPressed: () {
-            Navigator.of(context).pop(); // Cierra el diálogo sin agregar usuario
+            Navigator.of(context).pop();
           },
         ),
       ],
     );
-
   }
+
   ///True si el nombre del rol es inválido (si contiene SUP y AD). Indicios que contiene super admin o similiar
   bool _invalidRoleName() =>
     _nameController.text.toUpperCase().contains('SUP') &&
     _nameController.text.toUpperCase().contains('AD');
+
 }
 
 

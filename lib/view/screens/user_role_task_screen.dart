@@ -401,7 +401,6 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     ).then((data) {
       _taskList.clear();
       if (data.isNotEmpty) _taskList.addAll(data.cast<TaskDTO>());
-      setState(() {});
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         FloatingMessage.show(
@@ -459,10 +458,10 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   }
 
   Future<void> _addRole() async {
-    RoleDTO1? newRole;
+    RoleDTO? newRole;
     do {
       // Muestra un diálogo para ingresar los datos del nuevo usuario
-      newRole = await showDialog<RoleDTO1>(
+      newRole = await showDialog<RoleDTO>(
         context: context,
         builder: (BuildContext context) {
           return RoleAddDialog(taskList: _taskList);
@@ -547,13 +546,14 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     });
   }
 
-  Future<bool> _saveRole(RoleDTO1 role, {required bool isAdd}) async {
+  Future<bool> _saveRole(RoleDTO role, {required bool isAdd}) async {
     bool ok = true;
     _setLoading(isUsers: false, loading: true);
+
     try {
-      await fetchDataObject<RoleDTO1>(
+      await fetchDataObject<RoleDTO>(
           uri: uriRoleAdd,
-          classObject: RoleDTO1.empty(),
+          classObject: RoleDTO.empty(),
           requestType: RequestTypeEnum.post,
           body: role
       ).then((value) {
@@ -599,14 +599,14 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   }
 
   Future<void> _editRole(RoleDTO role) async {
-    RoleDTO1? roleChanged = await showDialog<RoleDTO1>(
+    RoleDTO? roleChanged = await showDialog<RoleDTO>(
       context: context,
       builder: (BuildContext context) {
         return RoleEditDialog(
-            role: RoleDTO1(
+            role: RoleDTO(
                 roleId: role.roleId,
                 name: role.name,
-                //taskList: []
+                taskList: []
             )
         );
       },

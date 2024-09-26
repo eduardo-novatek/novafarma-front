@@ -5,10 +5,12 @@ import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 
+import '../../model/DTOs/role_dto.dart';
+
 
 ///Permite la edicion del role.
 class RoleEditDialog extends StatefulWidget {
-  final RoleDTO1 role;
+  final RoleDTO role;
 
   const RoleEditDialog({
     required this.role,
@@ -29,20 +31,12 @@ class _RoleEditDialogState extends State<RoleEditDialog> {
   @override
   void initState() {
     super.initState();
-    /*if (!widget.roleList[0].isFirst!) {
-      widget.roleList.insert(
-          0,
-          RoleDTO(
-              isFirst: true, roleId: null, name: defaultFirstOption)
-      );
-    }*/
     _nameController.value = TextEditingValue(text: widget.role.name!);
   }
 
   @override
   void dispose() {
     super.dispose();
-    //widget.roleList[0].isFirst == true ? widget.roleList.removeAt(0) : null;
     _nameController.dispose();
     _nameFocusNode.dispose();
   }
@@ -70,25 +64,6 @@ class _RoleEditDialogState extends State<RoleEditDialog> {
                     maxValueForValidation: 19,
                     textForValidation: 'El nombre es requerido',
                   ),
-                  /*Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text("Rol:"),
-                      ),
-                      CustomDropdown<RoleDTO>(
-                        themeData: _themeData,
-                        optionList: widget.roleList,
-                        selectedOption: widget.roleList[_getSelectedRole()],
-                        isSelected: true,
-                        callback: (role) {
-                          setState(() {
-                            _selectedRole = role!.name;
-                          });
-                        },
-                      ),
-                    ],
-                  )*/
               ],
               ),
             ),
@@ -101,13 +76,12 @@ class _RoleEditDialogState extends State<RoleEditDialog> {
           onPressed: () async {
             if (await _validatedForm(roleName: _nameController.text)) {
               if (!context.mounted) return;
-              RoleDTO1 roleUpdated = RoleDTO1(
+              RoleDTO roleUpdated = RoleDTO(
                 roleId: widget.role.roleId,
                 name: _nameController.text.trim(),
-                //taskList: []
+                taskList: []
               );
-              // Cierra el diálogo y devuelve el usuario actualizado
-              Navigator.of(context).pop(roleUpdated);
+              Navigator.of(context).pop(roleUpdated);  // Cierra el diálogo y devuelve el usuario actualizado
             }
           }
         ),
