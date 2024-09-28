@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
+import 'package:novafarma_front/model/DTOs/role_dto2.dart';
 import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';

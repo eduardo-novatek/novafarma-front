@@ -6,16 +6,16 @@ class TaskDTO extends Deserializable<TaskDTO> {
   int? taskId;
   TaskEnum? task;
   String? description;
-  bool? isFirst;
+  //bool? isFirst;
 
   TaskDTO.empty():
     taskId = null,
     task = null,
-    description = null,
-    isFirst = null;
+    description = null;
+    //isFirst = null;
 
   TaskDTO({
-    this.isFirst = false,
+    //this.isFirst = false,
     required this.taskId,
     required this.task,
     required this.description

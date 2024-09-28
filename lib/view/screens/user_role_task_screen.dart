@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
+import 'package:novafarma_front/model/DTOs/role_dto2.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto_2.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
@@ -21,6 +22,7 @@ import 'package:novafarma_front/view/dialogs/role_add_dialog.dart';
 import 'package:novafarma_front/view/dialogs/role_edit_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/DTOs/task_dto.dart';
+import '../../model/DTOs/task_dto1.dart';
 import '../../model/enums/task_enum.dart';
 import '../../model/globals/tools/build_circular_progress.dart';
 import '../dialogs/user_add_dialog.dart';
@@ -549,17 +551,31 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   Future<bool> _saveRole(RoleDTO role, {required bool isAdd}) async {
     bool ok = true;
     _setLoading(isUsers: false, loading: true);
+    if (isAdd) {
+      ok = await _saveAddRole(role);
+    } else {
+      ok = await _saveUpdateRole(role);
+    }
+    _setLoading(isUsers: false, loading: false);
+    return Future.value(ok);
+  }
 
+  Future<bool> _saveAddRole(RoleDTO role) async {
+    bool ok = true;
+    RoleDTO2 roleDTO2 = RoleDTO2(
+      name: role.name,
+      taskList: _buildTasksBackend(role.taskList)
+    );
     try {
-      await fetchDataObject<RoleDTO>(
+      await fetchDataObject<RoleDTO2>(
           uri: uriRoleAdd,
-          classObject: RoleDTO.empty(),
+          classObject: RoleDTO2.empty(),
           requestType: RequestTypeEnum.post,
-          body: role
+          body: roleDTO2
       ).then((value) {
         FloatingMessage.show(
             context: context,
-            text: _getMessageSuccess(isAdd: isAdd, isUser: false),
+            text: _getMessageSuccess(isAdd: true, isUser: false),
             messageTypeEnum: MessageTypeEnum.info
         );
       });
@@ -575,7 +591,39 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       }
       ok = false;
     }
-    _setLoading(isUsers: false, loading: false);
+    return Future.value(ok);
+  }
+
+  List<TaskDTO1>? _buildTasksBackend(List<TaskDTO>? taskList) =>
+    taskList?.map((t) => TaskDTO1(task: toBackendFormat(t.task!))).toList();
+
+  Future<bool> _saveUpdateRole(RoleDTO role) async {
+    bool ok = true;
+    try {
+      await fetchDataObject<RoleDTO>(
+          uri: uriRoleAdd,
+          classObject: RoleDTO.empty(),
+          requestType: RequestTypeEnum.post,
+          body: role
+      ).then((value) {
+        FloatingMessage.show(
+            context: context,
+            text: _getMessageSuccess(isAdd: false, isUser: false),
+            messageTypeEnum: MessageTypeEnum.info
+        );
+      });
+    } catch(e) {
+      if (e is ErrorObject) {
+        FloatingMessage.show(
+            context: context,
+            text: e.message!,
+            messageTypeEnum: MessageTypeEnum.warning
+        );
+      } else {
+        genericError(e, context, isFloatingMessage: true);
+      }
+      ok = false;
+    }
     return Future.value(ok);
   }
 
