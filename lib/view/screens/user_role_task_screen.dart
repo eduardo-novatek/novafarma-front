@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/DTOs/role_dto2.dart';
+import 'package:novafarma_front/model/DTOs/role_dto3.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_dto_2.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
@@ -14,7 +15,7 @@ import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriTaskFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
+import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriRoleUpdate, uriTaskFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -600,11 +601,11 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   Future<bool> _saveUpdateRole(RoleDTO role) async {
     bool ok = true;
     try {
-      await fetchDataObject<RoleDTO>(
-          uri: uriRoleAdd,
-          classObject: RoleDTO.empty(),
-          requestType: RequestTypeEnum.post,
-          body: role
+      await fetchDataObject<RoleDTO3>(
+          uri: uriRoleUpdate,
+          classObject: RoleDTO3.empty(),
+          requestType: RequestTypeEnum.patch,
+          body: RoleDTO3(roleId: role.roleId, name: role.name),
       ).then((value) {
         FloatingMessage.show(
             context: context,
