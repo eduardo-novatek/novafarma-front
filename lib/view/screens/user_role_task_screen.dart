@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/empty_dto.dart';
 import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/DTOs/role_dto2.dart';
@@ -15,11 +16,11 @@ import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriRoleUpdate, uriTaskFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
+import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleAddTasks, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriRoleUpdate, uriTaskFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
-import 'package:novafarma_front/view/dialogs/role_add_dialog.dart';
+import 'package:novafarma_front/view/dialogs/role_add_or_tasks_update_dialog.dart';
 import 'package:novafarma_front/view/dialogs/role_edit_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/DTOs/task_dto.dart';
@@ -211,7 +212,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
                   _editRole(role);
                   break;
                 case 'Agregar tareas':
-                  //_addTaskToRole(role);
+                  _addTaskToRole(role);
                   break;
                 case 'Eliminar rol':
                   _deleteRole(role);
@@ -463,11 +464,10 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   Future<void> _addRole() async {
     RoleDTO? newRole;
     do {
-      // Muestra un diálogo para ingresar los datos del nuevo usuario
       newRole = await showDialog<RoleDTO>(
         context: context,
         builder: (BuildContext context) {
-          return RoleAddDialog(taskList: _taskList);
+          return RoleAddOrTasksUpdateDialog(taskList: _taskList);
         },
       );
       if (newRole != null) {
@@ -475,6 +475,28 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       }
     } while (newRole != null);
   }
+
+  Future<void> _addTaskToRole(RoleDTO role) async {
+    RoleDTO? newRole;
+    do {
+      newRole = await showDialog<RoleDTO>(
+        context: context,
+        builder: (BuildContext context) {
+          return RoleAddOrTasksUpdateDialog(
+            role: RoleDTO3(roleId: role.roleId, name: role.name),
+            taskList: _getNewTasks(role)
+            );
+        },
+      );
+      if (newRole != null) {
+        if (await _saveTasks(newRole)) _loadRoles();
+      }
+    } while (newRole != null);
+  }
+
+  ///Devuelve las tareas que estan sin asignar al rol
+  List<TaskDTO>? _getNewTasks(RoleDTO role) =>
+      _taskList.where((t) => !role.taskList!.contains(t)).toList();
 
   ///isAdd=true: es agregar el usuario. false: es modificar el usuario
   Future<void> _saveUser(UserDTO userDTO, {required bool isAdd}) async {
@@ -506,13 +528,6 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       await _updateUser(isAdd, userDTO2);
     }
     _setLoading(isUsers: true, loading: false);
-    /*
-     // Si está la opcion "Seleccione...", la elimina de la lista
-    if (_roleList[0].isFirst! == true) {
-      _roleList.removeAt(0);
-      setState(() {});
-    }
-     */
   }
 
   Future<void> _addNewUser(bool isAdd, UserDTO userDTO) async {
@@ -548,6 +563,27 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       genericError(error, context, isFloatingMessage: true);
     });
   }
+
+  Future<bool> _saveTasks(RoleDTO role) async {
+    bool ok = true;
+    await fetchDataObject<EmptyDTO>(
+      uri: '$uriRoleAddTasks/${role.roleId}',
+      classObject: EmptyDTO.empty(),
+      requestType: RequestTypeEnum.put,
+      body: role.taskList!.map((t) => toBackendFormat(t.task!)).toList()
+    ).then((savedUserId) {
+      FloatingMessage.show(
+          context: context,
+          text: "Tareas actualizadas con éxito",
+          messageTypeEnum: MessageTypeEnum.info
+      );
+    }).catchError((error) {
+      ok = false;
+      genericError(error, context, isFloatingMessage: true);
+    });
+    return Future.value(ok);
+  }
+
 
   Future<bool> _saveRole(RoleDTO role, {required bool isAdd}) async {
     bool ok = true;

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/DTOs/role_dto2.dart';
+import 'package:novafarma_front/model/DTOs/role_dto3.dart';
 import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
@@ -11,20 +12,29 @@ import '../../model/DTOs/role_dto.dart';
 import '../../model/globals/task_selection.dart';
 
 
-class RoleAddDialog extends StatefulWidget {
-  final List<TaskDTO> taskList;
+class RoleAddOrTasksUpdateDialog extends StatefulWidget {
+  final RoleDTO3? role; // Si se especifica, es una actualización de tareas del rol
+  final List<TaskDTO>? taskList;
 
-  const RoleAddDialog({super.key, required this.taskList});
+  const RoleAddOrTasksUpdateDialog({super.key, this.role, required this.taskList});
 
   @override
-  State<RoleAddDialog> createState() => _RoleAddDialogState();
+  State<RoleAddOrTasksUpdateDialog> createState() => _RoleAddOrTasksUpdateDialogState();
 }
 
-class _RoleAddDialogState extends State<RoleAddDialog> {
+class _RoleAddOrTasksUpdateDialogState extends State<RoleAddOrTasksUpdateDialog> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
   List<TaskDTO> _selectedTasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.role != null) {
+      _nameController.value = TextEditingValue(text: widget.role!.name!);
+    }
+  }
 
   @override
   void dispose() {
@@ -36,7 +46,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Agregar rol'),
+      title: Text(widget.role == null ? 'Agregar rol' : 'Modificar rol'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -50,6 +60,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
                   CustomTextFormField(
                     controller: _nameController,
                     focusNode: _nameFocusNode,
+                    enabled: widget.role == null,
                     label: 'Nombre',
                     initialFocus: true,
                     dataType: DataTypeEnum.text,
@@ -58,7 +69,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
                   ),
                   const SizedBox(height: 20),
                   TaskSelection(
-                    taskList: widget.taskList,
+                    taskList: widget.taskList!,
                     onTaskSelectionChanged: (selectedTasks) {
                       _selectedTasks = selectedTasks;
                     },
@@ -78,7 +89,7 @@ class _RoleAddDialogState extends State<RoleAddDialog> {
             }
             if (!_formKey.currentState!.validate()) return;
             RoleDTO newRole = RoleDTO(
-              roleId: null,
+              roleId: widget.role?.roleId, // Si role == null, asigna null a roleId, sino asigna el roleId
               name: _nameController.text,
               taskList: _selectedTasks,
             );
