@@ -512,8 +512,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     }
 
     //No valida si ya tiene todas las tareas, menos TaskEnum.all
-    List<TaskDTO>? tasks = _getNewTasks(roleTasks);
-    if (tasks?.length == 1 && tasks?[0].taskId == 1) {
+    List<TaskDTO>? newTasks = _getNewTasks(roleTasks);
+    if (newTasks!.isEmpty) {
       FloatingMessage.show(
         context: context,
         text: 'El rol ya tiene todas las tareas asignadas manualmente. '
@@ -530,7 +530,17 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   
   ///Devuelve las tareas que estan sin asignar al rol
   List<TaskDTO>? _getNewTasks(List<TaskDTO>? roleTasks) {
-    return _taskList.where((t) => !roleTasks!.contains(t)).toList();
+
+    //Obtiene las tareas sin asignar a este rol
+    List<TaskDTO> unassigned = _taskList.where((t) =>
+      ! roleTasks!.contains(t)).toList();
+
+    //Si tiene tareas asignadas, elimina 'Todas las tareas'
+    if (_taskList.length > unassigned.length) {
+      unassigned.removeWhere((t) =>
+        t == TaskDTO(taskId: 1, task: TaskEnum.all, description: null));
+    }
+    return unassigned;
   }
 
   ///isAdd=true: es agregar el usuario. false: es modificar el usuario
