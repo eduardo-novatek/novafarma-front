@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 
@@ -9,19 +8,19 @@ import '../../model/DTOs/role_dto.dart';
 
 
 ///Permite la edicion del role.
-class RoleEditDialog extends StatefulWidget {
+class ChangeRoleNameDialog extends StatefulWidget {
   final RoleDTO role;
 
-  const RoleEditDialog({
+  const ChangeRoleNameDialog({
     required this.role,
     super.key
   });
 
   @override
-  State<RoleEditDialog> createState() => _RoleEditDialogState();
+  State<ChangeRoleNameDialog> createState() => _ChangeRoleNameDialogState();
 }
 
-class _RoleEditDialogState extends State<RoleEditDialog> {
+class _ChangeRoleNameDialogState extends State<ChangeRoleNameDialog> {
 
   final _formKey = GlobalKey<FormState>();
 
@@ -44,7 +43,7 @@ class _RoleEditDialogState extends State<RoleEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Editar rol'),
+      title: const Text('Cambiar nombre del rol'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,

@@ -21,7 +21,7 @@ import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/role_add_or_tasks_update_dialog.dart';
-import 'package:novafarma_front/view/dialogs/role_edit_dialog.dart';
+import 'package:novafarma_front/view/dialogs/change_role_name_dialog.dart';
 import 'package:novafarma_front/view/dialogs/user_edit_dialog.dart';
 import '../../model/DTOs/task_dto.dart';
 import '../../model/DTOs/task_dto1.dart';
@@ -208,8 +208,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             tooltip: '',
             onSelected: (value) {
               switch (value) {
-                case 'Editar':
-                  _editRole(role);
+                case 'Cambiar nombre':
+                  _changeRoleName(role);
                   break;
                 case 'Agregar tareas':
                   _addTaskToRole(role);
@@ -221,8 +221,8 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
-                value: 'Editar',
-                child: Text('Editar'),
+                value: 'Cambiar nombre',
+                child: Text('Cambiar nombre'),
               ),
               const PopupMenuItem<String>(
                 value: 'Agregar tareas',
@@ -477,6 +477,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   }
 
   Future<void> _addTaskToRole(RoleDTO role) async {
+    if (!_validateTasks(role.taskList)) return;
     RoleDTO? newRole;
     do {
       newRole = await showDialog<RoleDTO>(
@@ -484,7 +485,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         builder: (BuildContext context) {
           return RoleAddOrTasksUpdateDialog(
             role: RoleDTO3(roleId: role.roleId, name: role.name),
-            taskList: _getNewTasks(role)
+            taskList: _getNewTasks(role.taskList)
             );
         },
       );
@@ -494,9 +495,43 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     } while (newRole != null);
   }
 
+  ///Devuelve true si se pueden agregar tareas al rol.
+  ///Si no se puede, muestra un FloatingMessage y retorna false.
+  bool _validateTasks(List<TaskDTO>? roleTasks) {
+    if (roleTasks == null || roleTasks.isEmpty) return true;
+
+    //No valida si tiene TaskEnum.all
+    if (roleTasks.contains(
+      TaskDTO(taskId: 1, task: TaskEnum.all, description: null))) {
+        FloatingMessage.show(
+          context: context,
+          text: 'El rol ya tiene todas las tareas asignadas',
+          messageTypeEnum: MessageTypeEnum.warning
+        );
+        return false;
+    }
+
+    //No valida si ya tiene todas las tareas, menos TaskEnum.all
+    List<TaskDTO>? tasks = _getNewTasks(roleTasks);
+    if (tasks?.length == 1 && tasks?[0].taskId == 1) {
+      FloatingMessage.show(
+        context: context,
+        text: 'El rol ya tiene todas las tareas asignadas manualmente. '
+            'Se sugiere seleccionar \'Todas las tareas\' en lugar de la '
+            'selección manual.',
+        messageTypeEnum: MessageTypeEnum.warning,
+        secondsDelay: 7
+      );
+      return false;
+    }
+
+    return true;
+  }
+  
   ///Devuelve las tareas que estan sin asignar al rol
-  List<TaskDTO>? _getNewTasks(RoleDTO role) =>
-      _taskList.where((t) => !role.taskList!.contains(t)).toList();
+  List<TaskDTO>? _getNewTasks(List<TaskDTO>? roleTasks) {
+    return _taskList.where((t) => !roleTasks!.contains(t)).toList();
+  }
 
   ///isAdd=true: es agregar el usuario. false: es modificar el usuario
   Future<void> _saveUser(UserDTO userDTO, {required bool isAdd}) async {
@@ -683,11 +718,11 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     }
   }
 
-  Future<void> _editRole(RoleDTO role) async {
+  Future<void> _changeRoleName(RoleDTO role) async {
     RoleDTO? roleChanged = await showDialog<RoleDTO>(
       context: context,
       builder: (BuildContext context) {
-        return RoleEditDialog(
+        return ChangeRoleNameDialog(
             role: RoleDTO(
                 roleId: role.roleId,
                 name: role.name,

@@ -12,6 +12,7 @@ import '../../model/DTOs/role_dto.dart';
 import '../../model/globals/task_selection.dart';
 
 
+///Pide un rol a agregar o permite la seleccion de las tareas a agregar.
 class RoleAddOrTasksUpdateDialog extends StatefulWidget {
   final RoleDTO3? role; // Si se especifica, es una actualización de tareas del rol
   final List<TaskDTO>? taskList;
@@ -46,7 +47,7 @@ class _RoleAddOrTasksUpdateDialogState extends State<RoleAddOrTasksUpdateDialog>
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.role == null ? 'Agregar rol' : 'Modificar rol'),
+      title: Text(widget.role == null ? 'Agregar rol' : 'Agregar tareas'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -61,6 +62,7 @@ class _RoleAddOrTasksUpdateDialogState extends State<RoleAddOrTasksUpdateDialog>
                     controller: _nameController,
                     focusNode: _nameFocusNode,
                     enabled: widget.role == null,
+                    textStyle: const TextStyle(color: Colors.blueGrey),
                     label: 'Nombre',
                     initialFocus: true,
                     dataType: DataTypeEnum.text,

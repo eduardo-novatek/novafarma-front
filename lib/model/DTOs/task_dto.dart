@@ -44,4 +44,15 @@ class TaskDTO extends Deserializable<TaskDTO> {
     return description!;
   }
 
+  // Sobrescribiendo `==` para comparar objetos basados en `taskId`
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TaskDTO && other.taskId == taskId;
+  }
+
+  // Sobrescribiendo `hashCode` para que funcione con `==`
+  @override
+  int get hashCode => taskId.hashCode;
+
 }
