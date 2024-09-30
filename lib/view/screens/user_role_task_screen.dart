@@ -511,8 +511,9 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         return false;
     }
 
-    //No valida si ya tiene todas las tareas, menos TaskEnum.all
     List<TaskDTO>? newTasks = _getNewTasks(roleTasks);
+
+    //No valida si ya tiene todas las tareas, menos TaskEnum.all
     if (newTasks!.isEmpty) {
       FloatingMessage.show(
         context: context,
@@ -530,13 +531,17 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
   
   ///Devuelve las tareas que estan sin asignar al rol
   List<TaskDTO>? _getNewTasks(List<TaskDTO>? roleTasks) {
+    List<TaskDTO> unassigned = [];
 
-    //Obtiene las tareas sin asignar a este rol
-    List<TaskDTO> unassigned = _taskList.where((t) =>
-      ! roleTasks!.contains(t)).toList();
+    if (roleTasks != null && roleTasks.isNotEmpty) {
+      //Obtiene las tareas sin asignar a este rol
+      unassigned = _taskList.where((t) => ! roleTasks.contains(t)).toList();
+    } else {
+      unassigned.addAll(_taskList);
+    }
 
     //Si tiene tareas asignadas, elimina 'Todas las tareas'
-    if (_taskList.length > unassigned.length) {
+    if (unassigned.isNotEmpty && _taskList.length > unassigned.length) {
       unassigned.removeWhere((t) =>
         t == TaskDTO(taskId: 1, task: TaskEnum.all, description: null));
     }
