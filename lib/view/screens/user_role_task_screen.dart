@@ -276,7 +276,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   Future<void> _removeTasksFromRole(
       RoleDTO role, List<String> taskBackendEnums) async {
-
+    _setLoading(isUsers: false, loading: true);
     await fetchDataObject<TaskDTO>(
         uri: '$uriRoleDeleteTasks/${role.roleId}',
         classObject: TaskDTO.empty(),
@@ -295,6 +295,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         genericError(error!, context, isFloatingMessage: true);
       }
     });
+    _setLoading(isUsers: false, loading: false);
   }
 
   Widget _buildUserData(UserDTO user, int index) {
@@ -478,21 +479,18 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   Future<void> _addTaskToRole(RoleDTO role) async {
     if (!_validateTasks(role.taskList)) return;
-    RoleDTO? newRole;
-    do {
-      newRole = await showDialog<RoleDTO>(
-        context: context,
-        builder: (BuildContext context) {
-          return RoleAddOrTasksUpdateDialog(
-            role: RoleDTO3(roleId: role.roleId, name: role.name),
-            taskList: _getNewTasks(role.taskList)
-            );
-        },
-      );
-      if (newRole != null) {
-        if (await _saveTasks(newRole)) _loadRoles();
-      }
-    } while (newRole != null);
+    RoleDTO? newRole = await showDialog<RoleDTO>(
+      context: context,
+      builder: (BuildContext context) {
+        return RoleAddOrTasksUpdateDialog(
+          role: RoleDTO3(roleId: role.roleId, name: role.name),
+          taskList: _getNewTasks(role.taskList)
+          );
+      },
+    );
+    if (newRole != null) {
+      if (await _saveTasks(newRole)) _loadRoles();
+    }
   }
 
   ///Devuelve true si se pueden agregar tareas al rol.
@@ -513,7 +511,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
     List<TaskDTO>? newTasks = _getNewTasks(roleTasks);
 
-    //No valida si ya tiene todas las tareas, menos TaskEnum.all
+    //No valida si ya tiene todas las tareas
     if (newTasks!.isEmpty) {
       FloatingMessage.show(
         context: context,
@@ -616,6 +614,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
 
   Future<bool> _saveTasks(RoleDTO role) async {
     bool ok = true;
+    _setLoading(isUsers: false, loading: true);
     await fetchDataObject<EmptyDTO>(
       uri: '$uriRoleAddTasks/${role.roleId}',
       classObject: EmptyDTO.empty(),
@@ -631,6 +630,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       ok = false;
       genericError(error, context, isFloatingMessage: true);
     });
+    _setLoading(isUsers: false, loading: false);
     return Future.value(ok);
   }
 

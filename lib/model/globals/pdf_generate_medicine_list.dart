@@ -1,9 +1,10 @@
+import 'dart:html' as html;
+import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:intl/intl.dart'; // Para formatear la fecha y hora
 
 Future<void> pdfGenerateMedicineList({
@@ -108,9 +109,20 @@ Future<void> pdfGenerateMedicineList({
     ),
   );
 
-  await Printing.layoutPdf(
-    onLayout: (PdfPageFormat format) async => pdf.save(),
-  );
+  try {
+    /*await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );*/
+    final pdfData = await pdf.save();
+    final blob = html.Blob([pdfData], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', 'lista-articulos-$currentDate.pdf')
+      ..click();
+    html.Url.revokeObjectUrl(url);
+  } catch (e) {
+    if (kDebugMode) print (e.toString());
+  }
 }
 
 pw.Column _buildHead({

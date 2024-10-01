@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/globals/pdf_genereate_nursing_report.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/custom_icon_button.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
@@ -16,6 +15,7 @@ import '../../model/DTOs/customer_dto2.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show sizePageCustomerNursingReportList, uriCustomerNursingReportPage;
+import '../../model/globals/pdf_generate_nursing_report.dart';
 import '../../model/globals/tools/custom_text_form_field.dart';
 import '../../model/globals/tools/date_time.dart' show dateTimeToStr, dateToStr,
   strDateViewToStrDate, strToDate;

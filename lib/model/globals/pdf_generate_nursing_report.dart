@@ -1,3 +1,6 @@
+import 'dart:html' as html;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto2.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
@@ -5,7 +8,6 @@ import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 import 'package:novafarma_front/model/objects/page_object_map.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:intl/intl.dart'; // Para formatear la fecha y hora
 
 Future<void> pdfGenerateNursingReport({
@@ -99,10 +101,21 @@ Future<void> pdfGenerateNursingReport({
     ),
   );
 
-  await Printing.layoutPdf(
-    name: 'Nursing_Report.pdf',
-    onLayout: (PdfPageFormat format) async => pdf.save(),
-  );
+
+  try {
+    /*await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );*/
+    final pdfData = await pdf.save();
+    final blob = html.Blob([pdfData], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', 'informe-enfermeria-$currentDate.pdf')
+      ..click();
+    html.Url.revokeObjectUrl(url);
+  } catch (e) {
+    if (kDebugMode) print (e.toString());
+  }
 }
 
 pw.Column _buildHead({
