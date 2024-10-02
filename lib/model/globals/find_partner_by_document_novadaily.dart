@@ -21,7 +21,7 @@ Future<PartnerNovaDailyDTO?> findPartnerByDocumentNovaDaily({
     if (partnerNovaDailyList.isNotEmpty) {
       return partnerNovaDailyList[0];
     } else {
-      return null;
+      return Future.value(null);
     }
 
   } catch (error) {

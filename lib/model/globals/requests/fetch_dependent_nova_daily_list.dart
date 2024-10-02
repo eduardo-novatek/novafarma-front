@@ -45,6 +45,7 @@ Future<void> fetchDependentNovaDailyList({
   }).onError((error, stackTrace) {
     if (kDebugMode) print(error);
     if (error is ErrorObject) {
+      if (error.statusCode == 0) return null; //No encontrado
       throw ErrorObject(statusCode: error.statusCode, message: error.message);
     } else {
       throw Exception(error);

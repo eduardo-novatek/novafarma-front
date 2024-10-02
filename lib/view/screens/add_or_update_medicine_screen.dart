@@ -585,6 +585,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       lastSalePrice: double.parse(_lastSalePriceController.text.trim()),
       currentStock: double.parse(_currentStockController.text.trim()),
       controlled: _controlled!,
+      deleted: false,
     );
     //Nota: no se especifica 'deleted' porque lo maneja el backend
   }

@@ -9,6 +9,7 @@ class SupplierDTO extends Deserializable<SupplierDTO> {
   String? email;
   String? notes;
   bool? isFirst;
+  bool? deleted;
 
   SupplierDTO.empty():
         supplierId = null,
@@ -18,7 +19,8 @@ class SupplierDTO extends Deserializable<SupplierDTO> {
         address = "",
         email = "",
         notes = "",
-        isFirst = false
+        isFirst = false,
+        deleted = false
   ;
 
   SupplierDTO({
@@ -29,6 +31,7 @@ class SupplierDTO extends Deserializable<SupplierDTO> {
     this.email,
     this.notes,
     this.isFirst,
+    this.deleted,
     required this.name,
   });
 
@@ -42,6 +45,7 @@ class SupplierDTO extends Deserializable<SupplierDTO> {
       address: json['address'],
       email: json['email'],
       notes: json['notes'],
+      deleted: json['deleted'],
     );
   }
 
@@ -55,6 +59,7 @@ class SupplierDTO extends Deserializable<SupplierDTO> {
       'address': address,
       'email': email,
       'notes': notes,
+      'deleted': deleted,
     };
   }
 

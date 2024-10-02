@@ -6,7 +6,8 @@ import 'package:novafarma_front/model/globals/requests/fetch_dependent_nova_dail
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
-///Dada una cedula, devuelve el Dependiente encontrado (DependentNovaDailyDTO) o null si no lo encuentra o lanzó excepcion.
+///Dada una cedula, devuelve el Dependiente encontrado (DependentNovaDailyDTO) o null
+///si no lo encuentra o lanzó excepcion.
 Future<DependentNovaDailyDTO?> findDependentByDocumentNovaDaily({
   required String document,
   required BuildContext context,

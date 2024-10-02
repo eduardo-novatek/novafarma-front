@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import 'package:novafarma_front/model/globals/constants.dart'
@@ -41,6 +40,7 @@ Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
       response = await http.get(
         uri,
         headers: {
+          //'Origin': 'http://localhost:8081',
           "Content-Type": "application/json; charset=UTF-8",
           "Accept": "application/json"
         }
@@ -71,10 +71,16 @@ Future<List<Object>> fetchDataNovaDaily <T extends Deserializable<T>>({
             return [decodedData].toList();
           } else {
             String err = 'Tipo de datos desconocido';
-            if (decodedData == null) err = 'No se obtuvo respuesta de NovaDaily';
+            if (decodedData == null) {
+              if (response.body == "null") {
+                err = "No encontrado";
+              } else {
+                err = 'No se obtuvo respuesta de NovaDaily';
+              }
+            }
             if (kDebugMode) print(err);
             throw ErrorObject(
-              statusCode: 0,
+              statusCode: response.body == "null" ? 0 : -1,
               message: err
             );
           }

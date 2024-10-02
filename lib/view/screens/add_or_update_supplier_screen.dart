@@ -292,7 +292,8 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
       telephone2: _telephone2Controller.text.trim(),
       address: _addressController.text.trim(),
       email: _emailController.text.trim(),
-      notes: _notesController.text.trim()
+      notes: _notesController.text.trim(),
+      deleted: false,
     );
   }
 

@@ -32,10 +32,8 @@ Future<void> fetchPartnerNovaDailyList({
     if (data[0] == "null") return null;
     partnerNovaDailyList.clear();
     partnerNovaDailyList.addAll(
-
         data.cast<PartnerNovaDailyDTO>().map((e) => e)
         //data.cast<PartnerNovaDailyDTO>().map((e) => e.fromJson(e.toJson())
-
 
       /*data.cast<PartnerNovaDailyDTO>().map((e) => PartnerNovaDailyDTO(
         partnerId: e.partnerId,
@@ -54,8 +52,9 @@ Future<void> fetchPartnerNovaDailyList({
       */
     );
   }).onError((error, stackTrace) {
-    if (kDebugMode) print(error);
     if (error is ErrorObject) {
+      if (error.statusCode == 0) return null;  //No encontrado
+      if (kDebugMode) print(error);
       //throw ErrorObject(statusCode: error.statusCode, message: error.message);
       return Future.error(error);
     } else {
