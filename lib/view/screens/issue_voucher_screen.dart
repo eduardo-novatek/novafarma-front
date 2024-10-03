@@ -562,9 +562,9 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: item.controlled != null && item.controlled!
                     ? const Tooltip(
-                  message: 'Medicamento controlado',
-                  child: Icon(Icons.copyright, color: Colors.red),
-                )
+                        message: 'Medicamento controlado',
+                        child: Icon(Icons.copyright, color: Colors.red),
+                      )
                     : const SizedBox.shrink(),
               ),
             ),
@@ -589,11 +589,11 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                 child: Text(
                   _selectedMovementType != nameMovementType(MovementTypeEnum.adjustmentStock)
                       ? item.unitPrice != null
-                      ? NumberFormat('#,##0.00', 'es_ES').format(item.unitPrice)
-                      : '0,00'
+                        ? NumberFormat('#,##0.00', 'es_ES').format(item.unitPrice)
+                        : '0,00'
                       : item.currentStock != null
-                      ? NumberFormat('#,##0.00', 'es_ES').format(item.currentStock)
-                      : '0,00',
+                        ? NumberFormat('#,##0.00', 'es_ES').format(item.currentStock)
+                        : '0,00',
                   textAlign: TextAlign.right,
                 ),
               ),

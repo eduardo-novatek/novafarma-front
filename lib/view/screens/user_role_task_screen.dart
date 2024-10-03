@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/empty_dto.dart';
@@ -385,6 +386,11 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       setState(() {});
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+          _roleList.clear();
+          _setLoading(isUsers: false, loading: false);
+          return;
+        }
         FloatingMessage.show(
             context: context,
             text: error.message ?? 'Error ${error.statusCode}',
@@ -557,6 +563,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         lastname: userDTO.lastname,
         userName: userDTO.userName,
         pass: userDTO.pass,
+        active: true,
         role: RoleDTO(
           roleId: userDTO.role?.roleId,
           name: userDTO.role!.name,

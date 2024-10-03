@@ -654,7 +654,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   double? _unitPrice() {
     if (widget.movementType == MovementTypeEnum.sale) {
       return _medicine.lastSalePrice!;
-    } else if (_isSupplier()) {
+    } else if (_isSupplier() ||
+        widget.movementType == MovementTypeEnum.adjustmentStock) {
       return _medicine.lastCostPrice!;
     }
     return null;
