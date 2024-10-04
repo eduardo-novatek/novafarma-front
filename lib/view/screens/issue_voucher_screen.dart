@@ -63,6 +63,14 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
   final List<VoucherItemDTO> _voucherItemList = [];
   final List<String> _barCodeList = []; //Para control de medicamentos ingresados al voucher
 
+  final List<String> _movementTypes = [
+    defaultFirstOption,
+    nameMovementType(MovementTypeEnum.purchase),
+    nameMovementType(MovementTypeEnum.sale),
+    nameMovementType(MovementTypeEnum.returnToSupplier),
+    nameMovementType(MovementTypeEnum.adjustmentStock),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -196,7 +204,7 @@ class _IssueVoucherScreenState extends State<IssueVoucherScreen> {
                     padding: const EdgeInsets.only(left: 8.0),
                     child: CustomDropdown<String>(
                       themeData: _themeData,
-                      optionList: movementTypes,
+                      optionList: _movementTypes,
                       selectedOption: _selectedMovementType, //movementTypes[0],
                       isSelected: true,
                       callback: (movementType) {

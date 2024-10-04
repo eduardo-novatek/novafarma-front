@@ -1,13 +1,4 @@
-import 'package:novafarma_front/model/DTOs/user_dto_2.dart';
-import '../enums/movement_type_enum.dart';
-import 'constants.dart';
 
-UserDTO2? userLogged = UserDTO2.empty();
+import 'package:novafarma_front/model/DTOs/user_dto_3.dart';
 
-final List<String> movementTypes = [
-  defaultFirstOption,
-  nameMovementType(MovementTypeEnum.purchase),
-  nameMovementType(MovementTypeEnum.sale),
-  nameMovementType(MovementTypeEnum.returnToSupplier),
-  nameMovementType(MovementTypeEnum.adjustmentStock),
-];
+UserDTO3? userLogged = UserDTO3.empty();

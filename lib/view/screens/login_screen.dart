@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/role_dto1.dart';
+import 'package:novafarma_front/model/DTOs/role_dto4.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
@@ -13,7 +13,8 @@ import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart'
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
-import 'home_page_screen.dart'; // Asegúrate de importar la pantalla principal
+import 'package:novafarma_front/view/dialogs/update_pass_dialog.dart';
+import 'home_page_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -118,28 +119,17 @@ class _LoginScreenState extends State<LoginScreen> {
     if (! _formKey.currentState!.validate()) return;
     if (_userNameController.text.trim() == superAdminUser &&
       _passwordController.text.trim() == superAdminPass) {
-      userLogged!.userId = 0;
-      userLogged!.name = 'Super';
-      userLogged!.lastname = 'Administrador';
-      userLogged!.role = RoleDTO1(
-        name: 'Super Administrador',
-        roleId: 0,
-        //taskList: []
-      );
-      Navigator.pushReplacement(
-        mounted ? context : context,
-        MaterialPageRoute(builder: (context) =>
-        const HomePageScreen(title: 'NovaFarma - administración')),
-      );
+      _loginSuperAdmin();
       return;
     }
+
     setState(() {
       _isLoading = true;
     });
     await fetchDataObject<UserDTO>(
       uri: '$uriUserLogin/${_userNameController.text}/${_passwordController.text}',
       classObject: UserDTO.empty(),
-    ).then((userDb) {
+    ).then((userDb) async {
 
       setState(() {
         _isLoading = false;
@@ -155,14 +145,36 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
+      if (user.changeCredentials!) {
+        await showDialog<String>(
+          context: mounted ? context : context,
+          builder: (BuildContext context) {
+            return UpdatePassDialog(userId: user.userId!);
+          },
+        );
+        _passwordController.value = TextEditingValue.empty;
+        return;
+      }
+
+      if (user.role?.taskList == null || user.role!.taskList!.isEmpty) {
+        FloatingMessage.show(
+          context: mounted ? context : context,
+          text: 'Su rol \'${user.role?.name}\' no tiene tareas asignadas. '
+              'Comuníquese con el administrador del software.',
+          messageTypeEnum: MessageTypeEnum.warning
+        );
+        _passwordController.value = TextEditingValue.empty;
+        return;
+      }
+
       // Actualiza el usuario logueado
       userLogged!.userId = user.userId;
       userLogged!.name = user.name;
       userLogged!.lastname = user.lastname;
-      userLogged!.role = RoleDTO1(
+      userLogged!.role = RoleDTO4(
         roleId: user.role!.roleId,
         name: user.role!.name,
-        //taskList: []
+        taskList: user.role?.taskList!
       );
 
       Navigator.pushReplacement(
@@ -170,6 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) =>
           const HomePageScreen(title: 'NovaFarma')),
       );
+
     }).onError((error, stackTrace) {
       setState(() {
         _isLoading = false;
@@ -184,6 +197,22 @@ class _LoginScreenState extends State<LoginScreen> {
         genericError(error!, isFloatingMessage: true, context);
       }
     });
+  }
+
+  void _loginSuperAdmin() {
+    userLogged!.userId = 0;
+    userLogged!.name = 'Super';
+    userLogged!.lastname = 'Administrador';
+    userLogged!.role = RoleDTO4(
+      name: 'Super Administrador',
+      roleId: 0,
+      taskList: []
+    );
+    Navigator.pushReplacement(
+      mounted ? context : context,
+      MaterialPageRoute(builder: (context) =>
+      const HomePageScreen(title: 'NovaFarma - administración')),
+    );
   }
 
 }

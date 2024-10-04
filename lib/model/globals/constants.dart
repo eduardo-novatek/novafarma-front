@@ -1,12 +1,10 @@
-//const String socket = '192.168.1.8:8080';       //casa
-//const String socket = '192.168.43.203:8080';    //celu
 
 const String host = 'localhost';
 const int port = 8080;
 const String socket = '$host:$port';
 const String hostNovaDaily = 'novateksoluciones.dyndns.org';
 const int portNovaDaily = 9091;
-//const String uriDockerNovaDaily = ''; //Habilitar en caso de solucionar CORS en backend
+//const String uriProxyCORSNovaDaily = ''; //Habilitar en caso de solucionar CORS en backend NovaDaily
 const String uriProxyCORSNovaDaily = 'http://localhost:8081/'; //Habilitar en caso de no solucionar CORS en backend
 
 //Tokens
@@ -47,11 +45,11 @@ const String uriUserAdd = '/user/add';
 const String uriUserUpdate = '/user/update';
 const String uriUserDelete = '/user/delete';
 const String uriUserFindAll = '/user/findAll';
-const String uriUserFindId = '/user/findId';
 const String uriUserNameExist = '/user/userNameExist';
 const String uriUserLogin = 'user/login';
 const String uriUserActivate = 'user/activate';
 const String uriUserChangeCredentials = 'user/changeCredentials';
+const String uriUserUpdateCredentials = 'user/updateCredentials';
 
 //Role
 const String uriRoleAdd = '/role/add';
@@ -60,13 +58,11 @@ const String uriRoleDelete = '/role/delete';
 const String uriRoleDeleteTasks = "/role/deleteTasks";
 const String uriRoleAddTasks = "/role/addTasks";
 const String uriRoleFindAll = '/role/findAll';
-const String uriRoleFindId = '/role/findId';
 
 //Task
 const String uriTaskFindAll = '/task/findAll';
 
 //Customer
-const String uriCustomerFindAll = '/customer/findAll';
 const String uriCustomerFindAllPage = '/customer/findAllPage';
 const String uriCustomerFindDocument = '/customer/findDocument';
 const String uriCustomerFindLastnameName = '/customer/findLastnameName';
