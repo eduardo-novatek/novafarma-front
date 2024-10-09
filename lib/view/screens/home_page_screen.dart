@@ -64,7 +64,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 
   List<PopupMenuEntry<String>> _buildItems(BuildContext context, Offset tilePosition) {
-
     return [
       if (! _isSuperAdmin())
         PopupMenuItem<String>(

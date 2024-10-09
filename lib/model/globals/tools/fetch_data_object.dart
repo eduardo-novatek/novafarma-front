@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:novafarma_front/model/globals/constants.dart'
     show socket,timeOutSecondsResponse;
 import 'package:novafarma_front/model/globals/deserializable.dart';
+import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/request_type_enum.dart';
@@ -14,6 +15,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
   required String uri,
   required T classObject,
   RequestTypeEnum? requestType = RequestTypeEnum.get,
+  bool includeToken = true,
   Object? body,
 }) async {
 
@@ -29,8 +31,9 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           url,
           body: json.encode(body),
           headers:{
-            "Content-Type": "application/json; charset=UTF-8",
-            'Accept': 'application/json; charset=utf-8'
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json; charset=utf-8',
+            if (includeToken) 'Authorization': 'Bearer ${userLogged!.token}'
           }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
@@ -41,6 +44,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
             'Accept': 'application/json; charset=utf-8',
+            if (includeToken) 'Authorization': 'Bearer ${userLogged!.token}'
           }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
@@ -50,8 +54,9 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           body: json.encode(body),
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
-            'Accept': 'application/json; charset=utf-8'
-          }
+            'Accept': 'application/json; charset=utf-8',
+            if (includeToken) 'Authorization': 'Bearer ${userLogged!.token}'
+      }
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     } else if (requestType == RequestTypeEnum.delete){
@@ -60,6 +65,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
             'Accept': 'application/json; charset=utf-8',
+            if (includeToken) 'Authorization': 'Bearer ${userLogged!.token}'
           },
           body: json.encode(body)
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
@@ -70,6 +76,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
           headers: {
             "Content-Type": "application/json; charset=UTF-8",
             'Accept': 'application/json; charset=utf-8',
+            if (includeToken) 'Authorization': 'Bearer ${userLogged!.token}'
           },
       ).timeout(const Duration(seconds: timeOutSecondsResponse));
     }

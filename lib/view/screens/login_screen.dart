@@ -120,12 +120,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     if (! _formKey.currentState!.validate()) return;
-    if (_userNameController.text.trim() == superAdminUser &&
-      _passwordController.text.trim() == superAdminPass) {
-      _loginSuperAdmin();
-      return;
-    }
-
     setState(() {
       _isLoading = true;
     });
@@ -136,14 +130,18 @@ class _LoginScreenState extends State<LoginScreen> {
         userName: _userNameController.text,
         password: _passwordController.text
       ),
-      requestType: RequestTypeEnum.post
+      requestType: RequestTypeEnum.post,
+      includeToken: false,
     ).then((userDb) async {
-
       setState(() {
         _isLoading = false;
       });
-
       UserJwtDTO userJwt = userDb[0] as UserJwtDTO;
+      if (_userNameController.text.trim() == superAdminUser &&
+        _passwordController.text.trim() == superAdminPass) {
+        _loginSuperAdmin(userJwt.jwt!);
+        return;
+      }
       if (!userJwt.active! && mounted) {
         FloatingMessage.show(
           context: context,
@@ -152,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         return;
       }
-
       if (userJwt.changeCredentials!) {
         await showDialog<String>(
           context: mounted ? context : context,
@@ -163,7 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.value = TextEditingValue.empty;
         return;
       }
-
       if (userJwt.role?.taskList == null || userJwt.role!.taskList!.isEmpty) {
         FloatingMessage.show(
           context: mounted ? context : context,
@@ -174,7 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.value = TextEditingValue.empty;
         return;
       }
-
       // Actualiza el usuario logueado
       userLogged!.userId = userJwt.userId;
       userLogged!.name = userJwt.name;
@@ -208,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _loginSuperAdmin() {
+  void _loginSuperAdmin(String token) {
     userLogged!.userId = 0;
     userLogged!.name = 'Super';
     userLogged!.lastname = 'Administrador';
@@ -217,6 +212,8 @@ class _LoginScreenState extends State<LoginScreen> {
       roleId: 0,
       taskList: []
     );
+    userLogged!.token = token;
+
     Navigator.pushReplacement(
       mounted ? context : context,
       MaterialPageRoute(builder: (context) =>
