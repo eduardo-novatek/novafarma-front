@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto4.dart';
 import 'package:novafarma_front/model/DTOs/user_dto.dart';
+import 'package:novafarma_front/model/DTOs/user_jwt_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
@@ -128,9 +129,9 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
     });
-    await fetchDataObject<UserDTO>(
+    await fetchDataObject<UserJwtDTO>(
       uri: uriUserLogin,
-      classObject: UserDTO.empty(),
+      classObject: UserJwtDTO.empty(),
       body: UserDTO4(
         userName: _userNameController.text,
         password: _passwordController.text
@@ -142,8 +143,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
       });
 
-      UserDTO user = userDb[0] as UserDTO;
-      if (!user.active! && mounted) {
+      UserJwtDTO userJwt = userDb[0] as UserJwtDTO;
+      if (!userJwt.active! && mounted) {
         FloatingMessage.show(
           context: context,
           text: 'Usuario inactivo',
@@ -152,21 +153,21 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      if (user.changeCredentials!) {
+      if (userJwt.changeCredentials!) {
         await showDialog<String>(
           context: mounted ? context : context,
           builder: (BuildContext context) {
-            return UpdatePassDialog(userId: user.userId!);
+            return UpdatePassDialog(userId: userJwt.userId!);
           },
         );
         _passwordController.value = TextEditingValue.empty;
         return;
       }
 
-      if (user.role?.taskList == null || user.role!.taskList!.isEmpty) {
+      if (userJwt.role?.taskList == null || userJwt.role!.taskList!.isEmpty) {
         FloatingMessage.show(
           context: mounted ? context : context,
-          text: 'Su rol \'${user.role?.name}\' no tiene tareas asignadas. '
+          text: 'Su rol \'${userJwt.role?.name}\' no tiene tareas asignadas. '
               'Comuníquese con el administrador del software.',
           messageTypeEnum: MessageTypeEnum.warning
         );
@@ -175,14 +176,15 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       // Actualiza el usuario logueado
-      userLogged!.userId = user.userId;
-      userLogged!.name = user.name;
-      userLogged!.lastname = user.lastname;
+      userLogged!.userId = userJwt.userId;
+      userLogged!.name = userJwt.name;
+      userLogged!.lastname = userJwt.lastname;
       userLogged!.role = RoleDTO4(
-        roleId: user.role!.roleId,
-        name: user.role!.name,
-        taskList: user.role?.taskList!
+        roleId: userJwt.role!.roleId,
+        name: userJwt.role!.name,
+        taskList: userJwt.role?.taskList!
       );
+      userLogged!.token = userJwt.jwt!;
 
       Navigator.pushReplacement(
         mounted ? context : context,
