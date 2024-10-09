@@ -47,6 +47,7 @@ const String uriUserDelete = '/user/delete';
 const String uriUserFindAll = '/user/findAll';
 const String uriUserNameExist = '/user/userNameExist';
 const String uriUserLogin = 'user/login';
+const String uriUserLogout = 'user/logout';
 const String uriUserActivate = 'user/activate';
 const String uriUserChangeCredentials = 'user/changeCredentials';
 const String uriUserUpdateCredentials = 'user/updateCredentials';

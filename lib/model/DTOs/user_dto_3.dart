@@ -6,6 +6,7 @@ class UserDTO3 extends Deserializable<UserDTO3> {
   int? userId;
   String? name;
   String? lastname;
+  String? userName;
   RoleDTO4? role;
   String? token;
 
@@ -13,6 +14,7 @@ class UserDTO3 extends Deserializable<UserDTO3> {
     userId = null,
     name = null,
     lastname = null,
+    userName = null,
     role = RoleDTO4.empty(),
     token = null;
 
@@ -21,6 +23,7 @@ class UserDTO3 extends Deserializable<UserDTO3> {
     this.userId,
     required this.name,
     required this.lastname,
+    required this.userName,
     required this.role,
     required this.token,
   });
@@ -31,6 +34,7 @@ class UserDTO3 extends Deserializable<UserDTO3> {
       userId: json['userId'],
       name: json['name'],
       lastname: json['lastname'],
+      userName: json['userName'],
       role: role?.fromJson(json['role']),
       token: json['jwt'],
     );
@@ -44,6 +48,7 @@ class UserDTO3 extends Deserializable<UserDTO3> {
       'lastname': lastname,
       'role': role?.toJson(),
       'token': token,
+      'userName': userName,
     };
   }
 }

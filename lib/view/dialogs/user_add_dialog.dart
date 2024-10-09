@@ -159,7 +159,8 @@ class _UserAddDialogState extends State<UserAddDialog> {
                 userName: _userNameController.text,
                 pass: _passController.text,
                 role: widget.roleList.firstWhere(
-                  (role) => role.name == _selectedRole),
+                  (role) => role.name == _selectedRole
+                ),
               );
               Navigator.of(context).pop(newUser); // Cierra el diálogo y devuelve el nuevo usuario
             }

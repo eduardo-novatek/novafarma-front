@@ -10,6 +10,7 @@ import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
+import 'package:novafarma_front/model/globals/requests/logout.dart';
 import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
@@ -132,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       requestType: RequestTypeEnum.post,
       includeToken: false,
+
     ).then((userDb) async {
       setState(() {
         _isLoading = false;
@@ -142,12 +144,14 @@ class _LoginScreenState extends State<LoginScreen> {
         _loginSuperAdmin(userJwt.jwt!);
         return;
       }
+      _updateUserLogged(userJwt); // Actualiza el usuario logueado
       if (!userJwt.active! && mounted) {
         FloatingMessage.show(
           context: context,
           text: 'Usuario inactivo',
           messageTypeEnum: MessageTypeEnum.warning
         );
+        logout(context);
         return;
       }
       if (userJwt.changeCredentials!) {
@@ -158,6 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         );
         _passwordController.value = TextEditingValue.empty;
+        logout(mounted ? context : context);
         return;
       }
       if (userJwt.role?.taskList == null || userJwt.role!.taskList!.isEmpty) {
@@ -168,19 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
           messageTypeEnum: MessageTypeEnum.warning
         );
         _passwordController.value = TextEditingValue.empty;
+        logout(mounted ? context : context);
         return;
       }
-      // Actualiza el usuario logueado
-      userLogged!.userId = userJwt.userId;
-      userLogged!.name = userJwt.name;
-      userLogged!.lastname = userJwt.lastname;
-      userLogged!.role = RoleDTO4(
-        roleId: userJwt.role!.roleId,
-        name: userJwt.role!.name,
-        taskList: userJwt.role?.taskList!
-      );
-      userLogged!.token = userJwt.jwt!;
-
       Navigator.pushReplacement(
         mounted ? context : context,
         MaterialPageRoute(builder: (context) =>
@@ -191,22 +186,45 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
-      if (error is ErrorObject && error.statusCode == HttpStatus.notFound) {
-        FloatingMessage.show(
-            context: mounted ? context : context,
-            text: 'Usuario o contraseña incorrecta',
-            messageTypeEnum: MessageTypeEnum.warning
-        );
+      if (error is ErrorObject) {
+        if (error.statusCode == HttpStatus.notFound) {
+          FloatingMessage.show(
+              context: mounted ? context : context,
+              text: 'Usuario o contraseña incorrecta',
+              messageTypeEnum: MessageTypeEnum.warning
+          );
+        } else {
+          FloatingMessage.show(
+              context: mounted ? context : context,
+              text: error.message ?? 'Error ${error.statusCode}',
+              messageTypeEnum: MessageTypeEnum.warning
+          );
+        }
       } else if (mounted) {
         genericError(error!, isFloatingMessage: true, context);
       }
     });
   }
 
+  // Actualiza el usuario logueado
+  void _updateUserLogged(UserJwtDTO userJwt) {
+     userLogged!.userId = userJwt.userId;
+    userLogged!.name = userJwt.name;
+    userLogged!.lastname = userJwt.lastname;
+    userLogged!.userName = _userNameController.text;
+    userLogged!.role = RoleDTO4(
+      roleId: userJwt.role!.roleId,
+      name: userJwt.role!.name,
+      taskList: userJwt.role?.taskList!
+    );
+    userLogged!.token = userJwt.jwt!;
+  }
+
   void _loginSuperAdmin(String token) {
     userLogged!.userId = 0;
     userLogged!.name = 'Super';
     userLogged!.lastname = 'Administrador';
+    userLogged!.userName = _userNameController.text;
     userLogged!.role = RoleDTO4(
       name: 'Super Administrador',
       roleId: 0,

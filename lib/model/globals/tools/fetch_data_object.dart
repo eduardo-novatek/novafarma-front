@@ -127,13 +127,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
 
     } else {
       generalException = false;
-      throw ErrorObject(
-          statusCode: response.statusCode,
-          message: response.body.isNotEmpty
-              ? jsonDecode(response.body)['message']
-              : null
-      );
-
+      throw _handleResponse(response);
     }
   } catch (e) {
     if (generalException) {
@@ -142,4 +136,18 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
     return Future.error(e);
   }
 
+}
+
+ErrorObject _handleResponse(http.Response response) {
+  try {
+    return ErrorObject(
+      statusCode: response.statusCode,
+      message: jsonDecode(response.body)['message'],
+    );
+  } catch (e) {
+    return ErrorObject(
+      statusCode: response.statusCode,
+      message: response.body.isNotEmpty ? response.body : null,
+    );
+  }
 }

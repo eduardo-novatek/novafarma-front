@@ -121,7 +121,6 @@ class _UpdatePassDialogState extends State<UpdatePassDialog> {
   }
 
   Future<void> _submit() async {
-    print('submit');
     if (! _formKey.currentState!.validate()) return;
     if (_newPassController.text == _newPassRepeatController.text) {
       setState(() {
