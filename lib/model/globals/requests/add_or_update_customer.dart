@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/message_type_enum.dart';
@@ -28,18 +29,7 @@ Future<int?> addOrUpdateCustomer({
     id = customerId.isNotEmpty ? customerId[0] as int : customer.customerId!;
 
   }).onError((error, stackTrace) {
-    String msg = '';
-    if (error is ErrorObject) {
-      msg = error.message ?? 'Error ${error.statusCode}';
-    } else {
-      msg = 'Error desconocido: ${error.toString()}';
-    }
-    FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.warning
-    );
-    if (kDebugMode) print(msg);
+    handleError(error: error, context: context);
     return Future.error(0);
   });
   return Future.value(id);

@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/message_type_enum.dart';
@@ -28,19 +29,7 @@ Future<int?> addOrUpdateUnit({
     id = unitId.isNotEmpty ? unitId[0] as int : unit.unitId!;
 
   }).onError((error, stackTrace) {
-    String msg = '';
-    if (error is ErrorObject) {
-      msg = error.message ?? 'Error ${error.statusCode}';
-      FloatingMessage.show(
-          context: context,
-          text: msg,
-          messageTypeEnum: MessageTypeEnum.warning
-      );
-    } else {
-      msg = error!.toString();
-      genericError(error, context, isFloatingMessage: true);
-    }
-    if (kDebugMode) print(msg);
+    handleError(error: error, context: context);
     return Future.error(0);
   });
   return Future.value(id);

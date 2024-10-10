@@ -8,6 +8,7 @@ import 'package:novafarma_front/model/DTOs/customer_dto2.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/globals/constants.dart'
     show socket, timeOutSecondsResponse;
+import 'package:novafarma_front/model/globals/handle_response.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object_map.dart';
 
@@ -86,12 +87,7 @@ Future<PageObjectMap> fetchNursingReportPageable({
       }
     } else {
       generalException = false;
-      throw ErrorObject(
-        statusCode: response.statusCode,
-        message: response.body.isNotEmpty
-            ? jsonDecode(response.body)['message']
-            : null,
-      );
+     throw handleResponse(response);
     }
   } catch (e) {
     if (generalException) {

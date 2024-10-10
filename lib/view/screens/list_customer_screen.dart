@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/controlled_medication_list_from_customer_dialog.dart';
@@ -272,27 +273,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         });
       }
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _toggleLoading();
   }
@@ -510,14 +491,14 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
     ).then((pageObject) {
      if (pageObject.totalElements == 0) {
        FloatingMessage.show(
-         context: context,
+         context: mounted ? context : context,
          text: 'Sin datos',
          messageTypeEnum: MessageTypeEnum.info,
        );
      } else {
        CustomerDTO1 customer = _customerList[index];
        showDialog(
-         context: context,
+         context: mounted ? context : context,
          builder: (context) {
            return AlertDialog(
              content: VouchersFromCustomerDialog(
@@ -539,7 +520,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       }
       if (msg != null) {
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: msg,
           messageTypeEnum: MessageTypeEnum.error,
         );
@@ -572,7 +553,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       if (error is ErrorObject) {
         if (error.statusCode == HttpStatus.notFound) {
           FloatingMessage.show(
-            context: context,
+            context: mounted ? context : context,
             text: 'Sin datos',
             messageTypeEnum: MessageTypeEnum.info,
           );
@@ -581,11 +562,11 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         }
 
       } else {
-        genericError(error!, context, isFloatingMessage: true);
+        if (mounted) genericError(error!, context, isFloatingMessage: true);
       }
       if (msg != null) {
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: msg,
           messageTypeEnum: MessageTypeEnum.error,
         );
@@ -619,32 +600,12 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
           _customerList.removeAt(index);
         });
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: 'Cliente eliminado con éxito',
           messageTypeEnum: MessageTypeEnum.info,
         );
       } catch (error) {
-        if (error is ErrorObject) {
-          FloatingMessage.show(
-            context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-          }
-        } else {
-          FloatingMessage.show(
-            context: context,
-            text: 'Error obteniendo datos',
-            messageTypeEnum: MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('Error obteniendo datos: ${error.toString()}');
-          }
-        }
+          if (mounted) handleError(error: error, context: context);
       } finally {
         _toggleLoading();
       }

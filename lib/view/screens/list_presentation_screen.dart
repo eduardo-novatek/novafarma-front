@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
@@ -238,27 +240,7 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
       );
       _updatePageObject(pageObjectResult);
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(false);
   }
@@ -293,30 +275,8 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
           data as Iterable<PresentationDTO>
       );
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        if (error.statusCode != 404) {
-          FloatingMessage.show(
-            context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error
-                .statusCode})',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error
-                .statusCode})');
-          }
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
+      if (error is ErrorObject && error.statusCode != HttpStatus.notFound) {
+        if (mounted) handleError(error: error, context: context);
       }
     });
     _setLoading(false);

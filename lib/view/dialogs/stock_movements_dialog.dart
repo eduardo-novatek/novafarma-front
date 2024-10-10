@@ -256,7 +256,7 @@ class _StockMovementsDialogState extends State<StockMovementsDialog> {
       }
       if (msg != null) {
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: msg,
           messageTypeEnum: MessageTypeEnum.error,
         );

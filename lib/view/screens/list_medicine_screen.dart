@@ -11,9 +11,10 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto.dart';
+import '../../model/DTOs/stock_movement_dto.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/constants.dart' show sizePageMedicineList,
-  uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage;
+import '../../model/globals/constants.dart' show host, port, sizePageMedicineList, uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage, uriMedicineFindStockMovements;
+import '../../model/globals/handleError.dart';
 import '../../model/globals/pdf_generate_medicine_list.dart';
 import '../../model/globals/tools/date_time.dart' show dateToStr;
 import '../../model/globals/tools/fetch_data_object.dart';
@@ -261,27 +262,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       );
       _updatePageObject(pageObjectResult);
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(false);
   }
@@ -322,27 +303,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       );
       _updatePageObject(pageObjectResult);
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(false);
   }
@@ -550,23 +511,7 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
           );
         }
       } catch (error) {
-        if (error is ErrorObject) {
-          if (mounted) {
-          FloatingMessage.show(
-            context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error
-                .statusCode})',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-          );
-        }
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-          }
-        } else if (mounted) {
-            genericError(error, context);
-        }
+          if (mounted) handleError(error: error, context: context);
       } finally {
         _setLoading(false);
       }
@@ -576,8 +521,17 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   Future<void> _stockMovements(int index) async {
     _setLoading(true);
     MedicineDTO1 medicine = _pageObject.content[index];
+    if (! await _areMovements(medicine)) {
+      FloatingMessage.show(
+        context: mounted ? context : context,
+        text: 'Sin datos',
+        messageTypeEnum: MessageTypeEnum.info,
+      );
+      _setLoading(false);
+      return;
+    }
     showDialog(
-      context: context,
+      context: mounted ? context : context,
       builder: (context) {
         return AlertDialog(
           content: StockMovementsDialog(
@@ -599,14 +553,39 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
     return CustomIconButton(
       onTap: () {
         pdfGenerateMedicineList(
-            medicineList: _pageObject.content,
-            filter: _nameFilterController.text.trim()
+          medicineList: _pageObject.content,
+          filter: _nameFilterController.text.trim()
         );
       },
       tooltipMessage: 'Exportar a PDF',
       icon: Icons.picture_as_pdf,
       iconSize: 35
     );
+  }
+
+  Future<bool> _areMovements(MedicineDTO1 medicine) async {
+    final uri = Uri(
+      scheme: 'http',
+      host: host,
+      port: port,
+      path: uriMedicineFindStockMovements,
+      queryParameters: {
+        'medicineId': medicine.medicineId.toString(),
+        'pageNumber': '0',
+        'pageSize': '1',
+      },
+    );
+    await fetchDataObjectPageable<StockMovementDTO>(
+      uri: uri,
+      isRequestParam: true,
+      classObject: StockMovementDTO.empty(),
+    ).then((pageObjectResult) {
+      return pageObjectResult.totalElements > 0;
+    }).onError((error, stackTrace) {
+      if (mounted) handleError(error: error, context: context);
+      return false;
+    });
+    return false;
   }
 
 }

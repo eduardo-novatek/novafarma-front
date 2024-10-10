@@ -28,8 +28,7 @@ Future<void> genericError(
       ).view();
     }
 
-  } else {
-    if (error.toString().contains('TimeoutException')) {
+  } else if (error.toString().contains('TimeoutException')) {
       if (isFloatingMessage) {
         FloatingMessage.show(
           context: context,
@@ -45,7 +44,7 @@ Future<void> genericError(
         ).view();
       }
 
-    } else {
+  } else {
       if (isFloatingMessage) {
         FloatingMessage.show(
           context: context,
@@ -56,10 +55,9 @@ Future<void> genericError(
       } else {
         await OpenDialog(
           context: context,
-          title: 'Error desconocido',
+          title: 'Error',
           content: error.toString(),
         ).view();
       }
-    }
   }
 }

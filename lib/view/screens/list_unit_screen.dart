@@ -11,6 +11,7 @@ import 'package:novafarma_front/model/objects/error_object.dart';
 import '../../model/DTOs/unit_dto.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart' show uriUnitDelete, uriUnitFindAll;
+import '../../model/globals/handleError.dart';
 import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/open_dialog.dart';
 
@@ -182,31 +183,7 @@ class _ListUnitScreenState extends State<ListUnitScreen> {
       _unitList.clear();
       _unitList.addAll(data as Iterable<UnitDTO>);
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        if (error.statusCode != HttpStatus.notFound) {
-          FloatingMessage.show(
-            context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error
-                .statusCode})',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error
-                .statusCode})');
-          }
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(false);
   }

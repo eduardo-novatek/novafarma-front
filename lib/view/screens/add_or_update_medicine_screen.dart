@@ -12,6 +12,7 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption,
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
@@ -478,6 +479,8 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       //Actualiza la var. publica con el id de la presentacion ingresada
       _presentationId = await fetchPresentationId(presentationDTO);
     } catch (e) {
+      if (mounted) handleError(error: e, context: context);
+      _changeStateLoading(false);
       return;
     }
 
@@ -543,7 +546,6 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
         return;
       }
     }
-
     await _addOrUpdateMedicine();
     _changeStateLoading(false);
   }
@@ -928,10 +930,10 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     }).onError((error, stackTrace) {
       if (error is ErrorObject){
         if (error.statusCode != HttpStatus.notFound) {
-          genericError(error, isFloatingMessage: true, context);
+          genericError(error, isFloatingMessage: true, mounted ? context : context);
         }
       } else {
-        genericError(error!, context);
+        genericError(error!, mounted ? context : context);
       }
     });
 

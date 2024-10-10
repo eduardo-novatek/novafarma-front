@@ -15,6 +15,7 @@ import '../../model/DTOs/customer_dto2.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/constants.dart'
     show sizePageCustomerNursingReportList, uriCustomerNursingReportPage;
+import '../../model/globals/handleError.dart';
 import '../../model/globals/pdf_generate_nursing_report.dart';
 import '../../model/globals/tools/custom_text_form_field.dart';
 import '../../model/globals/tools/date_time.dart' show dateTimeToStr, dateToStr,
@@ -293,7 +294,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
       _total = 0;
       if (pageObject.totalElements == 0) {
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: 'Sin datos',
           messageTypeEnum: MessageTypeEnum.info
         );
@@ -311,27 +312,7 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
       _updatePageObjectMap(pageObject);
 
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(false);
   }

@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -199,28 +200,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
         _supplierList.addAll(data as Iterable<SupplierDTO>);
       });
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) return;
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(false);
   }
@@ -360,14 +340,14 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
     ).then((pageObject) {
       if (pageObject.totalElements == 0) {
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: 'Sin datos',
           messageTypeEnum: MessageTypeEnum.info,
         );
       } else {
         SupplierDTO supplier = _supplierList[index];
         showDialog(
-          context: context,
+          context: mounted ? context : context,
           builder: (context) {
             return AlertDialog(
               content: VouchersFromSupplierDialog(
@@ -389,7 +369,7 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
       }
       if (msg != null) {
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: msg,
           messageTypeEnum: MessageTypeEnum.error,
         );
@@ -422,32 +402,12 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
           _supplierList.removeAt(index);
         });
         FloatingMessage.show(
-          context: context,
+          context: mounted ? context : context,
           text: 'Proveedor eliminado con éxito',
           messageTypeEnum: MessageTypeEnum.info,
         );
       } catch (error) {
-        if (error is ErrorObject) {
-          FloatingMessage.show(
-            context: context,
-            text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-          }
-        } else {
-          FloatingMessage.show(
-            context: context,
-            text: 'Error obteniendo datos',
-            messageTypeEnum: MessageTypeEnum.error,
-          );
-          if (kDebugMode) {
-            print('Error obteniendo datos: ${error.toString()}');
-          }
-        }
+          if (mounted) handleError(error: error, context: context);
       } finally {
         _setLoading(false);
       }

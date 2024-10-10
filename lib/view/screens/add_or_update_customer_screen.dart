@@ -304,7 +304,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       FloatingMessage.show(
           text: msg,
           messageTypeEnum: MessageTypeEnum.info,
-          context: context
+          context: mounted ? context : context
       );
       _initialize(initDocument: true);
       FocusScope.of(context).requestFocus(_documentFocusNode);
