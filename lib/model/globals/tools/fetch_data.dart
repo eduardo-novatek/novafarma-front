@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:novafarma_front/model/globals/handle_response.dart';
+import 'package:novafarma_front/model/globals/publics.dart';
 
 import '../../objects/error_object.dart';
 import '../constants.dart' show socket, timeOutSecondsResponse;
@@ -11,8 +13,10 @@ Future<List<T>> fetchData<T>({required String uri}) async {
 
   final url = Uri.http(socket, uri);
   try {
-    var response = await http.get(url)
-        .timeout(const Duration(seconds: timeOutSecondsResponse));
+    var response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer ${userLogged!.token}'}
+    ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     if (response.statusCode == 200) {
       dynamic decodedData = json.decode(response.body);
@@ -20,12 +24,7 @@ Future<List<T>> fetchData<T>({required String uri}) async {
         return (decodedData as List<dynamic>).map((item) => item as T).toList();
     } else {
       generalException = false;
-      throw ErrorObject(
-        statusCode: response.statusCode,
-        message: response.body.isNotEmpty
-          ? jsonDecode(response.body)['message']
-          : null
-      );
+      throw handleResponse(response);
     }
 
   } catch (e) {

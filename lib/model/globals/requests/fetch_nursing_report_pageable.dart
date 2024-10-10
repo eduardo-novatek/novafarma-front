@@ -11,6 +11,8 @@ import 'package:novafarma_front/model/globals/constants.dart'
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object_map.dart';
 
+import '../publics.dart';
+
 ///Devuelve una lista de objetos de la base de datos, obtenidos por paginación.
 ///Envía solo solicitudes get.
 Future<PageObjectMap> fetchNursingReportPageable({
@@ -22,9 +24,10 @@ Future<PageObjectMap> fetchNursingReportPageable({
 
   try {
     url = Uri.http(socket, uri);
-    response = await http
-        .get(url)
-        .timeout(const Duration(seconds: timeOutSecondsResponse));
+    response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer ${userLogged!.token}'}
+    ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     if (response.statusCode == 200) {
       try {

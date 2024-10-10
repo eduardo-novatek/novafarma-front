@@ -6,6 +6,8 @@ import 'package:http/http.dart';
 import 'package:novafarma_front/model/globals/constants.dart'
     show socket, timeOutSecondsResponse;
 import 'package:novafarma_front/model/globals/deserializable.dart';
+import 'package:novafarma_front/model/globals/handle_response.dart';
+import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
@@ -32,8 +34,10 @@ Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
       url = uri as Uri;
     }
 
-    response = await http.get(url)
-        .timeout(const Duration(seconds: timeOutSecondsResponse));
+    response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer ${userLogged!.token}'}
+    ).timeout(const Duration(seconds: timeOutSecondsResponse));
 
     if (response.statusCode == 200) {
       try {
@@ -62,12 +66,7 @@ Future<PageObject> fetchDataObjectPageable <T extends Deserializable<T>>({
       }
     } else {
       generalException = false;
-      throw ErrorObject(
-        statusCode: response.statusCode,
-        message: response.body.isNotEmpty
-            ? jsonDecode(response.body)['message']
-            : null
-      );
+      throw handleResponse(response);
     }
   } catch (e) {
     if (generalException) {

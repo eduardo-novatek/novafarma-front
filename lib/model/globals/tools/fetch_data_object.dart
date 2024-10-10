@@ -9,6 +9,7 @@ import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../enums/request_type_enum.dart';
+import '../handle_response.dart';
 
 ///Devuelve una lista de objetos de la base de datos.
 Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
@@ -127,7 +128,7 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
 
     } else {
       generalException = false;
-      throw _handleResponse(response);
+      throw handleResponse(response);
     }
   } catch (e) {
     if (generalException) {
@@ -136,18 +137,4 @@ Future<List<Object>> fetchDataObject <T extends Deserializable<T>>({
     return Future.error(e);
   }
 
-}
-
-ErrorObject _handleResponse(http.Response response) {
-  try {
-    return ErrorObject(
-      statusCode: response.statusCode,
-      message: jsonDecode(response.body)['message'],
-    );
-  } catch (e) {
-    return ErrorObject(
-      statusCode: response.statusCode,
-      message: response.body.isNotEmpty ? response.body : null,
-    );
-  }
 }
