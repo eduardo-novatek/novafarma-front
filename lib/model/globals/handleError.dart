@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 
 import '../enums/message_type_enum.dart';
@@ -18,21 +19,17 @@ void handleError({required Object? error, required BuildContext context}) {
     } else {
       FloatingMessage.show(
         context: context,
-        text: error.message ?? 'Error indeterminado (${error.statusCode})',
+        text: error.message ?? 'Error ${error.statusCode}',
         messageTypeEnum: _getMessageType(error),
       );
     }
     if (kDebugMode) {
-      print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
+      print(error.message ?? 'Error ${error.statusCode}');
     }
   } else {
-    FloatingMessage.show(
-      context: context,
-      text: 'Error obteniendo datos',
-      messageTypeEnum: MessageTypeEnum.error,
-    );
+    genericError(error!, context, isFloatingMessage: true);
     if (kDebugMode) {
-      print('Error obteniendo datos: ${error.toString()}');
+      print('Error: ${error.toString()}');
     }
   }
 }

@@ -4,6 +4,7 @@ import 'dart:html';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -170,13 +171,8 @@ class CustomerBoxState extends State<CustomerBox> {
     required Object? error,
     required bool isDocument
   }) async {
-    if (kDebugMode) print('_showMessageConnectionError: $error');
-    FloatingMessage.show(
-      context: context,
-      text: "Error de conexión",
-      messageTypeEnum: MessageTypeEnum.error,
-      allowFlow: true,
-    );
+    if (kDebugMode) print('Error: $error');
+    if (mounted) handleError(error: error, context: context);
     _pushFocus(context: context, isDocument: isDocument);
   }
 
@@ -276,9 +272,7 @@ class CustomerBoxState extends State<CustomerBox> {
   }
 
   Future<void> _notFound({required bool viewMessage, required bool isDocument}) async {
-    //_customerFound = null;
     widget.onSelectedChanged(null);
-
     if (viewMessage) {
       await OpenDialog(
         context: context,

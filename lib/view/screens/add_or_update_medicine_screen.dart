@@ -11,7 +11,6 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption,
   defaultLastOption, uriUnitFindAll;
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_medicine.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_presentation.dart';
@@ -691,38 +690,12 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
               messageTypeEnum: MessageTypeEnum.warning
             );
           } else {
-            await OpenDialog(
-                context: context,
-                title: 'Error',
-                content: error.message != null
-                    ? error.message!
-                    : 'Error ${error.statusCode}'
-            ).view();
+            if (mounted) handleError(error: error, context: context);
           }
         }
       } else {
         registered = null;
-        if (error.toString().contains('XMLHttpRequest error')) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException')) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }
+        if (mounted) handleError(error: error, context: context);
       }
     } finally {
       _changeStateLoading(false);
@@ -839,7 +812,7 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
             message: 'La unidad de medida $unitName '
                 'no existe o no se pudo cargar.\n'
                 'Contacte al administrador del sistema.',
-            context: context
+            context: mounted ? context : context
         );
         return Future.value();
       }
@@ -928,13 +901,16 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
       }
 
     }).onError((error, stackTrace) {
-      if (error is ErrorObject){
+      if (error is! ErrorObject || error.statusCode != HttpStatus.notFound) {
+        if (mounted) handleError(error: error, context: context);
+      }
+        /*if (error is ErrorObject){
         if (error.statusCode != HttpStatus.notFound) {
           genericError(error, isFloatingMessage: true, mounted ? context : context);
         }
       } else {
         genericError(error!, mounted ? context : context);
-      }
+      }*/
     });
 
     if (isInitState) {

@@ -12,6 +12,7 @@ import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/add_controlled_medication.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_date_authorization_sale.dart';
@@ -481,7 +482,8 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       } else if (error.message!.contains('El medicamento está eliminado')) {
         await message(context: context, message: error.message!);
       } else if (mounted) {
-        _showMessageConnectionError(context: context);
+        if (mounted) handleError(error: error, context: context);
+        //_showMessageConnectionError(context: context);
       }
     } else {
       genericError(error!, context, isFloatingMessage: true);
@@ -684,6 +686,7 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
   }
 
   void _quantityListener() {
+    if (_voucherItem.currentStock == null) return;
     if (_quantityFocusNode.hasFocus) {
       HardwareKeyboard.instance.addHandler(_handleKeyEvent);
       _quantityController.selection = TextSelection(
@@ -693,7 +696,6 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
     } else {
       HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     }
-
     Future.delayed(const Duration(milliseconds: 100), () async {
       if (!_focusEnabled ||
           _quantityFocusNode.hasFocus ||
@@ -701,7 +703,6 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         _setQuantityValidated(true);
         return;
       }
-
       double? quantity = double.tryParse(_quantityController.text);
       if (_validQuantity(quantity)) {
         quantity = _oppositeQuantity(quantity);
@@ -755,14 +756,14 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
         || widget.movementType != MovementTypeEnum.adjustmentStock && quantity > 0);
   }
 
-  Future<Null> _showMessageConnectionError({required BuildContext context}) async {
+ /* Future<Null> _showMessageConnectionError({required BuildContext context}) async {
     FloatingMessage.show(
       context: context,
       text: "Error de conexión",
       messageTypeEnum: MessageTypeEnum.error,
       allowFlow: true,
     );
-  }
+  }*/
 
  /* void _pushFocus({required BuildContext context, required bool isBarCode}) {
     setState(() {

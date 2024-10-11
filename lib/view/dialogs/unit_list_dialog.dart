@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/unit_dto.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/globals/constants.dart' show uriUnitFindNameLike;
@@ -43,7 +44,7 @@ Future<UnitDTO?> unitListDialog({
       }
     }
     if (msg != null) {
-      genericError(error!, context);
+      handleError(error: error, context: context);
     }
   });
   return Future.value(unitSelected);

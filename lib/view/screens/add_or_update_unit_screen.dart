@@ -9,6 +9,7 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show defaultFirstOption,
   defaultLastOption, uriUnitFindAll;
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/add_or_update_unit.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -151,6 +152,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
                 viewCharactersCount: false,
                 textForValidation: 'Máximo 4 caracteres',
                 acceptEmpty: false,
+                initialFocus: true,
                 onEditingComplete: () async {
                   //Borra el evento del listener para evitar la doble llamada
                   //a _searchContainerName, que se desencadenaría en el listener
@@ -201,7 +203,6 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
       _newNameController.value = TextEditingValue(
           text: unitSelected.name!
       );
-      //_updateUnitSelected(unitSelected.unitName!);
       setState(() {
         _isAdd = false;
       });
@@ -219,10 +220,6 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         FocusScope.of(context).requestFocus(_newNameFocusNode);
-        /*FocusScope.of(context).requestFocus(_isAdd!
-            ? _quantityFocusNode
-            : _newNameFocusNode
-        );*/
       }
     });
   }
@@ -329,17 +326,9 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
       }
 
     } catch (error) {
-      if (error is ErrorObject) {
+      if (mounted) handleError(error: error, context: context);
+      /*if (error is ErrorObject) {
         if (error.message != null) {
-          /*String msg = error.message!;
-          if (error.message!.contains("NO EXISTE UNA UNIDAD DE MEDIDA")) {
-            msg = 'La unidad de medida $_unitSelected fué eliminada por '
-                'otro usuario.\nLa lista ha sido actualizada.';
-            _loadUnits(false);
-            setState(() {
-              _unitSelected = defaultFirstOption;
-            });
-          }*/
           if (mounted) {
             FloatingMessage.show(
               context: context,
@@ -350,7 +339,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
         }
       } else {
         if (mounted) genericError(error, context);
-      }
+      }*/
       _changeStateLoading(false);
       return;
     }
@@ -471,7 +460,7 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
     }).onError((error, stackTrace) {
       if (error is ErrorObject) {
         if (error.statusCode != HttpStatus.notFound && mounted) {
-          genericError(error, context, isFloatingMessage: true);
+          if (mounted) handleError(error: error, context: context);
         }
       }
     });
