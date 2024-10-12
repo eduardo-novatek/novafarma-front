@@ -10,13 +10,11 @@ import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/add_controlled_medication.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_date_authorization_sale.dart';
-import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -150,9 +148,11 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
                                 onEditingComplete: () async {
                                   //Evita la reinvocación de _barCodeOk() desde el listener _barCode una vez que
                                   //el campo pierda el foco
-                                  setState(() {
-                                    _focusEnabled = false;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      _focusEnabled = false;
+                                    });
+                                  }
                                   if (await _barCodeOk()) {
                                     widget.movementType == MovementTypeEnum.purchase
                                         ? _costPriceFocusNode.requestFocus()
@@ -479,14 +479,15 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       if (error.statusCode == HttpStatus.notFound) {
         _initialize(initializeCodeBar: false);
         await message(context: context, message: 'Artículo no encontrado');
-      } else if (error.message!.contains('El medicamento está eliminado')) {
+      } else if (error.message != null
+          && error.message!.contains('El medicamento está eliminado')) {
         await message(context: context, message: error.message!);
       } else if (mounted) {
-        if (mounted) handleError(error: error, context: context);
+        handleError(error: error, context: context);
         //_showMessageConnectionError(context: context);
       }
     } else {
-      genericError(error!, context, isFloatingMessage: true);
+      handleError(error: error, context: context);
     }
     if (kDebugMode) print(error.toString());
   }
@@ -793,16 +794,17 @@ class _VoucherItemDialogState extends State<VoucherItemDialog> {
       _setBarCodeValidated(false);
       return Future.value(false);
     }
-
     if (widget.barCodeList!.contains(_barCodeController.text.trim().toUpperCase())) {
       _setBarCodeValidated(false);
-      await message(context: context, message:'El artículo ya está agregado al comprobante');
+      await message(
+        context: context,
+        message:'El artículo ya está agregado al comprobante'
+      );
       return Future.value(false);
     }
     bool ok = false;
     _medicine = MedicineDTO1.empty();
     _medicine2 = MedicineDTO2.empty();
-
     await fetchMedicineBarCode(
       barCode: _barCodeController.text,
       medicine: _medicine,

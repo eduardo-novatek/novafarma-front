@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
@@ -9,7 +8,6 @@ import 'package:novafarma_front/model/globals/requests/fetch_nursing_report_page
 import 'package:novafarma_front/model/globals/tools/custom_icon_button.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
-import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/customer_dto2.dart';
 import '../../model/enums/message_type_enum.dart';
@@ -299,15 +297,17 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
           messageTypeEnum: MessageTypeEnum.info
         );
       } else {
-        setState(() {
-          (pageObject.content as Map<CustomerDTO2, List<NursingReportDTO>>)
-              .forEach((customer, reports) {
-                _pageObjectMap.content[customer] = reports;
-                for (var report in reports) {
-                  _total += report.quantity! * report.unitPrice!;
-                }
-              });
-        });
+        if (mounted) {
+          setState(() {
+            (pageObject.content as Map<CustomerDTO2, List<NursingReportDTO>>)
+                .forEach((customer, reports) {
+              _pageObjectMap.content[customer] = reports;
+              for (var report in reports) {
+                _total += report.quantity! * report.unitPrice!;
+              }
+            });
+          });
+        }
       }
       _updatePageObjectMap(pageObject);
 
@@ -318,9 +318,11 @@ class _NursingReportScreenState extends State<NursingReportScreen> {
   }
 
   void _setLoading(bool loading) {
-    setState(() {
-      _loading = loading;
-    });
+    if (mounted) {
+      setState(() {
+        _loading = loading;
+      });
+    }
   }
 
   Widget _buildReportRow(int index) {

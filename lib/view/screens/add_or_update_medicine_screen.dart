@@ -287,9 +287,11 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
     ).then((medicine) {
       _changeStateLoading(false);
       if (medicine != null) _updatePresentationFields(medicine);
-      FocusScope.of(context).requestFocus(_presentationContainerFocusNode);
+      if (mounted) {
+        FocusScope.of(context).requestFocus(_presentationContainerFocusNode);
+      }
     }).onError((error, stackTrace) {
-      if (kDebugMode) print(error);
+      if (mounted) handleError(error: error, context: context);
     });
   }
 
@@ -306,7 +308,9 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
           text: containerSelected
       );
     }
-    FocusScope.of(context).requestFocus(_presentationQuantityFocusNode);
+    if (mounted) {
+      FocusScope.of(context).requestFocus(_presentationQuantityFocusNode);
+    }
   }
 
   Widget _buildFormPresentation() {
@@ -676,16 +680,16 @@ class _AddOrUpdateMedicineScreen extends State<AddOrUpdateMedicineScreen> {
           );
         }
       }
-
     } catch (error) {
       if (error is ErrorObject) {
         if (error.statusCode == HttpStatus.notFound) {
           registered = false;
         } else {
           registered = null;
-          if (error.message!.contains('El medicamento está eliminado')) {
+          if (error.message != null &&
+              error.message!.contains('El medicamento está eliminado')) {
             FloatingMessage.show(
-              context: context,
+              context: mounted ? context : context,
               text: error.message!,
               messageTypeEnum: MessageTypeEnum.warning
             );

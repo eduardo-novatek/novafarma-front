@@ -1,19 +1,18 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/tools/custom_icon_button.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
 import '../../model/DTOs/medicine_dto1.dart';
 import '../../model/DTOs/presentation_dto.dart';
 import '../../model/DTOs/stock_movement_dto.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/constants.dart' show host, port, sizePageMedicineList, uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage, uriMedicineFindStockMovements;
+import '../../model/globals/constants.dart' show host, port, sizePageMedicineList,
+uriMedicineDelete, uriMedicineFindAll, uriMedicineFindNamePage,
+uriMedicineFindStockMovements;
 import '../../model/globals/handleError.dart';
 import '../../model/globals/pdf_generate_medicine_list.dart';
 import '../../model/globals/tools/date_time.dart' show dateToStr;
@@ -564,6 +563,8 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
   }
 
   Future<bool> _areMovements(MedicineDTO1 medicine) async {
+    bool ret = false;
+
     final uri = Uri(
       scheme: 'http',
       host: host,
@@ -580,12 +581,11 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
       isRequestParam: true,
       classObject: StockMovementDTO.empty(),
     ).then((pageObjectResult) {
-      return pageObjectResult.totalElements > 0;
+      ret = pageObjectResult.totalElements > 0;
     }).onError((error, stackTrace) {
       if (mounted) handleError(error: error, context: context);
-      return false;
     });
-    return false;
+    return ret;
   }
 
 }

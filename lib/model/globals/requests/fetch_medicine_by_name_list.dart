@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
 import '../../DTOs/medicine_dto2.dart';
@@ -42,21 +43,6 @@ Future<void> fetchMedicineByNameList({
     pageObject.last = page.last;
 
   }).onError((error, stackTrace) {
-    String? msg;
-    if (error is ErrorObject) {
-      msg = error.message;
-    } else {
-      msg = error.toString().contains('XMLHttpRequest error')
-          ? 'Error de conexión'
-          : error.toString();
-    }
-    if (msg != null) {
-      FloatingMessage.show(
-        context: context,
-        text: msg,
-        messageTypeEnum: MessageTypeEnum.error,
-      );
-      if (kDebugMode) print(error);
-    }
+    handleError(error: error, context: context);
   });
 }

@@ -13,29 +13,36 @@ void handleError({required Object? error, required BuildContext context}) {
     if (error.statusCode == HttpStatus.notFound) {
       FloatingMessage.show(
         context: context,
-        text: 'No encontrado',
-        messageTypeEnum: MessageTypeEnum.warning,
+        text: 'Sin datos',
+        messageTypeEnum: MessageTypeEnum.info,
       );
     } else {
-      FloatingMessage.show(
-        context: context,
-        text: error.message ?? 'Error ${error.statusCode}',
-        messageTypeEnum: _getMessageType(error),
-      );
+      if (error.statusCode != HttpStatus.forbidden) {
+        FloatingMessage.show(
+          context: context,
+          text: error.message ?? 'Error ${error.statusCode}',
+          messageTypeEnum: _getMessageType(error),
+        );
+      } else {
+        FloatingMessage.show(
+          context: context,
+          text: error.message ?? 'Sesión expirada. Vuelva a iniciar sesión',
+          messageTypeEnum: _getMessageType(error),
+        );
+      }
     }
-    if (kDebugMode) {
-      print(error.message ?? 'Error ${error.statusCode}');
-    }
+    if (kDebugMode) print('ErrorObject: ${error.message ?? error.statusCode}');
+
   } else {
     genericError(error!, context, isFloatingMessage: true);
-    if (kDebugMode) {
-      print('Error: ${error.toString()}');
-    }
+    if (kDebugMode) print('genericError: ${error.toString()}');
   }
 }
 
 MessageTypeEnum _getMessageType(ErrorObject error) {
-  return error.message != null && ! error.message!.contains('Sesión expirada')
+  return error.message != null
+      && ! error.message!.contains('Sesión expirada')
+      && error.statusCode != HttpStatus.forbidden
         ? MessageTypeEnum.warning
         : MessageTypeEnum.error;
 }

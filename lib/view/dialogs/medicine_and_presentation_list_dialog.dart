@@ -65,7 +65,7 @@ class _MedicineDialogState extends State<_MedicineDialog> {
 
   @override
   void dispose() {
-    // RRemueve el listener cuando el diálogo se cierra
+    // Remueve el listener cuando el diálogo se cierra
     HardwareKeyboard.instance.removeHandler(_handleKeyPress);
     super.dispose();
   }

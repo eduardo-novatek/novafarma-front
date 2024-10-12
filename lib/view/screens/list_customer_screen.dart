@@ -301,27 +301,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         });
       }
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: '${error.message ?? 'Error indeterminado'} (${error.statusCode})',
-          messageTypeEnum: error.message != null
-              ? MessageTypeEnum.warning
-              : MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-        }
-      } else {
-        FloatingMessage.show(
-          context: context,
-          text: 'Error obteniendo datos',
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) {
-          print('Error obteniendo datos: ${error.toString()}');
-        }
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _toggleLoading();
   }
@@ -510,22 +490,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
        );
      }
     }).onError((error, stackTrace) {
-      String? msg;
-      if (error is ErrorObject) {
-          msg = error.message;
-      } else {
-        msg = error.toString().contains('XMLHttpRequest error')
-          ? 'Error de conexión'
-          : error.toString();
-      }
-      if (msg != null) {
-        FloatingMessage.show(
-          context: mounted ? context : context,
-          text: msg,
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) print(error);
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _toggleLoading();
   }
@@ -549,29 +514,7 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
       );
     }).onError((error, stackTrace) {
       _toggleLoading();
-      String? msg;
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
-          FloatingMessage.show(
-            context: mounted ? context : context,
-            text: 'Sin datos',
-            messageTypeEnum: MessageTypeEnum.info,
-          );
-        } else {
-          msg = error.message;
-        }
-
-      } else {
-        if (mounted) genericError(error!, context, isFloatingMessage: true);
-      }
-      if (msg != null) {
-        FloatingMessage.show(
-          context: mounted ? context : context,
-          text: msg,
-          messageTypeEnum: MessageTypeEnum.error,
-        );
-        if (kDebugMode) print(error);
-      }
+      if (mounted) handleError(error: error, context: context);
     });
   }
 

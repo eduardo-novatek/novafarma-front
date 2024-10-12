@@ -38,15 +38,9 @@ Future<PresentationDTO?> presentationContainerListDialog({
       }
     );
   }).onError((error, stackTrace) {
-    String? msg = error.toString();
-    if (error is ErrorObject) {
-      if (error.statusCode == HttpStatus.notFound) {
-        msg = null;
-      } else {
-        msg = error.message;
-      }
-    }
-    if (msg != null) {
+    if (error is ErrorObject
+        && error.statusCode != HttpStatus.notFound
+        || error is! ErrorObject) {
       handleError(error: error, context: context);
     }
   });

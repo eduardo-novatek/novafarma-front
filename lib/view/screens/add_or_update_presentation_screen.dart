@@ -411,8 +411,9 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
       }
 
     } catch (error) {
-      if (error is ErrorObject && ! error.message!.contains('Sesión expirada')) {
-        if (error.message != null) {
+      if (error is ErrorObject
+          && error.message != null
+          && ! error.message!.contains('Sesión expirada')) {
           String msg = error.message!;
           if (error.message!.contains("NO EXISTE UNA UNIDAD DE MEDIDA")) {
             msg = 'La unidad de medida $_unitSelected fué eliminada por '
@@ -429,7 +430,6 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdatePresentationScreen
               messageTypeEnum: MessageTypeEnum.warning,
             );
           }
-        }
       } else {
         if (mounted) handleError(error: error, context: context);
       }

@@ -400,8 +400,6 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
 
   Future<void> _delete(int index) async {
     PresentationDTO presentationSelected = _pageObject.content[index];
-    //bool isDelete = ! _pageObject.content[index].deleted!;
-
     int option = await OpenDialog(
       context: context,
       title: 'Eliminar presentación',
@@ -436,23 +434,7 @@ class _ListPresentationScreenState extends State<ListPresentationScreen> {
           );
         }
       } catch (error) {
-        if (error is ErrorObject) {
-          if (mounted) {
-          FloatingMessage.show(
-            context: context,
-            text: error.message ?? 'Error indeterminado',
-            messageTypeEnum: error.message != null
-                ? MessageTypeEnum.warning
-                : MessageTypeEnum.error,
-            secondsDelay: 8,
-          );
-        }
-          if (kDebugMode) {
-            print('${error.message ?? 'Error indeterminado'} (${error.statusCode})');
-          }
-        } else if (mounted) {
-            genericError(error, context);
-        }
+          if (mounted) handleError(error: error, context: context);
       } finally {
         _setLoading(false);
       }
