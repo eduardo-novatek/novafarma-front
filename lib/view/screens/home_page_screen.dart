@@ -15,10 +15,40 @@ class _HomePageScreenState extends State<HomePageScreen> {
   static const Widget msgHomeScreen = Text('Bienvenido a NovaFarma');
 
   final GlobalKey _menuButtonKey = GlobalKey();
+  final GlobalKey _userIconKey = GlobalKey(); // GlobalKey para el icono de usuario
+
   bool _enableMenu = true;
   Widget _currentWidget = msgHomeScreen;
 
   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        leading: IconButton(
+          key: _menuButtonKey,
+          onPressed: () => _enableMenu ? _openMenu(context) : null,
+          icon: const Icon(Icons.menu),
+          color: _enableMenu ? Colors.black : Colors.grey,
+          tooltip: 'Menu',
+        ),
+        actions: [
+          // Icono de usuario que abre el modal al hacer clic
+          IconButton(
+            key: _userIconKey, // Asigna la GlobalKey aquí
+            icon: const Icon(Icons.account_circle, size: 30),
+            onPressed: () {
+              _showUserMenu(context); // Mostrar menú al presionar el icono
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: _currentWidget,
+      ),
+    );
+  }
+  /*@override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -36,6 +66,8 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ),
     );
   }
+
+   */
 
   void _openMenu(BuildContext context) {
     const RelativeRect position = RelativeRect.fromLTRB(
@@ -583,4 +615,99 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
   bool _isSuperAdmin() =>
       userLogged?.userId == 0 && userLogged?.role!.name! == 'Super Administrador';
+
+  void _logout() {
+
+  }
+
+  void _updateProfile() {
+
+  }
+
+  void _showUserMenu(BuildContext context) {
+    // Asegurarse de que el widget esté completamente construido antes de obtener la posición
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Obtener el RenderBox del icono de usuario utilizando la GlobalKey
+      final RenderBox button =
+        _userIconKey.currentContext!.findRenderObject() as RenderBox;
+      final Offset buttonPosition = button.localToGlobal(Offset.zero); // Obtener la posición global del icono de usuario
+      final RelativeRect position = RelativeRect.fromLTRB(
+        buttonPosition.dx,  // Posición X (alineado al ícono)
+        kToolbarHeight,
+        buttonPosition.dx + button.size.width,
+        0,
+      );
+
+      // Mostrar el menú
+      showMenu(
+        context: context,
+        position: position,
+        items: [
+          PopupMenuItem(
+            enabled: false, // No seleccionable, solo para mostrar el contenido personalizado
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              width: 250, // Ancho del menú
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Icono de usuario grande centrado
+                  const CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage('assets/user_icon.png'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Nombre del usuario con ícono de editar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${userLogged!.name} ${userLogged!.lastname}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.edit, size: 18),
+                        onPressed: () {
+                          Navigator.pop(context); // Cerrar el menú
+                          _updateProfile();
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Botón de Cerrar Sesión estilizado
+                  SizedBox(
+                    width: double.infinity, // Botón que ocupe todo el ancho
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context); // Cerrar el menú
+                        _logout();
+                      },
+                      icon: Icon(Icons.logout),
+                      label: Text('Cerrar sesión'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        textStyle: const TextStyle(fontSize: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+
+
 }
