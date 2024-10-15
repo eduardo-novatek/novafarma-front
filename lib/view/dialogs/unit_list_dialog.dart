@@ -123,7 +123,7 @@ class _UnitNamesDialogState extends State<_UnitNamesDialog> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20.0),
           child: ElevatedButton(
-            onPressed: () =>Navigator.of(context).pop(null),
+            onPressed: () => Navigator.of(context).pop(null),
             child: const Text('Cancelar'),
           ),
         )

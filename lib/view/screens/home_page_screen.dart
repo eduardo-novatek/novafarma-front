@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/DTOs/empty_dto.dart';
+import 'package:novafarma_front/model/DTOs/user_dto_3.dart';
+import 'package:novafarma_front/model/enums/message_type_enum.dart';
+import 'package:novafarma_front/model/enums/request_type_enum.dart';
+import 'package:novafarma_front/model/globals/constants.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
+import 'package:novafarma_front/model/globals/requests/logout.dart';
+import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
+import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/view/screens.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -616,9 +625,33 @@ class _HomePageScreenState extends State<HomePageScreen> {
   bool _isSuperAdmin() =>
       userLogged?.userId == 0 && userLogged?.role!.name! == 'Super Administrador';
 
-  void _logout() {
+  /*
+  Future<void> _logout() async {
+    await fetchDataObject<EmptyDTO> (
+      uri: '$uriUserLogout/${userLogged!.userName}',
+      classObject: EmptyDTO.empty(),
+      requestType: RequestTypeEnum.delete,
+    ).then((onValue) {
+      userLogged = UserDTO3.empty();
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+        //Muestra el mensaje de éxito que envía el server
+        FloatingMessage.show(
+          context: context,
+          text: onValue[0] as String,
+          messageTypeEnum: MessageTypeEnum.info
+        );
+      }
 
+    }).onError((error, stackTrace) {
+      if (mounted) handleError(error: error, context: context);
+    });
   }
+
+   */
 
   void _updateProfile() {
 
@@ -638,7 +671,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         0,
       );
 
-      // Mostrar el menú
       showMenu(
         context: context,
         position: position,
@@ -651,11 +683,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Icono de usuario grande centrado
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage('assets/user_icon.png'),
-                  ),
+                  Icon(Icons.person, size: 80,),
                   const SizedBox(height: 10),
 
                   // Nombre del usuario con ícono de editar
@@ -680,13 +708,11 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Botón de Cerrar Sesión estilizado
                   SizedBox(
-                    width: double.infinity, // Botón que ocupe todo el ancho
+                    width: double.infinity, // Botón que ocupe tod@ el ancho
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context); // Cerrar el menú
-                        _logout();
+                      onPressed: () async {
+                        if (await logout(context)) Navigator.pop(context);
                       },
                       icon: Icon(Icons.logout),
                       label: Text('Cerrar sesión'),

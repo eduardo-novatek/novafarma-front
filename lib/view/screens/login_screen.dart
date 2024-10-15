@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/role_dto4.dart';
-import 'package:novafarma_front/model/DTOs/user_dto.dart';
 import 'package:novafarma_front/model/DTOs/user_jwt_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
