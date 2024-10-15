@@ -712,7 +712,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     width: double.infinity, // Botón que ocupe tod@ el ancho
                     child: ElevatedButton.icon(
                       onPressed: () async {
-                        if (await logout(context)) Navigator.pop(context);
+                        if (await logout(context)) {
+                          Navigator.pushReplacement(
+                            mounted ? context : context,
+                            MaterialPageRoute(builder: (context) =>
+                              const LoginScreen())
+                          );
+                        }
                       },
                       icon: Icon(Icons.logout),
                       label: Text('Cerrar sesión'),

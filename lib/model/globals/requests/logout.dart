@@ -9,15 +9,16 @@ import 'package:novafarma_front/model/globals/publics.dart';
 import '../tools/fetch_data_object.dart';
 
 Future<bool> logout(BuildContext context) async {
+  bool ok = false;
   await fetchDataObject<EmptyDTO>(
     uri: '$uriUserLogout/${userLogged!.userName}',
     classObject: EmptyDTO.empty(),
     requestType: RequestTypeEnum.delete
   ).then((onValue) {
     if (kDebugMode) print('Sesión cerrada con éxito por usuario ${userLogged!.userName}');
-    return true;
+    ok = true;
   }).onError((error, stackTrace) {
     handleError(error: error, context: context);
   });
-  return false;
+  return ok;
 }
