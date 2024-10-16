@@ -13,7 +13,7 @@ Future<bool> logout(BuildContext context) async {
   await fetchDataObject<EmptyDTO>(
     uri: '$uriUserLogout/${userLogged!.userName}',
     classObject: EmptyDTO.empty(),
-    requestType: RequestTypeEnum.delete
+    requestType: RequestTypeEnum.post
   ).then((onValue) {
     if (kDebugMode) print('Sesión cerrada con éxito por usuario ${userLogged!.userName}');
     ok = true;
