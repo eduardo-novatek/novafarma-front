@@ -8,6 +8,7 @@ import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/globals/requests/logout.dart';
 import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
@@ -200,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else if (mounted) {
-        genericError(error!, isFloatingMessage: true, context);
+        if (mounted) handleError(error: error, context: context);
       }
     });
   }

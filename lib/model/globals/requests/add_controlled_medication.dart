@@ -5,6 +5,7 @@ import 'dart:html';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/capitalize_first_letter.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 
@@ -58,7 +59,7 @@ Future<bool> addControlledMedication({
       );
 
     } else {
-      genericError(error!, context, isFloatingMessage: true);
+      handleError(error: error, context: context);
       msg = error.toString();
     }
     if (kDebugMode) print(msg);

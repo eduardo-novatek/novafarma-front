@@ -8,6 +8,7 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show
   uriSupplierFindName;
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -367,7 +368,7 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
           uri: '$uriSupplierFindName/${_nameController.text.trim()}'
       );
       await showDialog(
-        context: context,
+        context: mounted ? context : context,
         builder: (BuildContext context) {
           return SupplierSelectionDialog(
             suppliers: supplierList,
@@ -387,42 +388,11 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateSupplierScreen> {
         }
       );
     } catch (error) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
+      registered = null;
+      if (error is ErrorObject && error.statusCode == HttpStatus.notFound) {
           registered = false;
-        } else {
-          registered = null;
-          await OpenDialog(
-              context: context,
-              title: 'Error',
-              content: error.message != null
-                  ? error.message!
-                  : 'Error ${error.statusCode}'
-          ).view();
-        }
       } else {
-        registered = null;
-        if (error.toString().contains('XMLHttpRequest error')) {
-          await OpenDialog(
-            context: context,
-            title: 'Error de conexión',
-            content: 'No es posible conectar con el servidor',
-          ).view();
-        } else {
-          if (error.toString().contains('TimeoutException')) {
-            await OpenDialog(
-              context: context,
-              title: 'Error de conexión',
-              content: 'No es posible conectar con el servidor.\nTiempo expirado.',
-            ).view();
-          } else {
-            await OpenDialog(
-              context: context,
-              title: 'Error desconocido',
-              content: error.toString(),
-            ).view();
-          }
-        }
+        if (mounted) handleError(error: error, context: context);
       }
     } finally {
       _changeStateLoading(false);

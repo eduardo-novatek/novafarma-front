@@ -14,6 +14,7 @@ import 'package:novafarma_front/model/globals/constants.dart' show
 import 'package:novafarma_front/model/globals/find_dependent_by_document_novadaily.dart';
 import 'package:novafarma_front/model/globals/find_partner_by_document_novadaily.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
@@ -443,12 +444,14 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
     bool? registered;
     PartnerNovaDailyDTO? partner;
     DependentNovaDailyDTO? dependent;
+
     if (_documentController.text.trim().isEmpty) {
       return Future.value(false);
     }
     if (! _formDocumentKey.currentState!.validate()) {
       return Future.value(false);
     }
+
     registered = await _registeredDocumentNovaFarma();
     if (registered != null) {
       _isAdd = ! registered;
@@ -538,20 +541,10 @@ class _AddOrUpdateCustomerScreen extends State<AddOrUpdateCustomerScreen> {
       registered = true;
 
     } catch (error) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
+      if (error is ErrorObject && error.statusCode == HttpStatus.notFound) {
           registered = false;
-        } else {
-          await OpenDialog(
-              context: mounted ? context : context,
-              title: 'Error',
-              content: error.message != null
-                  ? error.message!
-                  : 'Error ${error.statusCode}'
-          ).view();
-        }
       } else {
-        genericError(error, mounted ? context : context);
+        if (mounted) handleError(error: error, context: context);
       }
     } finally {
       _changeStateLoading(false);

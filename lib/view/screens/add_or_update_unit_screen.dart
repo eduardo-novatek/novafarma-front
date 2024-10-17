@@ -327,19 +327,6 @@ class _AddOrUpdatePresentationScreen extends State<AddOrUpdateUnitScreen> {
 
     } catch (error) {
       if (mounted) handleError(error: error, context: context);
-      /*if (error is ErrorObject) {
-        if (error.message != null) {
-          if (mounted) {
-            FloatingMessage.show(
-              context: context,
-              text: error.message!,
-              messageTypeEnum: MessageTypeEnum.warning,
-            );
-          }
-        }
-      } else {
-        if (mounted) genericError(error, context);
-      }*/
       _changeStateLoading(false);
       return;
     }

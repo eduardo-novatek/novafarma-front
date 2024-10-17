@@ -5,6 +5,7 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
@@ -210,7 +211,7 @@ class _UserEditDialogState extends State<UserEditDialog> {
         return false;
       }
     } catch (e) {
-      genericError(e, isFloatingMessage: true, context);
+      if (mounted) handleError(error: e, context: context);
       return false;
     }
     return true;  // Validacion correcta

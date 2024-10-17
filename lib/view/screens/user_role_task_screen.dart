@@ -15,6 +15,7 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/constants.dart' show uriRoleAdd, uriRoleAddTasks, uriRoleDelete, uriRoleDeleteTasks, uriRoleFindAll, uriRoleUpdate, uriTaskFindAll, uriUserActivate, uriUserAdd, uriUserChangeCredentials, uriUserDelete, uriUserFindAll, uriUserUpdate;
@@ -286,15 +287,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
     ).then((value) {
       _loadRoles();
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-          context: context,
-          text: error.message!,
-          messageTypeEnum: MessageTypeEnum.warning
-        );
-      } else {
-        genericError(error!, context, isFloatingMessage: true);
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(isUsers: false, loading: false);
   }
@@ -385,20 +378,12 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       if (data.isNotEmpty) _roleList.addAll(data.cast<RoleDTO>());
       setState(() {});
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        if (error.statusCode == HttpStatus.notFound) {
+      if (error is ErrorObject && error.statusCode == HttpStatus.notFound) {
           _roleList.clear();
           _setLoading(isUsers: false, loading: false);
           return;
         }
-        FloatingMessage.show(
-            context: context,
-            text: error.message ?? 'Error ${error.statusCode}',
-            messageTypeEnum: MessageTypeEnum.error
-        );
-      } else {
-        genericError(error!, context, isFloatingMessage: true);
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(isUsers: false, loading: false);
   }
@@ -413,15 +398,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       _taskList.clear();
       if (data.isNotEmpty) _taskList.addAll(data.cast<TaskDTO>());
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-            context: context,
-            text: error.message ?? 'Error ${error.statusCode}',
-            messageTypeEnum: MessageTypeEnum.error
-        );
-      } else {
-        genericError(error!, context, isFloatingMessage: true);
-      }
+        if (mounted) handleError(error: error, context: context);
     });
     _setLoading(isUsers: false, loading: false);
   }
@@ -437,15 +414,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       if (data.isNotEmpty) _userList.addAll(data.cast<UserDTO>());
       setState(() {});
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-            context: context,
-            text: error.message ?? 'Error ${error.statusCode}',
-            messageTypeEnum: MessageTypeEnum.error
-        );
-      } else {
-        genericError(error!, context, isFloatingMessage: true);
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(isUsers: true, loading: false);
   }
@@ -598,7 +567,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
           messageTypeEnum: MessageTypeEnum.info
       );
     }).catchError((error) {
-      genericError(error, context, isFloatingMessage: true);
+      if (mounted) handleError(error: error, context: context);
     });
   }
 
@@ -615,7 +584,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
           messageTypeEnum: MessageTypeEnum.info
       );
     }).catchError((error) {
-      genericError(error, context, isFloatingMessage: true);
+      if (mounted) handleError(error: error, context: context);
     });
   }
 
@@ -635,7 +604,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       );
     }).catchError((error) {
       ok = false;
-      genericError(error, context, isFloatingMessage: true);
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(isUsers: false, loading: false);
     return Future.value(ok);
@@ -674,15 +643,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
       });
     } catch(e) {
-      if (e is ErrorObject) {
-        FloatingMessage.show(
-            context: context,
-            text: e.message!,
-            messageTypeEnum: MessageTypeEnum.warning
-        );
-      } else {
-        genericError(e, context, isFloatingMessage: true);
-      }
+      if (mounted) handleError(error: e, context: context);
       ok = false;
     }
     return Future.value(ok);
@@ -707,15 +668,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
       });
     } catch(e) {
-      if (e is ErrorObject) {
-        FloatingMessage.show(
-            context: context,
-            text: e.message!,
-            messageTypeEnum: MessageTypeEnum.warning
-        );
-      } else {
-        genericError(e, context, isFloatingMessage: true);
-      }
+      if (mounted) handleError(error: e, context: context);
       ok = false;
     }
     return Future.value(ok);
@@ -788,16 +741,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
         _loadUsers();
       }).onError((error, stackTrace) {
-        if (error is ErrorObject) {
-          FloatingMessage.show(
-              context: context,
-              text: error.message!,
-              messageTypeEnum: MessageTypeEnum.warning,
-              secondsDelay: 8
-          );
-        } else {
-          genericError(error!, context, isFloatingMessage: true);
-        }
+        if (mounted) handleError(error: error, context: context);
       });
       _setLoading(isUsers: true, loading: false);
     }
@@ -827,10 +771,14 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
         _loadUsers();
       }).onError((error, stackTrace) {
-        if (error is ErrorObject) {
+        if (error is ErrorObject && error.statusCode != HttpStatus.forbidden) {
           String msg = 'El usuario está siendo utilizado.\n'
               'No es posible eliminarlo.';
-          if (! error.message!.contains('Cannot delete'))  {
+          if (error.message == null ) {
+            if (mounted) handleError(error: error, context: context);
+            _setLoading(isUsers: true, loading: false);
+            return;
+          } else if (! error.message!.contains('Cannot delete'))  {
             msg = error.message!;
           }
           FloatingMessage.show(
@@ -840,7 +788,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
               secondsDelay: 8
           );
         } else {
-          genericError(error!, context, isFloatingMessage: true);
+          if (mounted) handleError(error: error, context: context);
         }
       });
       _setLoading(isUsers: true, loading: false);
@@ -869,21 +817,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
         );
         _loadRoles();
       }).onError((error, stackTrace) {
-        if (error is ErrorObject) {
-          String msg = 'El rol está siendo utilizado.\n'
-              'No es posible eliminarlo.';
-          if (! error.message!.contains('Cannot delete'))  {
-            msg = error.message!;
-          }
-          FloatingMessage.show(
-              context: context,
-              text: msg,
-              messageTypeEnum: MessageTypeEnum.info,
-              secondsDelay: 8
-          );
-        } else {
-          genericError(error!, context, isFloatingMessage: true);
-        }
+          if (mounted) handleError(error: error, context: context);
       });
       _setLoading(isUsers: false, loading: false);
     }
@@ -984,16 +918,7 @@ class UserRoleTaskScreenState extends State<UserRoleTaskScreen> {
       );
       _loadUsers();
     }).onError((error, stackTrace) {
-      if (error is ErrorObject) {
-        FloatingMessage.show(
-            context: context,
-            text: error.message!,
-            messageTypeEnum: MessageTypeEnum.warning,
-            secondsDelay: 8
-        );
-      } else {
-        genericError(error!, context, isFloatingMessage: true);
-      }
+      if (mounted) handleError(error: error, context: context);
     });
     _setLoading(isUsers: true, loading: false);
   }
