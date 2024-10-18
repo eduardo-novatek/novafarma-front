@@ -170,7 +170,8 @@ class _LoginScreenState extends State<LoginScreen> {
           context: mounted ? context : context,
           text: 'Su rol \'${userJwt.role?.name}\' no tiene tareas asignadas. '
               'Comuníquese con el administrador del software.',
-          messageTypeEnum: MessageTypeEnum.warning
+          messageTypeEnum: MessageTypeEnum.warning,
+          secondsDelay: 8
         );
         _passwordController.value = TextEditingValue.empty;
         logout(mounted ? context : context);
@@ -208,14 +209,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Actualiza el usuario logueado
   void _updateUserLogged(UserJwtDTO userJwt) {
-     userLogged!.userId = userJwt.userId;
+    userLogged!.userId = userJwt.userId;
     userLogged!.name = userJwt.name;
     userLogged!.lastname = userJwt.lastname;
     userLogged!.userName = _userNameController.text;
     userLogged!.role = RoleDTO4(
       roleId: userJwt.role!.roleId,
       name: userJwt.role!.name,
-      taskList: userJwt.role?.taskList!
+      taskList: userJwt.role?.taskList
     );
     userLogged!.token = userJwt.jwt!;
   }

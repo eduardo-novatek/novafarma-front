@@ -1,12 +1,10 @@
-import 'dart:html';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/enums/task_enum.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
+import 'package:novafarma_front/model/globals/taskEnabled.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/controlled_medication_list_from_customer_dialog.dart';
 
 import '../../model/DTOs/controlled_medication_dto1.dart';
@@ -395,36 +393,39 @@ class _ListCustomerScreenState extends State<ListCustomerScreen> {
         onSelected: (menuItem) => _onSelected(context, menuItem, index),
         tooltip: 'Menú',
         itemBuilder: (context) => [
-          const PopupMenuItem<int>(
-            value: 0,
-            child: Row(
-              children: [
-                Icon(Icons.medical_information, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Medicamentos controlados')
-              ],
+          if (taskEnabled(TaskEnum.controlledMedicinesSee))
+            const PopupMenuItem<int>(
+              value: 0,
+              child: Row(
+                children: [
+                  Icon(Icons.medical_information, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('Medicamentos controlados')
+                ],
+              ),
             ),
-          ),
-          const PopupMenuItem<int>(
-            value: 1,
-            child: Row(
-              children: [
-                Icon(Icons.assignment_outlined, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Comprobantes emitidos')
-              ],
+          if (taskEnabled(TaskEnum.vouchersIssuedSee))
+            const PopupMenuItem<int>(
+              value: 1,
+              child: Row(
+                children: [
+                  Icon(Icons.assignment_outlined, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('Comprobantes emitidos')
+                ],
+              ),
             ),
-          ),
-          const PopupMenuItem<int>(
-            value: 2,
-            child: Row(
-              children: [
-                Icon(Icons.delete, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Eliminar')
-              ],
+          if (taskEnabled(TaskEnum.deleteCustomer))
+            const PopupMenuItem<int>(
+              value: 2,
+              child: Row(
+                children: [
+                  Icon(Icons.delete, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('Eliminar')
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

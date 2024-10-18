@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:novafarma_front/model/DTOs/empty_dto.dart';
-import 'package:novafarma_front/model/DTOs/user_dto_3.dart';
-import 'package:novafarma_front/model/enums/message_type_enum.dart';
-import 'package:novafarma_front/model/enums/request_type_enum.dart';
-import 'package:novafarma_front/model/globals/constants.dart';
-import 'package:novafarma_front/model/globals/handleError.dart';
+import 'package:novafarma_front/model/enums/task_enum.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/globals/requests/logout.dart';
-import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
-import 'package:novafarma_front/model/globals/tools/floating_message.dart';
+import 'package:novafarma_front/model/globals/taskEnabled.dart';
 import 'package:novafarma_front/view/screens.dart';
 
 class HomePageScreen extends StatefulWidget {
@@ -184,13 +178,14 @@ class _HomePageScreenState extends State<HomePageScreen> {
       position: subMenuPosition,
       elevation: 8.0,
       items: [
-        const PopupMenuItem<String>(
-          value: 'vouchers_emit',
-          child: ListTile(
-            leading: Icon(Icons.assignment_outlined),
-            title: Text('Emitir'),
+        if (taskEnabled(TaskEnum.voucherEmit))
+          const PopupMenuItem<String>(
+            value: 'vouchers_emit',
+            child: ListTile(
+              leading: Icon(Icons.assignment_outlined),
+              title: Text('Emitir'),
+            ),
           ),
-        ),
       ],
     ).then((String? result) {
       if (result != null) {
@@ -215,20 +210,22 @@ class _HomePageScreenState extends State<HomePageScreen> {
       position: subMenuPosition,
       elevation: 8.0,
       items: [
-        const PopupMenuItem<String>(
-          value: 'customers_add_update',
-          child: ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Agregar o actualizar clientes'),
+        if (taskEnabled(TaskEnum.customerAddUpdate))
+          const PopupMenuItem<String>(
+            value: 'customers_add_update',
+            child: ListTile(
+              leading: Icon(Icons.add),
+              title: Text('Agregar o actualizar clientes'),
+            ),
           ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'customers_list',
-          child: ListTile(
-            leading: Icon(Icons.list),
-            title: Text('Listar clientes'),
+        if (taskEnabled(TaskEnum.customerList))
+          const PopupMenuItem<String>(
+            value: 'customers_list',
+            child: ListTile(
+              leading: Icon(Icons.list),
+              title: Text('Listar clientes'),
+            ),
           ),
-        ),
       ],
     ).then((String? result) async {
       if (result != null) {
@@ -253,20 +250,22 @@ class _HomePageScreenState extends State<HomePageScreen> {
       position: subMenuPosition,
       elevation: 8.0,
       items: [
-        const PopupMenuItem<String>(
-          value: 'suppliers_add_update',
-          child: ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Agregar o actualizar proveedores'),
+        if (taskEnabled(TaskEnum.supplierAddUpdate))
+          const PopupMenuItem<String>(
+            value: 'suppliers_add_update',
+            child: ListTile(
+              leading: Icon(Icons.add),
+              title: Text('Agregar o actualizar proveedores'),
+            ),
           ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'supplier_list',
-          child: ListTile(
-            leading: Icon(Icons.list),
-            title: Text('Listar proveedores'),
+        if (taskEnabled(TaskEnum.supplierList))
+          const PopupMenuItem<String>(
+            value: 'supplier_list',
+            child: ListTile(
+              leading: Icon(Icons.list),
+              title: Text('Listar proveedores'),
+            ),
           ),
-        ),
       ],
     ).then((String? result) async {
       if (result != null) {
@@ -336,28 +335,31 @@ class _HomePageScreenState extends State<HomePageScreen> {
       position: subMenuPosition,
       elevation: 8.0,
       items: [
-        const PopupMenuItem<String>(
-          value: 'medicines_add_update',
-          child: ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Agregar o actualizar medicamentos'),
-            hoverColor: Colors.transparent,
+        if (taskEnabled(TaskEnum.medicineAddUpdate))
+          const PopupMenuItem<String>(
+            value: 'medicines_add_update',
+            child: ListTile(
+              leading: Icon(Icons.add),
+              title: Text('Agregar o actualizar medicamentos'),
+              hoverColor: Colors.transparent,
+            ),
           ),
-        ),
-        const PopupMenuItem<String>(
+        if (taskEnabled(TaskEnum.medicineList))
+          const PopupMenuItem<String>(
           value: 'medicine_list',
           child: ListTile(
             leading: Icon(Icons.list),
             title: Text('Listar medicamentos'),
           ),
         ),
-        const PopupMenuItem<String>(
-          value: 'medicine_nursing_report',
-          child: ListTile(
-            leading: Icon(Icons.table_rows),
-            title: Text('Informe de enfermería'),
+        if (taskEnabled(TaskEnum.nursingReport))
+          const PopupMenuItem<String>(
+            value: 'medicine_nursing_report',
+            child: ListTile(
+              leading: Icon(Icons.table_rows),
+              title: Text('Informe de enfermería'),
+            ),
           ),
-        ),
       ],
     ).then((String? result) async {
       if (result != null) {
@@ -384,21 +386,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
       position: subMenuPosition,
       elevation: 8.0,
       items: [
-        const PopupMenuItem<String>(
-          value: 'presentations_add_update',
-          child: ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Agregar o actualizar presentaciones'),
-            hoverColor: Colors.transparent,
+        if (taskEnabled(TaskEnum.presentationAddUpdate))
+          const PopupMenuItem<String>(
+            value: 'presentations_add_update',
+            child: ListTile(
+              leading: Icon(Icons.add),
+              title: Text('Agregar o actualizar presentaciones'),
+              hoverColor: Colors.transparent,
+            ),
           ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'presentation_list',
-          child: ListTile(
-            leading: Icon(Icons.list),
-            title: Text('Listar presentaciones'),
+        if (taskEnabled(TaskEnum.presentationList))
+          const PopupMenuItem<String>(
+            value: 'presentation_list',
+            child: ListTile(
+              leading: Icon(Icons.list),
+              title: Text('Listar presentaciones'),
+            ),
           ),
-        ),
       ],
     ).then((String? result) async {
       if (result != null) {
@@ -423,21 +427,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
       position: subMenuPosition,
       elevation: 8.0,
       items: [
-        const PopupMenuItem<String>(
-          value: 'units_add_update',
-          child: ListTile(
-            leading: Icon(Icons.add),
-            title: Text('Agregar o actualizar unidades de medida'),
-            hoverColor: Colors.transparent,
+        if (taskEnabled(TaskEnum.unitAddUpdate))
+          const PopupMenuItem<String>(
+            value: 'units_add_update',
+            child: ListTile(
+              leading: Icon(Icons.add),
+              title: Text('Agregar o actualizar unidades de medida'),
+              hoverColor: Colors.transparent,
+            ),
           ),
-        ),
-        const PopupMenuItem<String>(
-          value: 'units_list',
-          child: ListTile(
-            leading: Icon(Icons.list),
-            title: Text('Listar unidades de medida'),
+        if (taskEnabled(TaskEnum.unitList))
+          const PopupMenuItem<String>(
+            value: 'units_list',
+            child: ListTile(
+              leading: Icon(Icons.list),
+              title: Text('Listar unidades de medida'),
+            ),
           ),
-        ),
       ],
     ).then((String? result) async {
       if (result != null) {
@@ -625,38 +631,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
   bool _isSuperAdmin() =>
       userLogged?.userId == 0 && userLogged?.role!.name! == 'Super Administrador';
 
-  /*
-  Future<void> _logout() async {
-    await fetchDataObject<EmptyDTO> (
-      uri: '$uriUserLogout/${userLogged!.userName}',
-      classObject: EmptyDTO.empty(),
-      requestType: RequestTypeEnum.delete,
-    ).then((onValue) {
-      userLogged = UserDTO3.empty();
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-        //Muestra el mensaje de éxito que envía el server
-        FloatingMessage.show(
-          context: context,
-          text: onValue[0] as String,
-          messageTypeEnum: MessageTypeEnum.info
-        );
-      }
-
-    }).onError((error, stackTrace) {
-      if (mounted) handleError(error: error, context: context);
-    });
-  }
-
-   */
-
-  void _updateProfile() {
-
-  }
-
   void _showUserMenu(BuildContext context) {
     // Asegurarse de que el widget esté completamente construido antes de obtener la posición
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -685,29 +659,38 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 children: [
                   Icon(Icons.person, size: 80,),
                   const SizedBox(height: 10),
-
-                  // Nombre del usuario con ícono de editar
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        '${userLogged!.name} ${userLogged!.lastname}',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            '${userLogged!.name} ${userLogged!.lastname}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
-                      IconButton(
+                      /*IconButton(
                         icon: Icon(Icons.edit, size: 18),
                         onPressed: () {
                           Navigator.pop(context); // Cerrar el menú
                           _updateProfile();
                         },
-                      ),
+                      ),*/
                     ],
                   ),
+                  const SizedBox(height: 5),
+                  Text(
+                    '${userLogged!.role!.name}',
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
                   const SizedBox(height: 20),
-
                   SizedBox(
                     width: double.infinity, // Botón que ocupe tod@ el ancho
                     child: ElevatedButton.icon(
@@ -739,7 +722,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
       );
     });
   }
-
 
 
 }

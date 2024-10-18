@@ -1,10 +1,11 @@
-import 'dart:html';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
+import 'package:novafarma_front/model/enums/task_enum.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
+import 'package:novafarma_front/model/globals/taskEnabled.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object_pageable.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -276,26 +277,28 @@ class _ListSupplierScreenState extends State<ListSupplierScreen> {
         onSelected: (menuItem) => _onSelected(context, menuItem, index),
         tooltip: 'Menú',
         itemBuilder: (context) => [
-          const PopupMenuItem<int>(
-            value: 0,
-            child: Row(
-              children: [
-                Icon(Icons.assignment_outlined, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Comprobantes')
-              ],
+          if (taskEnabled(TaskEnum.vouchersSupplier))
+            const PopupMenuItem<int>(
+              value: 0,
+              child: Row(
+                children: [
+                  Icon(Icons.assignment_outlined, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('Comprobantes')
+                ],
+              ),
             ),
-          ),
-          const PopupMenuItem<int>(
-            value: 1,
-            child: Row(
-              children: [
-                Icon(Icons.delete, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Eliminar')
-              ],
+          if (taskEnabled(TaskEnum.deleteSupplier))
+            const PopupMenuItem<int>(
+              value: 1,
+              child: Row(
+                children: [
+                  Icon(Icons.delete, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('Eliminar')
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

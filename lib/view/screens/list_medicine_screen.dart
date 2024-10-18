@@ -1,7 +1,9 @@
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:novafarma_front/model/enums/task_enum.dart';
 import 'package:novafarma_front/model/globals/controlled_icon.dart';
+import 'package:novafarma_front/model/globals/taskEnabled.dart';
 import 'package:novafarma_front/model/globals/tools/custom_icon_button.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
@@ -402,20 +404,22 @@ class _ListMedicineScreenState extends State<ListMedicineScreen> {
         onSelected: (menuItem) => _onSelected(context, menuItem, index),
         tooltip: 'Menú',
         itemBuilder: (context) => [
-          const PopupMenuItem<int>(
-            value: 0,
-            child: Row(
-              children: [
-                Icon(Icons.assignment_outlined, color: Colors.black),
-                SizedBox(width: 8),
-                Text('Movimientos de stock')
-              ],
+          if (taskEnabled(TaskEnum.stockMovementsMedicineSee))
+            const PopupMenuItem<int>(
+              value: 0,
+              child: Row(
+                children: [
+                  Icon(Icons.assignment_outlined, color: Colors.black),
+                  SizedBox(width: 8),
+                  Text('Movimientos de stock')
+                ],
+              ),
             ),
-          ),
-          PopupMenuItem<int>(
-            value: 1,
-            child: _buildDeleteOrRecover(index),
-          ),
+          if (taskEnabled(TaskEnum.deleteRestoreMedicine))
+            PopupMenuItem<int>(
+              value: 1,
+              child: _buildDeleteOrRecover(index),
+            ),
         ],
       ),
     );
