@@ -1,14 +1,10 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
-import 'package:novafarma_front/model/objects/error_object.dart';
 
-import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriCustomerAdd, uriCustomerUpdate;
-import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id del cliente persistido o id=0 si hubo un error

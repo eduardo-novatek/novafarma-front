@@ -1,6 +1,7 @@
 import 'dart:html' as html;
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
+import 'package:intl/intl.dart'; // Para formatear la fecha y hora
 import 'package:novafarma_front/model/DTOs/customer_dto2.dart';
 import 'package:novafarma_front/model/DTOs/nursing_report_dto.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
@@ -8,7 +9,6 @@ import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 import 'package:novafarma_front/model/objects/page_object_map.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:intl/intl.dart'; // Para formatear la fecha y hora
 
 Future<void> pdfGenerateNursingReport({
   required String startDate,

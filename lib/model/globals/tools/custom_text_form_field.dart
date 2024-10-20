@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:intl/intl.dart';
 
 class CustomTextFormField extends StatefulWidget {
   final bool validate;

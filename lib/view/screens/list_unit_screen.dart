@@ -1,14 +1,10 @@
-import 'dart:html';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/enums/task_enum.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/taskEnabled.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
-import 'package:novafarma_front/model/objects/error_object.dart';
 
 import '../../model/DTOs/unit_dto.dart';
 import '../../model/enums/message_type_enum.dart';

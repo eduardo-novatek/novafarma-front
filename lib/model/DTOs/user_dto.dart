@@ -1,6 +1,6 @@
+import 'package:novafarma_front/model/DTOs/role_dto.dart';
 import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
-import 'package:novafarma_front/model/DTOs/role_dto.dart';
 
 import '../enums/task_enum.dart';
 

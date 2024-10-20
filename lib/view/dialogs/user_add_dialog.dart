@@ -5,8 +5,8 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
 import 'package:novafarma_front/model/globals/requests/user_name_exist.dart';
-import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
+import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 
 import '../../model/DTOs/role_dto.dart';
 import '../../model/DTOs/user_dto.dart';

@@ -9,7 +9,8 @@ import 'package:novafarma_front/model/DTOs/medicine_dto.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/DTOs/voucher_item_dto.dart';
 import 'package:novafarma_front/model/enums/movement_type_enum.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
+import 'package:novafarma_front/model/globals/constants.dart' show
+    defaultFirstOption, uriVoucherAdd;
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/custom_dropdown.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
@@ -17,6 +18,7 @@ import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/boxes/customer_box.dart';
 import 'package:novafarma_front/view/boxes/supplier_box.dart';
+
 import '../../model/DTOs/customer_dto.dart';
 import '../../model/DTOs/supplier_dto_1.dart';
 import '../../model/DTOs/user_dto_1.dart';
@@ -26,11 +28,8 @@ import '../../model/enums/data_type_enum.dart';
 import '../../model/enums/message_type_enum.dart';
 import '../../model/enums/request_type_enum.dart';
 import '../../model/globals/publics.dart';
-import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/custom_text_form_field.dart';
-import 'package:novafarma_front/model/globals/constants.dart' show
-    defaultFirstOption, uriVoucherAdd;
-
+import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/voucher_item_dialog.dart';
 

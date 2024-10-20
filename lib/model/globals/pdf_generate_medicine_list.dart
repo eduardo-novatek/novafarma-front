@@ -1,11 +1,12 @@
 import 'dart:html' as html;
+
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart'; // Para formatear la fecha y hora
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/globals/tools/date_time.dart';
 import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:intl/intl.dart'; // Para formatear la fecha y hora
 
 Future<void> pdfGenerateMedicineList({
   required List<MedicineDTO1> medicineList,

@@ -8,12 +8,12 @@ import 'package:novafarma_front/model/objects/page_object.dart';
 
 import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/build_table_cell.dart';
-import '../../model/globals/tools/pagination_bar.dart';
-import '../../model/objects/error_object.dart';
 import '../../model/globals/constants.dart' show host, port,
   sizePageMedicineStockMovements, uriMedicineFindStockMovements;
 import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/floating_message.dart';
+import '../../model/globals/tools/pagination_bar.dart';
+import '../../model/objects/error_object.dart';
 
 class StockMovementsDialog extends StatefulWidget {
   final int medicineId;

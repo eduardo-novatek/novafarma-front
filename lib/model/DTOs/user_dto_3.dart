@@ -1,4 +1,3 @@
-import 'package:novafarma_front/model/DTOs/role_dto1.dart';
 import 'package:novafarma_front/model/DTOs/role_dto4.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 

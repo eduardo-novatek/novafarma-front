@@ -13,7 +13,6 @@ import 'package:novafarma_front/model/globals/constants.dart' show
   uriCustomerFindPaymentNumber;
 import 'package:novafarma_front/model/globals/find_dependent_by_document_novadaily.dart';
 import 'package:novafarma_front/model/globals/find_partner_by_document_novadaily.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart';
 import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';

@@ -8,13 +8,13 @@ import 'package:novafarma_front/model/globals/tools/number_formats.dart';
 
 import '../../model/DTOs/voucher_item_dto_2.dart';
 import '../../model/enums/message_type_enum.dart';
-import '../../model/globals/tools/fetch_data_object.dart';
-import '../../model/globals/tools/pagination_bar.dart';
-import '../../model/objects/error_object.dart';
 import '../../model/globals/constants.dart' show sizePageVoucherListOfCustomer,
   uriCustomerFindVouchersPage, uriVoucherFindVoucherItems;
+import '../../model/globals/tools/fetch_data_object.dart';
 import '../../model/globals/tools/fetch_data_object_pageable.dart';
 import '../../model/globals/tools/floating_message.dart';
+import '../../model/globals/tools/pagination_bar.dart';
+import '../../model/objects/error_object.dart';
 
 class VouchersFromCustomerDialog extends StatefulWidget {
   final int customerId;

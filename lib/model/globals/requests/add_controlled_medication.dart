@@ -4,7 +4,6 @@ import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/capitalize_first_letter.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
@@ -13,8 +12,8 @@ import '../../DTOs/controlled_medication_dto.dart';
 import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriControlledMedicationAdd;
-import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
+import '../tools/floating_message.dart';
 
 Future<bool> addControlledMedication({
   required ControlledMedicationDTO controlledMedication,

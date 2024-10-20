@@ -1,15 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/objects/page_object.dart';
 
 import '../../DTOs/medicine_dto2.dart';
-import '../../enums/message_type_enum.dart';
-import '../../objects/error_object.dart';
 import '../constants.dart' show sizePageMedicineAndPresentationList,
   uriMedicineFindNamePage;
 import '../tools/fetch_data_object_pageable.dart';
-import '../tools/floating_message.dart';
 
 ///Partiendo desde la pagina definida en pageObject.pageNumber, actualiza el
 ///objeto pageObject con los medicamentos resultantes de buscarlo por nombre.

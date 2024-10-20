@@ -363,7 +363,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) async {
       if (result != null) {
-        Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
+        //Navigator.popUntil(mounted ? context : context, (route) => route.isFirst); // Cierra todos los menús
         if (result == 'medicines_add_update') {
           await _goAddOrUpdateMedicineScreen();
         } else if (result == 'medicine_list') {
@@ -371,6 +371,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         } else if (result == 'medicine_nursing_report') {
           await _goNursingReport();
         }
+        Navigator.popUntil(mounted ? context : context, (route) => route.isFirst); // Cierra todos los menús
       }
     });
   }
@@ -406,12 +407,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) async {
       if (result != null) {
-        Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
+        //Navigator.popUntil(mounted ? context : context, (route) => route.isFirst); // Cierra todos los menús
         if (result == 'presentations_add_update') {
           await _goAddOrUpdatePresentationScreen();
         } else if (result == 'presentation_list') {
           await _goListPresentationScreen();
         }
+        Navigator.popUntil(mounted ? context : context, (route) => route.isFirst); // Cierra todos los menús
       }
     });
   }
@@ -447,12 +449,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
       ],
     ).then((String? result) async {
       if (result != null) {
-        Navigator.popUntil(context, (route) => route.isFirst); // Cierra todos los menús
+        //Navigator.popUntil(mounted ? context : context, (route) => route.isFirst); // Cierra todos los menús
         if (result == 'units_add_update') {
           await _goAddOrUpdateUnitsScreen();
         } else if (result == 'units_list') {
           await _goListUnitScreen();
         }
+        Navigator.popUntil(mounted ? context : context, (route) => route.isFirst); // Cierra todos los menús
       }
     });
   }

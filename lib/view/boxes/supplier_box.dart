@@ -5,12 +5,11 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/tools/build_circular_progress.dart';
+
 import '../../model/DTOs/supplier_dto.dart';
-import '../../model/enums/message_type_enum.dart';
+import '../../model/globals/constants.dart' show defaultFirstOption;
 import '../../model/globals/requests/fetch_supplier_list.dart';
 import '../../model/globals/tools/custom_dropdown.dart';
-import '../../model/globals/constants.dart' show defaultFirstOption;
-import '../../model/globals/tools/floating_message.dart';
 import '../../model/objects/error_object.dart';
 
 class SupplierBox extends StatefulWidget {

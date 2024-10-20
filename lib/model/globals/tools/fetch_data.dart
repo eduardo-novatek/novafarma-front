@@ -1,9 +1,9 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:novafarma_front/model/globals/handle_response.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
 
-import '../../objects/error_object.dart';
 import '../constants.dart' show socket, timeOutSecondsResponse;
 
 ///Devuelve una List<T> del endpoint especificado (solo get). El tipo de datos

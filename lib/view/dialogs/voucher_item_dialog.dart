@@ -10,7 +10,6 @@ import 'package:novafarma_front/model/DTOs/customer_dto1.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
 import 'package:novafarma_front/model/DTOs/supplier_dto.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/requests/add_controlled_medication.dart';
 import 'package:novafarma_front/model/globals/requests/fetch_medicine_bar_code.dart';
@@ -25,8 +24,8 @@ import '../../model/DTOs/medicine_dto2.dart';
 import '../../model/DTOs/voucher_item_dto.dart';
 import '../../model/enums/movement_type_enum.dart';
 import '../../model/globals/controlled_icon.dart';
-import '../../model/globals/tools/message.dart';
 import '../../model/globals/tools/custom_text_form_field.dart';
+import '../../model/globals/tools/message.dart';
 import 'controlled_medication_dialog.dart';
 
 class VoucherItemDialog extends StatefulWidget {

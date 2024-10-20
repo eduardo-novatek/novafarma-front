@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:novafarma_front/model/DTOs/controlled_medication_dto1.dart';
 
 import '../../model/enums/data_type_enum.dart';
-import '../../model/globals/tools/message.dart';
 import '../../model/globals/tools/custom_text_form_field.dart';
+import '../../model/globals/tools/message.dart';
 
 class ControlledMedicationDialog extends StatefulWidget {
   //Se actualiza con los datos ingresados de Frecuencia y Tolernacia.

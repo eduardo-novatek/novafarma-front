@@ -1,15 +1,10 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:novafarma_front/model/DTOs/medicine_dto1.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
-import 'package:novafarma_front/model/objects/error_object.dart';
 
-import '../../enums/message_type_enum.dart';
 import '../../enums/request_type_enum.dart';
 import '../constants.dart' show uriMedicineAdd, uriMedicineUpdate;
-import '../tools/floating_message.dart';
 import '../tools/fetch_data_object.dart';
 
 ///Devuelve el id del medicamento persistido o id=0 si hubo un error

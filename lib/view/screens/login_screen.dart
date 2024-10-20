@@ -7,7 +7,6 @@ import 'package:novafarma_front/model/enums/data_type_enum.dart';
 import 'package:novafarma_front/model/enums/message_type_enum.dart';
 import 'package:novafarma_front/model/enums/request_type_enum.dart';
 import 'package:novafarma_front/model/globals/constants.dart';
-import 'package:novafarma_front/model/globals/generic_error.dart';
 import 'package:novafarma_front/model/globals/handleError.dart';
 import 'package:novafarma_front/model/globals/publics.dart';
 import 'package:novafarma_front/model/globals/requests/logout.dart';
@@ -17,6 +16,7 @@ import 'package:novafarma_front/model/globals/tools/fetch_data_object.dart';
 import 'package:novafarma_front/model/globals/tools/floating_message.dart';
 import 'package:novafarma_front/model/objects/error_object.dart';
 import 'package:novafarma_front/view/dialogs/update_pass_dialog.dart';
+
 import '../../model/DTOs/user_dto_4.dart';
 import 'home_page_screen.dart';
 

@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, must_be_immutable, avoid_web_libraries_in_flutter
 
 import 'dart:html';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:novafarma_front/model/enums/data_type_enum.dart';
@@ -10,9 +11,7 @@ import 'package:novafarma_front/model/globals/tools/custom_text_form_field.dart'
 import 'package:novafarma_front/model/globals/tools/open_dialog.dart';
 
 import '../../model/DTOs/customer_dto1.dart';
-import '../../model/enums/message_type_enum.dart';
 import '../../model/globals/requests/fetch_customer_list.dart';
-import '../../model/globals/tools/floating_message.dart';
 import '../dialogs/customer_selection_dialog.dart';
 
 class CustomerBox extends StatefulWidget {

@@ -1,4 +1,3 @@
-import 'package:novafarma_front/model/DTOs/task_dto.dart';
 import 'package:novafarma_front/model/DTOs/task_dto1.dart';
 import 'package:novafarma_front/model/globals/deserializable.dart';
 
