@@ -1,11 +1,12 @@
 
-const String host = 'localhost';
+//const String host = 'localhost'; // desarrollo
+const String host = '192.168.1.201'; //nginx VM lenovo
 const int port = 8080;
 const String socket = '$host:$port';
 const String hostNovaDaily = 'novateksoluciones.dyndns.org';
 const int portNovaDaily = 9091;
 //const String uriProxyCORSNovaDaily = ''; //Habilitar en caso de solucionar CORS en backend NovaDaily
-const String uriProxyCORSNovaDaily = 'http://localhost:8081/'; //Habilitar en caso de no solucionar CORS en backend
+const String uriProxyCORSNovaDaily = 'http://192.168.1.201:8081/'; //Habilitar en caso de no solucionar CORS en backend
 
 //Tokens
 const String novaDailyToken = 'ghcP1cfRITkveIikA3v1fRLVhnoKzuXK5Al7k0qCkvNyMeZI1nH1A19CwLuSCHnT3X3DYU2DvfaKnJbp1lZEVXNV0TpjWIzZrAqOTjxcPDxaDInIsdPkLi8QGHfgrQaU3ZIa8sLapH7qgyWU8eIn5AXiXcn5cRVbfh44mljLZr5jvgmtGmvW2CMUHzdrWfxCzNoUQgP6XECm2f3ShGJjXDyjkJOLYaS9fNAamqqqVBm';
